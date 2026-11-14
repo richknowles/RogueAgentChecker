@@ -1,0 +1,5 @@
+"Name","Agent","Users","Computers","PathPattern","Categories","Breadcrumbs","McpServers","Endpoints","AllowedIndicators","ApprovedBy","ApprovedOn","Expires","Ticket","Notes"
+"Claude Code - Engineering team","claude-code","jsmith;adeleon","","","","","github;filesystem","api.anthropic.com;claude.ai","LongRunning;PersistentLlmConnection","IT Security (Jane Admin)","2026-10-01","2027-04-01","CHG-1042","Multi-value cells are separated with semicolons."
+"GitHub Copilot Business - all staff","github-copilot","","","","","","","","LongRunning;PersistentLlmConnection","IT Security (Jane Admin)","2026-08-01","2027-08-01","CHG-0981",""
+"Ollama on the AI lab workstation","ollama","","AILAB-01","","","","","","PersistenceAutostart;LongRunning","IT Security (Jane Admin)","2026-09-15","2027-03-15","CHG-1007","Network exposure is not approved."
+"Sanctioned AI provider endpoints","*","","","","","DnsCacheLlm;ProxyLogLlm","","api.anthropic.com;claude.ai;*.githubcopilot.com","","IT Security (Jane Admin)","2026-08-01","2027-08-01","POL-0007",""

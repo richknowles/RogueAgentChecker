@@ -1,0 +1,2561 @@
+{
+  "tool": "Rogue Agent Checker",
+  "toolVersion": "0.1.0",
+  "scanId": "e373489f-8ca8-43b2-a7c4-e87e46765176",
+  "computerName": "FAKE-WS01",
+  "startTime": "2026-10-26T19:32:40.3168731+00:00",
+  "endTime": "2026-10-26T19:32:46.5294617+00:00",
+  "runAs": "CORP\\itadmin",
+  "elevated": true,
+  "powerShell": "7.4.6",
+  "os": "Microsoft Windows 11 Enterprise (fake)",
+  "parameters": {
+    "Category": "Processes,Network,ConfigAndSecrets,Persistence,TokensAndOAuth,LogsAndEvents,Behavior",
+    "LookbackDays": 7,
+    "BusinessHours": "7-19",
+    "BusinessDays": "Monday,Tuesday,Wednesday,Thursday,Friday",
+    "NetworkSamples": 1,
+    "IncludeBrowserAiSessions": false,
+    "CheckSignatures": false,
+    "ProfileRoot": "C:\\Users\\alice;C:\\Users\\bob;C:\\Users\\carol",
+    "SearchRoot": "",
+    "ProxyLogPath": "C:\\proxy\\access.log"
+  },
+  "signatures": {
+    "path": "/home/claude/RogueAgentChecker/RogueAgentChecker/Data/signatures.json",
+    "version": "2026.10.26",
+    "sha256": "710C82040622118149FDA615EB35C27E67342E28387792C78BC6AB2B588E44A0"
+  },
+  "allowList": {
+    "path": "/home/claude/RogueAgentChecker/Tests/Fixtures/allowlist.fixture.json",
+    "sha256": "184B5DA6BA356A49C3ACFFF2EC4734D4E48FE8BB2CB5B0AED76E8E4C25AC0F86",
+    "entries": 6,
+    "warnings": [
+      "Allow-list entry 'Approve everything (must be rejected)' uses Agent '*' without Categories or Breadcrumbs and was ignored (it would approve everything)."
+    ]
+  },
+  "summary": {
+    "Total": 79,
+    "Suspicious": 11,
+    "Unknown": 40,
+    "Trusted": 28,
+    "Agents": 19
+  },
+  "coverage": [
+    {
+      "Source": "User profiles (from -ProfileRoot)",
+      "Status": "Checked",
+      "ItemCount": 3,
+      "Detail": ""
+    },
+    {
+      "Source": "Process analysis",
+      "Status": "Info",
+      "ItemCount": 7,
+      "Detail": "Agent, MCP server and browser-automation processes identified."
+    },
+    {
+      "Source": "Browser AI sessions",
+      "Status": "Info",
+      "ItemCount": 1,
+      "Detail": "Ordinary web-browser connections to AI services were counted but not itemized. Use -IncludeBrowserAiSessions to list them."
+    },
+    {
+      "Source": "Proxy log: C:\\proxy\\access.log",
+      "Status": "Checked",
+      "ItemCount": 6,
+      "Detail": ""
+    },
+    {
+      "Source": "Agent folders, MCP configs, .env files, packages",
+      "Status": "Info",
+      "ItemCount": 3,
+      "Detail": "Profiles examined. Project folders are searched to depth 4 under Desktop, Documents, Downloads, source, src, dev, code, repos, projects, git, GitHub, workspace, work. OneDrive is skipped."
+    },
+    {
+      "Source": "Tenant OAuth consent grants",
+      "Status": "Skipped",
+      "ItemCount": -1,
+      "Detail": "Not visible from an endpoint. Review enterprise app consents in Entra ID / Google Workspace admin consoles."
+    }
+  ],
+  "findings": [
+    {
+      "findingId": "RAC-0001",
+      "classification": "Suspicious",
+      "score": 120,
+      "category": "Network",
+      "breadcrumb": "LlmConnection",
+      "agent": "Unidentified process",
+      "agentId": "",
+      "title": "powershell.exe (PID 802) connected to api.openai.com (OpenAI)",
+      "user": "NT AUTHORITY\\SYSTEM",
+      "location": "powershell.exe (PID 802) -> api.openai.com",
+      "eventTime": "2026-10-26 18:57:39",
+      "indicators": [
+        "LlmFromNonAgentProcess",
+        "PersistentLlmConnection",
+        "StealthLaunch",
+        "SystemContext"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Process": "powershell.exe (PID 802)",
+        "Remote host": "api.openai.com",
+        "Provider": "OpenAI",
+        "Remote address": "162.159.140.245:443",
+        "Open sockets": "1",
+        "Executable": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "Command line": "powershell.exe -NoProfile -WindowStyle Hidden -EncodedCommand SQBuAHYAbwBrAGUALQBSAGUAcwB0AE0AZQB0AGgAbwBkAA==",
+        "Owner": "NT AUTHORITY\\SYSTEM",
+        "Connected since": "2026-10-26 18:57:39",
+        "Open for (minutes)": "35",
+        "Hostname source": "local DNS client cache (no lookups performed)"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+40 LlmFromNonAgentProcess: A process that is not a known AI application is talking to an LLM API",
+        "+10 PersistentLlmConnection: Connection to an LLM API has stayed open for a long time or across samples",
+        "+40 StealthLaunch: Launched hidden or with an encoded command line",
+        "+30 SystemContext: Runs as SYSTEM or a service account rather than as a person",
+        "Risk score 120 is at or above the threshold of 40."
+      ],
+      "recommendation": "Investigate now. Confirm with the administrator who set this up (it runs as NT AUTHORITY\\SYSTEM) whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. Confirm the process is meant to call this AI provider and that the data it sends is allowed to leave."
+    },
+    {
+      "findingId": "RAC-0002",
+      "classification": "Suspicious",
+      "score": 100,
+      "category": "Persistence",
+      "breadcrumb": "ScheduledTask",
+      "agent": "Unidentified MCP server",
+      "agentId": "",
+      "title": "Scheduled task '\\SystemHealthUpdater' starts Unidentified MCP server",
+      "user": "SYSTEM",
+      "location": "Task Scheduler: \\SystemHealthUpdater",
+      "eventTime": "2026-10-25 02:14:00",
+      "indicators": [
+        "PersistenceAutostart",
+        "StealthLaunch",
+        "SystemContext",
+        "HiddenTask"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Task": "\\SystemHealthUpdater",
+        "State": "Ready",
+        "Runs as": "SYSTEM",
+        "Run level": "Highest",
+        "Action": "powershell.exe -NoProfile -WindowStyle Hidden -Command \"npx -y @modelcontextprotocol/server-everything\"",
+        "Triggers": "Boot",
+        "Hidden": "True",
+        "Registered": "2026-10-25T19:32:39",
+        "Matched because": "launches an MCP server (/@modelcontextprotocol//)",
+        "Last run": "2026-10-25 02:14:00",
+        "Next run": "2026-10-27 19:32:39"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+10 PersistenceAutostart: Starts automatically without a person launching it",
+        "+40 StealthLaunch: Launched hidden or with an encoded command line",
+        "+30 SystemContext: Runs as SYSTEM or a service account rather than as a person",
+        "+20 HiddenTask: Scheduled task is marked hidden",
+        "Risk score 100 is at or above the threshold of 40."
+      ],
+      "recommendation": "Investigate now. Confirm with the administrator who set this up (it runs as SYSTEM) whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. Confirm who created the task. Disable it through change control if the agent is not approved."
+    },
+    {
+      "findingId": "RAC-0003",
+      "classification": "Suspicious",
+      "score": 90,
+      "category": "Persistence",
+      "breadcrumb": "WmiSubscription",
+      "agent": "OpenClaw",
+      "agentId": "openclaw",
+      "title": "WMI event subscription 'AgentKeepAlive' runs OpenClaw",
+      "user": "bob",
+      "location": "root\\subscription: AgentKeepAlive",
+      "eventTime": "",
+      "indicators": [
+        "PersistenceWmi",
+        "StealthLaunch"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Consumer": "AgentKeepAlive",
+        "Consumer type": "CommandLineEventConsumer",
+        "Command line": "cmd.exe /c start /min node C:\\Users\\bob\\.openclaw\\workspace\\keepalive.js --token [REDACTED:anthropic-key]",
+        "Filter": "AgentKeepAliveFilter",
+        "Trigger query": "SELECT * FROM __InstanceModificationEvent WITHIN 60 WHERE TargetInstance ISA 'Win32_PerfFormattedData_PerfOS_System'",
+        "Matched because": "text matches /openclaw/"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+50 PersistenceWmi: Uses a WMI event subscription, a stealth persistence technique",
+        "+40 StealthLaunch: Launched hidden or with an encoded command line",
+        "Risk score 90 is at or above the threshold of 40."
+      ],
+      "recommendation": "Investigate now. Confirm with bob whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. WMI subscriptions are a stealth persistence technique. Capture the consumer and filter details, then remove them through change control (v1 never removes anything)."
+    },
+    {
+      "findingId": "RAC-0004",
+      "classification": "Suspicious",
+      "score": 65,
+      "category": "Network",
+      "breadcrumb": "AgentListener",
+      "agent": "Ollama",
+      "agentId": "ollama",
+      "title": "Ollama listening on port 11434 (Ollama API) on ALL network interfaces",
+      "user": "CORP\\alice",
+      "location": "TCP 11434 (ollama.exe (PID 7100))",
+      "eventTime": "2026-10-26 19:32:40",
+      "indicators": [
+        "ListensOnAllInterfaces",
+        "RemoteClientOnAgentPort"
+      ],
+      "allowListEntry": "Ollama - local models (alice only)",
+      "evidence": {
+        "Port": "11434",
+        "Service": "Ollama API",
+        "Bound to": "0.0.0.0, ::",
+        "Remote clients": "10.0.0.77:51515",
+        "Process": "ollama.exe (PID 7100)",
+        "Owner": "CORP\\alice",
+        "Executable": "C:\\Users\\alice\\AppData\\Local\\Programs\\Ollama\\ollama.exe"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Ollama - local models (alice only)' (approved by IT Security (J. Admin), on 2026-09-15, expires 2099-12-31).",
+        "+35 ListensOnAllInterfaces: Agent or model service listens on all network interfaces, so other machines can drive it",
+        "+30 RemoteClientOnAgentPort: Another machine is connected to a local agent or model port",
+        "Approved agent, but remaining risk score 65 is at or above the threshold of 40."
+      ],
+      "recommendation": "Investigate now. Confirm with CORP\\alice whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. Bind the service to 127.0.0.1 or block the port at the host firewall. An exposed agent or model port lets anyone on the network drive it."
+    },
+    {
+      "findingId": "RAC-0005",
+      "classification": "Suspicious",
+      "score": 55,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "SecretFile",
+      "agent": "Unattributed (.env file)",
+      "agentId": "",
+      "title": "Plaintext key or token in .env (GROQ_API_KEY, Groq API key)",
+      "user": "carol",
+      "location": "C:\\Users\\carol\\Downloads\\bot\\.env",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "SecretInPlaintext",
+        "SecretWorldReadable"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "File": "C:\\Users\\carol\\Downloads\\bot\\.env",
+        "Key names": "GROQ_API_KEY",
+        "Key formats": "Groq API key",
+        "Line numbers": "1",
+        "Last modified": "2026-10-23 10:00:00",
+        "Values": "not recorded (RAC never stores or prints key values)",
+        "Readable by": "BUILTIN\\Users"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+15 SecretInPlaintext: An AI provider key or token is stored in a plaintext file",
+        "+40 SecretWorldReadable: A file holding a key or token is readable by Everyone, Users, or Authenticated Users",
+        "Risk score 55 is at or above the threshold of 40."
+      ],
+      "recommendation": "Investigate now. Confirm with carol whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. Move the key into a secret store or Windows Credential Manager. If the file is readable by other users or has been synced or committed anywhere, rotate the key at the provider."
+    },
+    {
+      "findingId": "RAC-0006",
+      "classification": "Suspicious",
+      "score": 50,
+      "category": "Behavior",
+      "breadcrumb": "CrossAppReach",
+      "agent": "Claude Desktop",
+      "agentId": "claude-desktop",
+      "title": "Claude Desktop for alice can act across 4 app categories (private data + untrusted input + outbound channel)",
+      "user": "alice",
+      "location": "MCP configuration of Claude Desktop",
+      "eventTime": "",
+      "indicators": [
+        "CrossAppReach",
+        "LethalTrifecta"
+      ],
+      "allowListEntry": "Claude Desktop - company standard",
+      "evidence": {
+        "App categories": "chat, email, files, shell",
+        "MCP servers": "filesystem, gmail, slack, desktop-commander",
+        "Private data": "yes",
+        "Untrusted input": "yes",
+        "Outbound channel": "yes",
+        "Related findings": "RAC-0015, RAC-0016, RAC-0030, RAC-0052"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Claude Desktop - company standard' (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1043).",
+        "+20 CrossAppReach: One agent identity can act across three or more application categories",
+        "+30 LethalTrifecta: Agent combines private-data access, untrusted input, and an outbound channel (prompt-injection exfiltration risk)",
+        "Approved agent, but remaining risk score 50 is at or above the threshold of 40."
+      ],
+      "recommendation": "Investigate now. Confirm with alice whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. One agent identity can act across several apps. Narrow its tokens and scopes, split duties between agents, and require human approval for send, delete and execute actions."
+    },
+    {
+      "findingId": "RAC-0007",
+      "classification": "Suspicious",
+      "score": 40,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "McpServerConfig",
+      "agent": "OpenAI Codex CLI",
+      "agentId": "openai-codex",
+      "title": "MCP server 'shell' configured for OpenAI Codex CLI",
+      "user": "carol",
+      "location": "C:\\Users\\carol\\.codex\\config.toml :: shell",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "ShellCapableMcp",
+        "UnpinnedPackage",
+        "SecretInPlaintext"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Config file": "C:\\Users\\carol\\.codex\\config.toml",
+        "Server name": "shell",
+        "Scope": "User",
+        "Transport": "stdio (local process)",
+        "Command": "npx",
+        "Arguments": "-y mcp-shell-server",
+        "Env var names": "OPENAI_API_KEY",
+        "Plaintext secrets": "OPENAI_API_KEY (OpenAI API key)",
+        "Unpinned package": "mcp-shell-server",
+        "Reaches": "shell"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+15 ShellCapableMcp: MCP server gives the agent shell or file-system access",
+        "+10 UnpinnedPackage: MCP server is launched from an unpinned package (npx -y / uvx without a version), so code can change on every run",
+        "+15 SecretInPlaintext: An AI provider key or token is stored in a plaintext file",
+        "Risk score 40 is at or above the threshold of 40."
+      ],
+      "recommendation": "Investigate now. Confirm with carol whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. Review what this MCP server can reach, remove servers that are not needed, and pin package versions instead of npx -y / uvx latest."
+    },
+    {
+      "findingId": "RAC-0008",
+      "classification": "Suspicious",
+      "score": 40,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "EnvVarSecret",
+      "agent": "Unattributed (environment)",
+      "agentId": "",
+      "title": "OpenAI key set as a machine environment variable (OPENAI_API_KEY)",
+      "user": "",
+      "location": "HKLM\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment",
+      "eventTime": "",
+      "indicators": [
+        "SecretInPlaintext",
+        "MachineWideSecret"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Variable": "OPENAI_API_KEY",
+        "Scope": "Machine",
+        "Provider": "OpenAI",
+        "Value": "not read"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+15 SecretInPlaintext: An AI provider key or token is stored in a plaintext file",
+        "+25 MachineWideSecret: An AI provider key is set machine-wide, so every user and process inherits it",
+        "Risk score 40 is at or above the threshold of 40."
+      ],
+      "recommendation": "Investigate now. Confirm with the owner whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. Machine-wide AI keys are inherited by every user and service. Scope the key to the one account or service that needs it, and rotate it if it was shared."
+    },
+    {
+      "findingId": "RAC-0009",
+      "classification": "Suspicious",
+      "score": 40,
+      "category": "Persistence",
+      "breadcrumb": "Service",
+      "agent": "n8n",
+      "agentId": "n8n",
+      "title": "Service 'n8n' runs n8n",
+      "user": "LocalSystem",
+      "location": "Service: n8n",
+      "eventTime": "",
+      "indicators": [
+        "PersistenceAutostart",
+        "SystemContext"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Service": "n8n (n8n Automation)",
+        "Binary path": "\"C:\\Program Files\\nodejs\\node.exe\" \"C:\\agents\\n8n\\node_modules\\n8n\\bin\\n8n\" start",
+        "Start mode": "Auto",
+        "State": "Running",
+        "Runs as": "LocalSystem",
+        "Process ID": "3100",
+        "Matched because": "text matches //n8n/bin/n8n/"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+10 PersistenceAutostart: Starts automatically without a person launching it",
+        "+30 SystemContext: Runs as SYSTEM or a service account rather than as a person",
+        "Risk score 40 is at or above the threshold of 40."
+      ],
+      "recommendation": "Investigate now. Confirm with the administrator who set this up (it runs as LocalSystem) whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. Agents running as services act without a person present. Confirm ownership and the account it runs as."
+    },
+    {
+      "findingId": "RAC-0010",
+      "classification": "Suspicious",
+      "score": 40,
+      "category": "Processes",
+      "breadcrumb": "AgentProcess",
+      "agent": "Agent framework / SDK (custom-built agent)",
+      "agentId": "agent-framework",
+      "title": "Agent framework / SDK (custom-built agent) running (python.exe, PID 6100)",
+      "user": "CORP\\carol",
+      "location": "C:\\Users\\carol\\Downloads\\bot\\.venv\\Scripts\\python.exe",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "LongRunning",
+        "UserWritableExecPath"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Process": "python.exe (PID 6100)",
+        "Executable": "C:\\Users\\carol\\Downloads\\bot\\.venv\\Scripts\\python.exe",
+        "Command line": "python.exe -m crewai run --api-key=[REDACTED:groq-key]",
+        "Parent": "explorer.exe (PID 801)",
+        "Owner": "CORP\\carol",
+        "Started": "2026-10-23 10:00:00",
+        "Uptime (hours)": "81.5",
+        "Matched because": "command line matches /\\bcrewai\\b/"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+10 LongRunning: Agent process has been running longer than the long-running threshold",
+        "+30 UserWritableExecPath: Runs from a user-writable staging folder (Temp, Downloads, Public)",
+        "Risk score 40 is at or above the threshold of 40."
+      ],
+      "recommendation": "Investigate now. Confirm with CORP\\carol whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine."
+    },
+    {
+      "findingId": "RAC-0011",
+      "classification": "Suspicious",
+      "score": 40,
+      "category": "Processes",
+      "breadcrumb": "HeadlessBrowser",
+      "agent": "OpenClaw",
+      "agentId": "openclaw",
+      "title": "Automated / headless browser chrome.exe (PID 5200) launched by OpenClaw",
+      "user": "CORP\\bob",
+      "location": "C:\\Users\\bob\\AppData\\Local\\ms-playwright\\chromium-1187\\chrome-win\\chrome.exe",
+      "eventTime": "2026-10-23 19:37:39",
+      "indicators": [
+        "LongRunning",
+        "RemoteDebuggingPort"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Process": "chrome.exe (PID 5200)",
+        "Executable": "C:\\Users\\bob\\AppData\\Local\\ms-playwright\\chromium-1187\\chrome-win\\chrome.exe",
+        "Command line": "chrome.exe --headless=new --remote-debugging-port=9222 --user-data-dir=C:\\Users\\bob\\AppData\\Local\\Temp\\playwright_profile",
+        "Parent": "node.exe (PID 5100)",
+        "Owner": "CORP\\bob",
+        "Started": "2026-10-23 19:37:39",
+        "Uptime (hours)": "71.9",
+        "Launched by": "OpenClaw (PID 5100)",
+        "Automation flag": "--headless"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+10 LongRunning: Agent process has been running longer than the long-running threshold",
+        "+30 RemoteDebuggingPort: Browser exposes the Chrome DevTools Protocol, which allows full remote control of the browser and its sessions",
+        "Risk score 40 is at or above the threshold of 40."
+      ],
+      "recommendation": "Investigate now. Confirm with CORP\\bob whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. A browser with remote debugging can be fully controlled by any local process, including the user's signed-in sessions. Identify the automation that owns it."
+    },
+    {
+      "findingId": "RAC-0012",
+      "classification": "Unknown",
+      "score": 35,
+      "category": "Behavior",
+      "breadcrumb": "SelfModification",
+      "agent": "OpenClaw",
+      "agentId": "openclaw",
+      "title": "OpenClaw skills / memory changed for bob (3 file(s) in the last 7 days)",
+      "user": "bob",
+      "location": "Skills and memory of OpenClaw",
+      "eventTime": "2026-10-25 02:14:00",
+      "indicators": [
+        "SelfModification",
+        "SelfModificationByAgent"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Files changed": "3",
+        "Newest change": "2026-10-25 02:14:00",
+        "Examples": ".openclaw/workspace/memory.md, skills/autoupdate/skill.md, skills/autoupdate/skill.md",
+        "Written by agent process": "yes (Sysmon 11 (written by node.exe))"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+20 SelfModification: Agent skills, memory, or instruction files changed within the lookback window",
+        "+15 SelfModificationByAgent: Event logs show an agent process writing to its own skills or memory",
+        "Risk score 35 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Compare the changed skill and memory files with a known-good copy. An agent that rewrites its own instructions can carry a prompt injection forward."
+    },
+    {
+      "findingId": "RAC-0013",
+      "classification": "Unknown",
+      "score": 30,
+      "category": "Behavior",
+      "breadcrumb": "PackageInstallActivity",
+      "agent": "OpenClaw",
+      "agentId": "openclaw",
+      "title": "OpenClaw: 2 package install(s) in the last 7 days",
+      "user": "bob",
+      "location": "Install activity: OpenClaw",
+      "eventTime": "2026-10-25 02:14:00",
+      "indicators": [
+        "AgentInstallsPackages",
+        "RecentPackageInstall"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Installs": "2",
+        "Launched by the agent itself": "1",
+        "Most recent": "2026-10-25 02:14 openclaw 2026.10.2 (npm global) [install folder date] | 2026-10-24 03:07 cmd.exe /d /s /c \"npm install -g left-padz\" [Sysmon 1]",
+        "Users": "bob"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+20 AgentInstallsPackages: An agent process launched package installs on its own",
+        "+10 RecentPackageInstall: Agent software was installed within the lookback window",
+        "Risk score 30 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Review what was installed (watch for typosquats) and remove the agent's ability to install software if it is not required."
+    },
+    {
+      "findingId": "RAC-0014",
+      "classification": "Unknown",
+      "score": 30,
+      "category": "Network",
+      "breadcrumb": "AgentListener",
+      "agent": "OpenClaw",
+      "agentId": "openclaw",
+      "title": "OpenClaw listening on port 9222 (Chrome DevTools Protocol (full browser remote control))",
+      "user": "CORP\\bob",
+      "location": "TCP 9222 (chrome.exe (PID 5200))",
+      "eventTime": "2026-10-26 19:32:40",
+      "indicators": [
+        "RemoteDebuggingPort"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Port": "9222",
+        "Service": "Chrome DevTools Protocol (full browser remote control)",
+        "Bound to": "127.0.0.1",
+        "Process": "chrome.exe (PID 5200)",
+        "Owner": "CORP\\bob",
+        "Executable": "C:\\Users\\bob\\AppData\\Local\\ms-playwright\\chromium-1187\\chrome-win\\chrome.exe"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+30 RemoteDebuggingPort: Browser exposes the Chrome DevTools Protocol, which allows full remote control of the browser and its sessions",
+        "Risk score 30 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask CORP\\bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Bind the service to 127.0.0.1 or block the port at the host firewall. An exposed agent or model port lets anyone on the network drive it."
+    },
+    {
+      "findingId": "RAC-0015",
+      "classification": "Unknown",
+      "score": 25,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "McpServerConfig",
+      "agent": "Claude Desktop",
+      "agentId": "claude-desktop",
+      "title": "MCP server 'desktop-commander' configured for Claude Desktop",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\AppData\\Roaming\\Claude\\claude_desktop_config.json :: desktop-commander",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "ShellCapableMcp",
+        "UnpinnedPackage"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Config file": "C:\\Users\\alice\\AppData\\Roaming\\Claude\\claude_desktop_config.json",
+        "Server name": "desktop-commander",
+        "Scope": "User",
+        "Transport": "stdio (local process)",
+        "Command": "npx",
+        "Arguments": "-y @wonderwhy-er/desktop-commander@latest",
+        "Unpinned package": "@wonderwhy-er/desktop-commander@latest",
+        "Reaches": "shell"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+15 ShellCapableMcp: MCP server gives the agent shell or file-system access",
+        "+10 UnpinnedPackage: MCP server is launched from an unpinned package (npx -y / uvx without a version), so code can change on every run",
+        "Risk score 25 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask alice what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Review what this MCP server can reach, remove servers that are not needed, and pin package versions instead of npx -y / uvx latest."
+    },
+    {
+      "findingId": "RAC-0016",
+      "classification": "Unknown",
+      "score": 25,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "McpServerConfig",
+      "agent": "Claude Desktop",
+      "agentId": "claude-desktop",
+      "title": "MCP server 'slack' configured for Claude Desktop",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\AppData\\Roaming\\Claude\\claude_desktop_config.json :: slack",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "UnpinnedPackage",
+        "SecretInPlaintext"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Config file": "C:\\Users\\alice\\AppData\\Roaming\\Claude\\claude_desktop_config.json",
+        "Server name": "slack",
+        "Scope": "User",
+        "Transport": "stdio (local process)",
+        "Command": "npx",
+        "Arguments": "-y @modelcontextprotocol/server-slack",
+        "Env var names": "SLACK_TEAM_ID, SLACK_BOT_TOKEN",
+        "Plaintext secrets": "SLACK_BOT_TOKEN (Slack token)",
+        "Unpinned package": "@modelcontextprotocol/server-slack",
+        "Reaches": "chat"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+10 UnpinnedPackage: MCP server is launched from an unpinned package (npx -y / uvx without a version), so code can change on every run",
+        "+15 SecretInPlaintext: An AI provider key or token is stored in a plaintext file",
+        "Risk score 25 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask alice what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Review what this MCP server can reach, remove servers that are not needed, and pin package versions instead of npx -y / uvx latest."
+    },
+    {
+      "findingId": "RAC-0017",
+      "classification": "Unknown",
+      "score": 25,
+      "category": "LogsAndEvents",
+      "breadcrumb": "PowerShellScriptBlock",
+      "agent": "Unattributed (PowerShell)",
+      "agentId": "",
+      "title": "PowerShell script calls api.openai.com (1 block(s))",
+      "user": "",
+      "location": "Event log: PowerShell Operational (4104)",
+      "eventTime": "2026-10-25 02:24:00",
+      "indicators": [
+        "LlmCallFromScript"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Event": "PowerShell Script Block Logging (4104)",
+        "Script blocks": "1",
+        "First seen": "2026-10-25 02:24:00",
+        "Last seen": "2026-10-25 02:24:00",
+        "LLM host referenced": "api.openai.com",
+        "Script path": "C:\\Users\\carol\\Downloads\\bot\\ask-gpt.ps1",
+        "Samples (redacted)": "earer [REDACTED]\" }; Invoke-RestMethod -Uri \"https://api.openai.com/v1/chat/completions\" -Method Post -Headers $h -Body $body"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+25 LlmCallFromScript: A PowerShell script block called an LLM API directly",
+        "Risk score 25 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask the owner what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Find the script (see Script path) and its owner. Scripts calling LLM APIs directly are unmanaged agents."
+    },
+    {
+      "findingId": "RAC-0018",
+      "classification": "Unknown",
+      "score": 15,
+      "category": "Behavior",
+      "breadcrumb": "OffHoursActivity",
+      "agent": "OpenClaw",
+      "agentId": "openclaw",
+      "title": "OpenClaw active outside business hours (7 times)",
+      "user": "bob",
+      "location": "Activity timeline: C:\\Program Files\\nodejs\\node.exe",
+      "eventTime": "2026-10-25 17:32:39",
+      "indicators": [
+        "OffHoursActivity"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Off-hours timestamps": "7 of 7 in the last 7 days",
+        "Business hours": "07:00-19:00, Monday, Tuesday, Wednesday, Thursday, Friday",
+        "Most recent": "Sun 2026-10-25 17:32; Sun 2026-10-25 02:41; Sun 2026-10-25 02:14; Sat 2026-10-24 03:07; Sat 2026-10-24 03:05",
+        "Evidence from": "AgentProcess, HeadlessBrowser, LlmConnection, AgentConfigDir, SecretFile, AgentPackage, ScheduledTask, AgentTranscript, AgentLog, SysmonAgentProcess",
+        "Users": "bob"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+15 OffHoursActivity: Agent activity outside business hours",
+        "Risk score 15 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Confirm whether this was scheduled automation or an unattended agent. Check the Persistence findings for the same agent."
+    },
+    {
+      "findingId": "RAC-0019",
+      "classification": "Unknown",
+      "score": 15,
+      "category": "Behavior",
+      "breadcrumb": "OffHoursActivity",
+      "agent": "Script host (possible custom agent)",
+      "agentId": "",
+      "title": "Script host (possible custom agent) active outside business hours (3 times)",
+      "user": "bob",
+      "location": "Activity timeline: Sysmon: C:\\Program Files\\nodejs\\node.exe",
+      "eventTime": "2026-10-25 02:41:00",
+      "indicators": [
+        "OffHoursActivity"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Off-hours timestamps": "3 of 3 in the last 7 days",
+        "Business hours": "07:00-19:00, Monday, Tuesday, Wednesday, Thursday, Friday",
+        "Most recent": "Sun 2026-10-25 02:41; Sun 2026-10-25 02:14; Sat 2026-10-24 03:05",
+        "Evidence from": "SysmonLlmTraffic",
+        "Users": "bob"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+15 OffHoursActivity: Agent activity outside business hours",
+        "Risk score 15 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Confirm whether this was scheduled automation or an unattended agent. Check the Persistence findings for the same agent."
+    },
+    {
+      "findingId": "RAC-0020",
+      "classification": "Unknown",
+      "score": 15,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "McpServerConfig",
+      "agent": "Claude Code",
+      "agentId": "claude-code",
+      "title": "MCP server 'sentry' configured for Claude Code",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\Documents\\src\\webapp\\.mcp.json :: sentry",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "RemoteMcpServer"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Config file": "C:\\Users\\alice\\Documents\\src\\webapp\\.mcp.json",
+        "Server name": "sentry",
+        "Scope": "Project C:\\Users\\alice\\Documents\\src\\webapp",
+        "Transport": "remote (HTTP/SSE)",
+        "Remote host": "mcp.sentry.dev"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+15 RemoteMcpServer: MCP server runs on a remote host the organization may not control",
+        "Risk score 15 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask alice what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Review what this MCP server can reach, remove servers that are not needed, and pin package versions instead of npx -y / uvx latest."
+    },
+    {
+      "findingId": "RAC-0021",
+      "classification": "Unknown",
+      "score": 15,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "McpServerConfig",
+      "agent": "Cursor",
+      "agentId": "cursor",
+      "title": "MCP server 'linear' configured for Cursor",
+      "user": "carol",
+      "location": "C:\\Users\\carol\\.cursor\\mcp.json :: linear",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "RemoteMcpServer"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Config file": "C:\\Users\\carol\\.cursor\\mcp.json",
+        "Server name": "linear",
+        "Scope": "User",
+        "Transport": "remote (HTTP/SSE)",
+        "Remote host": "mcp.linear.app",
+        "Reaches": "docs"
+      },
+      "reasons": [
+        "Allow-list entry 'Cursor pilot (ended)' would match, but it expired on 2026-06-30.",
+        "Not on the allow-list.",
+        "+15 RemoteMcpServer: MCP server runs on a remote host the organization may not control",
+        "Risk score 15 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Review what this MCP server can reach, remove servers that are not needed, and pin package versions instead of npx -y / uvx latest."
+    },
+    {
+      "findingId": "RAC-0022",
+      "classification": "Unknown",
+      "score": 15,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "SecretFile",
+      "agent": "OpenAI Codex CLI",
+      "agentId": "openai-codex",
+      "title": "Plaintext key or token in config.toml (OpenAI API key)",
+      "user": "carol",
+      "location": "C:\\Users\\carol\\.codex\\config.toml",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "SecretInPlaintext"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "File": "C:\\Users\\carol\\.codex\\config.toml",
+        "Key formats": "OpenAI API key",
+        "Line numbers": "11",
+        "Last modified": "2026-10-23 10:00:00",
+        "Values": "not recorded (RAC never stores or prints key values)"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+15 SecretInPlaintext: An AI provider key or token is stored in a plaintext file",
+        "Risk score 15 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Move the key into a secret store or Windows Credential Manager. If the file is readable by other users or has been synced or committed anywhere, rotate the key at the provider."
+    },
+    {
+      "findingId": "RAC-0023",
+      "classification": "Unknown",
+      "score": 15,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "SecretFile",
+      "agent": "OpenClaw",
+      "agentId": "openclaw",
+      "title": "Plaintext key or token in .env (ANTHROPIC_API_KEY, Anthropic API key)",
+      "user": "bob",
+      "location": "C:\\Users\\bob\\.openclaw\\.env",
+      "eventTime": "2026-10-25 02:14:00",
+      "indicators": [
+        "SecretInPlaintext"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "File": "C:\\Users\\bob\\.openclaw\\.env",
+        "Key names": "ANTHROPIC_API_KEY",
+        "Key formats": "Anthropic API key",
+        "Line numbers": "1",
+        "Last modified": "2026-10-25 02:14:00",
+        "Values": "not recorded (RAC never stores or prints key values)"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+15 SecretInPlaintext: An AI provider key or token is stored in a plaintext file",
+        "Risk score 15 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Move the key into a secret store or Windows Credential Manager. If the file is readable by other users or has been synced or committed anywhere, rotate the key at the provider."
+    },
+    {
+      "findingId": "RAC-0024",
+      "classification": "Unknown",
+      "score": 15,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "SecretFile",
+      "agent": "Unattributed (.env file)",
+      "agentId": "",
+      "title": "Plaintext key or token in .env (OPENAI_API_KEY, OpenAI API key)",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\Documents\\src\\webapp\\.env",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "SecretInPlaintext"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "File": "C:\\Users\\alice\\Documents\\src\\webapp\\.env",
+        "Key names": "OPENAI_API_KEY",
+        "Key formats": "OpenAI API key",
+        "Line numbers": "2",
+        "Last modified": "2026-10-23 10:00:00",
+        "Values": "not recorded (RAC never stores or prints key values)"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+15 SecretInPlaintext: An AI provider key or token is stored in a plaintext file",
+        "Risk score 15 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask alice what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Move the key into a secret store or Windows Credential Manager. If the file is readable by other users or has been synced or committed anywhere, rotate the key at the provider."
+    },
+    {
+      "findingId": "RAC-0025",
+      "classification": "Unknown",
+      "score": 15,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "EnvVarSecret",
+      "agent": "Unattributed (environment)",
+      "agentId": "",
+      "title": "Anthropic key set as a user environment variable (ANTHROPIC_API_KEY)",
+      "user": "CORP\\alice",
+      "location": "HKU\\CORP\\alice\\Environment",
+      "eventTime": "",
+      "indicators": [
+        "SecretInPlaintext"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Variable": "ANTHROPIC_API_KEY",
+        "Scope": "User",
+        "User": "CORP\\alice",
+        "Provider": "Anthropic",
+        "Value": "not read"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+15 SecretInPlaintext: An AI provider key or token is stored in a plaintext file",
+        "Risk score 15 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask CORP\\alice what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Machine-wide AI keys are inherited by every user and service. Scope the key to the one account or service that needs it, and rotate it if it was shared."
+    },
+    {
+      "findingId": "RAC-0026",
+      "classification": "Unknown",
+      "score": 10,
+      "category": "Behavior",
+      "breadcrumb": "PackageInstallActivity",
+      "agent": "Agent framework / SDK (custom-built agent)",
+      "agentId": "agent-framework",
+      "title": "Agent framework / SDK (custom-built agent): 1 package install(s) in the last 7 days",
+      "user": "carol",
+      "location": "Install activity: Agent framework / SDK (custom-built agent)",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "RecentPackageInstall"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Installs": "1",
+        "Launched by the agent itself": "0",
+        "Most recent": "2026-10-23 10:00 crewai 0.86.0 (site-packages) [install folder date]",
+        "Users": "carol"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+10 RecentPackageInstall: Agent software was installed within the lookback window",
+        "Risk score 10 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Review what was installed (watch for typosquats) and remove the agent's ability to install software if it is not required."
+    },
+    {
+      "findingId": "RAC-0027",
+      "classification": "Unknown",
+      "score": 10,
+      "category": "Behavior",
+      "breadcrumb": "PackageInstallActivity",
+      "agent": "Aider",
+      "agentId": "aider",
+      "title": "Aider: 1 package install(s) in the last 7 days",
+      "user": "carol",
+      "location": "Install activity: Aider",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "RecentPackageInstall"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Installs": "1",
+        "Launched by the agent itself": "0",
+        "Most recent": "2026-10-23 10:00 aider-chat  (pipx) [install folder date]",
+        "Users": "carol"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+10 RecentPackageInstall: Agent software was installed within the lookback window",
+        "Risk score 10 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Review what was installed (watch for typosquats) and remove the agent's ability to install software if it is not required."
+    },
+    {
+      "findingId": "RAC-0028",
+      "classification": "Unknown",
+      "score": 10,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "AgentPackage",
+      "agent": "Agent framework / SDK (custom-built agent)",
+      "agentId": "agent-framework",
+      "title": "Agent framework / SDK (custom-built agent) package installed: crewai 0.86.0",
+      "user": "carol",
+      "location": "C:\\Users\\carol\\AppData\\Roaming\\Python\\Python312\\site-packages\\crewai-0.86.0.dist-info",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "RecentPackageInstall"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Package": "crewai",
+        "Ecosystem": "pypi",
+        "Installed via": "site-packages",
+        "Version": "0.86.0",
+        "Install path": "C:\\Users\\carol\\AppData\\Roaming\\Python\\Python312\\site-packages\\crewai-0.86.0.dist-info",
+        "Installed on": "2026-10-23 10:00:00"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+10 RecentPackageInstall: Agent software was installed within the lookback window",
+        "Risk score 10 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control."
+    },
+    {
+      "findingId": "RAC-0029",
+      "classification": "Unknown",
+      "score": 10,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "AgentPackage",
+      "agent": "Aider",
+      "agentId": "aider",
+      "title": "Aider package installed: aider-chat ",
+      "user": "carol",
+      "location": "C:\\Users\\carol\\.local\\pipx\\venvs\\aider-chat",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "RecentPackageInstall"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Package": "aider-chat",
+        "Ecosystem": "pypi",
+        "Installed via": "pipx",
+        "Install path": "C:\\Users\\carol\\.local\\pipx\\venvs\\aider-chat",
+        "Installed on": "2026-10-23 10:00:00"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+10 RecentPackageInstall: Agent software was installed within the lookback window",
+        "Risk score 10 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control."
+    },
+    {
+      "findingId": "RAC-0030",
+      "classification": "Unknown",
+      "score": 10,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "McpServerConfig",
+      "agent": "Claude Desktop",
+      "agentId": "claude-desktop",
+      "title": "MCP server 'gmail' configured for Claude Desktop",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\AppData\\Roaming\\Claude\\claude_desktop_config.json :: gmail",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "UnpinnedPackage"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Config file": "C:\\Users\\alice\\AppData\\Roaming\\Claude\\claude_desktop_config.json",
+        "Server name": "gmail",
+        "Scope": "User",
+        "Transport": "stdio (local process)",
+        "Command": "npx",
+        "Arguments": "-y @gongrzhe/server-gmail-autoauth-mcp",
+        "Unpinned package": "@gongrzhe/server-gmail-autoauth-mcp",
+        "Reaches": "email"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+10 UnpinnedPackage: MCP server is launched from an unpinned package (npx -y / uvx without a version), so code can change on every run",
+        "Risk score 10 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask alice what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Review what this MCP server can reach, remove servers that are not needed, and pin package versions instead of npx -y / uvx latest."
+    },
+    {
+      "findingId": "RAC-0031",
+      "classification": "Unknown",
+      "score": 10,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "McpServerConfig",
+      "agent": "Continue",
+      "agentId": "continue",
+      "title": "MCP server 'sqlite' configured for Continue",
+      "user": "carol",
+      "location": "C:\\Users\\carol\\.continue\\config.yaml :: sqlite",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "UnpinnedPackage"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Config file": "C:\\Users\\carol\\.continue\\config.yaml",
+        "Server name": "sqlite",
+        "Scope": "User",
+        "Transport": "stdio (local process)",
+        "Command": "uvx",
+        "Arguments": "mcp-server-sqlite --db-path C:\\Users\\carol\\data.db",
+        "Unpinned package": "mcp-server-sqlite",
+        "Reaches": "db"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+10 UnpinnedPackage: MCP server is launched from an unpinned package (npx -y / uvx without a version), so code can change on every run",
+        "Risk score 10 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Review what this MCP server can reach, remove servers that are not needed, and pin package versions instead of npx -y / uvx latest."
+    },
+    {
+      "findingId": "RAC-0032",
+      "classification": "Unknown",
+      "score": 10,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "AgentPackage",
+      "agent": "OpenClaw",
+      "agentId": "openclaw",
+      "title": "OpenClaw package installed: openclaw 2026.10.2",
+      "user": "bob",
+      "location": "C:\\Users\\bob\\AppData\\Roaming\\npm\\node_modules\\openclaw",
+      "eventTime": "2026-10-25 02:14:00",
+      "indicators": [
+        "RecentPackageInstall"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Package": "openclaw",
+        "Ecosystem": "npm",
+        "Installed via": "npm global",
+        "Version": "2026.10.2",
+        "Install path": "C:\\Users\\bob\\AppData\\Roaming\\npm\\node_modules\\openclaw",
+        "Installed on": "2026-10-25 02:14:00"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+10 RecentPackageInstall: Agent software was installed within the lookback window",
+        "Risk score 10 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control."
+    },
+    {
+      "findingId": "RAC-0033",
+      "classification": "Unknown",
+      "score": 10,
+      "category": "LogsAndEvents",
+      "breadcrumb": "SysmonAgentProcess",
+      "agent": "OpenClaw",
+      "agentId": "openclaw",
+      "title": "OpenClaw: 1 process launch(es) in the last 7 days",
+      "user": "CORP\\bob",
+      "location": "Event log: Sysmon Operational (1)",
+      "eventTime": "2026-10-24 03:07:00",
+      "indicators": [
+        "AgentSpawnedShell"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Event": "Sysmon process creation (1)",
+        "Launches": "1",
+        "First seen": "2026-10-24 03:07:00",
+        "Last seen": "2026-10-24 03:07:00",
+        "Shells launched by agent": "1",
+        "Images": "cmd.exe",
+        "Sample command lines": "cmd.exe /d /s /c \"npm install -g left-padz\"",
+        "User": "CORP\\bob"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+10 AgentSpawnedShell: Agent process launched command shells",
+        "Risk score 10 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask CORP\\bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control."
+    },
+    {
+      "findingId": "RAC-0034",
+      "classification": "Unknown",
+      "score": 10,
+      "category": "Network",
+      "breadcrumb": "LlmConnection",
+      "agent": "OpenClaw",
+      "agentId": "openclaw",
+      "title": "node.exe (PID 5100) connected to api.anthropic.com (Anthropic)",
+      "user": "CORP\\bob",
+      "location": "node.exe (PID 5100) -> api.anthropic.com",
+      "eventTime": "2026-10-25 17:32:39",
+      "indicators": [
+        "PersistentLlmConnection"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Process": "node.exe (PID 5100)",
+        "Remote host": "api.anthropic.com",
+        "Provider": "Anthropic",
+        "Remote address": "160.79.104.10:443",
+        "Open sockets": "1",
+        "Executable": "C:\\Program Files\\nodejs\\node.exe",
+        "Command line": "\"C:\\Program Files\\nodejs\\node.exe\" C:\\Users\\bob\\AppData\\Roaming\\npm\\node_modules\\openclaw\\dist\\index.js gateway --port 18789 --token [REDACTED:anthropic-key]",
+        "Owner": "CORP\\bob",
+        "Connected since": "2026-10-25 17:32:39",
+        "Open for (minutes)": "1560",
+        "Hostname source": "local DNS client cache (no lookups performed)"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+10 PersistentLlmConnection: Connection to an LLM API has stayed open for a long time or across samples",
+        "Risk score 10 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask CORP\\bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Confirm the process is meant to call this AI provider and that the data it sends is allowed to leave."
+    },
+    {
+      "findingId": "RAC-0035",
+      "classification": "Unknown",
+      "score": 10,
+      "category": "Persistence",
+      "breadcrumb": "ScheduledTask",
+      "agent": "OpenClaw",
+      "agentId": "openclaw",
+      "title": "Scheduled task '\\OpenClaw Gateway' starts OpenClaw",
+      "user": "CORP\\bob",
+      "location": "Task Scheduler: \\OpenClaw Gateway",
+      "eventTime": "2026-10-25 02:14:00",
+      "indicators": [
+        "PersistenceAutostart"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Task": "\\OpenClaw Gateway",
+        "State": "Ready",
+        "Runs as": "CORP\\bob",
+        "Run level": "Limited",
+        "Action": "C:\\Program Files\\nodejs\\node.exe C:\\Users\\bob\\AppData\\Roaming\\npm\\node_modules\\openclaw\\dist\\index.js gateway --port 18789",
+        "Triggers": "Logon",
+        "Hidden": "False",
+        "Author": "CORP\\bob",
+        "Registered": "2026-10-23T19:32:39",
+        "Matched because": "text matches /openclaw/",
+        "Last run": "2026-10-25 02:14:00",
+        "Next run": "2026-10-27 19:32:39"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+10 PersistenceAutostart: Starts automatically without a person launching it",
+        "Risk score 10 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask CORP\\bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Confirm who created the task. Disable it through change control if the agent is not approved."
+    },
+    {
+      "findingId": "RAC-0036",
+      "classification": "Unknown",
+      "score": 10,
+      "category": "Processes",
+      "breadcrumb": "AgentProcess",
+      "agent": "OpenClaw",
+      "agentId": "openclaw",
+      "title": "OpenClaw running (node.exe, PID 5100)",
+      "user": "CORP\\bob",
+      "location": "C:\\Program Files\\nodejs\\node.exe",
+      "eventTime": "2026-10-23 19:32:39",
+      "indicators": [
+        "LongRunning"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Process": "node.exe (PID 5100)",
+        "Executable": "C:\\Program Files\\nodejs\\node.exe",
+        "Command line": "\"C:\\Program Files\\nodejs\\node.exe\" C:\\Users\\bob\\AppData\\Roaming\\npm\\node_modules\\openclaw\\dist\\index.js gateway --port 18789 --token [REDACTED:anthropic-key]",
+        "Parent": "explorer.exe (PID 5000)",
+        "Owner": "CORP\\bob",
+        "Started": "2026-10-23 19:32:39",
+        "Uptime (hours)": "72",
+        "Matched because": "command line matches /openclaw/"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+10 LongRunning: Agent process has been running longer than the long-running threshold",
+        "Risk score 10 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask CORP\\bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control."
+    },
+    {
+      "findingId": "RAC-0037",
+      "classification": "Unknown",
+      "score": 10,
+      "category": "TokensAndOAuth",
+      "breadcrumb": "CredentialStore",
+      "agent": "Claude Code",
+      "agentId": "claude-code",
+      "title": "Stored credential for Claude Code in Credential Manager",
+      "user": "CORP\\itadmin",
+      "location": "Credential Manager: Claude Code-credentials",
+      "eventTime": "",
+      "indicators": [
+        "StoredOAuthToken"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Credential target": "Claude Code-credentials",
+        "Vault": "Windows Credential Manager (current user)",
+        "Secret": "not read (cmdkey lists target names only)"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+10 StoredOAuthToken: Stored OAuth or session token for an AI application",
+        "Risk score 10 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask CORP\\itadmin what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. If the application is not approved, remove the stored credential and revoke the session at the provider."
+    },
+    {
+      "findingId": "RAC-0038",
+      "classification": "Unknown",
+      "score": 10,
+      "category": "TokensAndOAuth",
+      "breadcrumb": "TokenFile",
+      "agent": "OpenAI Codex CLI",
+      "agentId": "openai-codex",
+      "title": "OpenAI Codex CLI sign-in token stored for user carol",
+      "user": "carol",
+      "location": "C:\\Users\\carol\\.codex\\auth.json",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "StoredOAuthToken"
+      ],
+      "allowListEntry": "",
+      "evidence": {
+        "Path": "C:\\Users\\carol\\.codex\\auth.json",
+        "Size": "110 bytes",
+        "Last modified": "2026-10-23 10:00:00",
+        "Contents": "not opened (RAC reports token files by presence only)"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "+10 StoredOAuthToken: Stored OAuth or session token for an AI application",
+        "Risk score 10 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Sign-in tokens act as the user. If the agent is not approved, sign it out and revoke the session at the provider."
+    },
+    {
+      "findingId": "RAC-0039",
+      "classification": "Unknown",
+      "score": 0,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "AgentConfigDir",
+      "agent": "Continue",
+      "agentId": "continue",
+      "title": "Continue installed or configured for user carol",
+      "user": "carol",
+      "location": "C:\\Users\\carol\\.continue",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [],
+      "allowListEntry": "",
+      "evidence": {
+        "Kind": "IDE agent extension / CLI",
+        "Vendor": "Continue Dev (open source)",
+        "Locations": "C:\\Users\\carol\\.continue",
+        "Top-level items": "1",
+        "Last changed": "2026-10-23 10:00:00",
+        "Changed in lookback": "2"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "Risk score 0 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control."
+    },
+    {
+      "findingId": "RAC-0040",
+      "classification": "Unknown",
+      "score": 0,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "AgentConfigDir",
+      "agent": "Cursor",
+      "agentId": "cursor",
+      "title": "Cursor installed or configured for user carol",
+      "user": "carol",
+      "location": "C:\\Users\\carol\\.cursor",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [],
+      "allowListEntry": "",
+      "evidence": {
+        "Kind": "AI IDE",
+        "Vendor": "Anysphere",
+        "Locations": "C:\\Users\\carol\\.cursor",
+        "Top-level items": "1",
+        "Last changed": "2026-10-23 10:00:00",
+        "Changed in lookback": "2"
+      },
+      "reasons": [
+        "Allow-list entry 'Cursor pilot (ended)' would match, but it expired on 2026-06-30.",
+        "Not on the allow-list.",
+        "Risk score 0 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control."
+    },
+    {
+      "findingId": "RAC-0041",
+      "classification": "Unknown",
+      "score": 0,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "AgentConfigDir",
+      "agent": "OpenAI Codex CLI",
+      "agentId": "openai-codex",
+      "title": "OpenAI Codex CLI installed or configured for user carol",
+      "user": "carol",
+      "location": "C:\\Users\\carol\\.codex",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [],
+      "allowListEntry": "",
+      "evidence": {
+        "Kind": "CLI coding agent",
+        "Vendor": "OpenAI",
+        "Locations": "C:\\Users\\carol\\.codex",
+        "Top-level items": "3",
+        "Last changed": "2026-10-23 10:00:00",
+        "Changed in lookback": "4"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "Risk score 0 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control."
+    },
+    {
+      "findingId": "RAC-0042",
+      "classification": "Unknown",
+      "score": 0,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "AgentConfigDir",
+      "agent": "OpenClaw",
+      "agentId": "openclaw",
+      "title": "OpenClaw installed or configured for user bob",
+      "user": "bob",
+      "location": "C:\\Users\\bob\\.openclaw",
+      "eventTime": "2026-10-25 02:14:00",
+      "indicators": [],
+      "allowListEntry": "",
+      "evidence": {
+        "Kind": "Autonomous personal agent with gateway",
+        "Vendor": "OpenClaw (open source; formerly Clawdbot / Moltbot)",
+        "Locations": "C:\\Users\\bob\\.openclaw",
+        "Top-level items": "4",
+        "Last changed": "2026-10-25 02:14:00",
+        "Skills / memory": "skills/autoupdate, MEMORY.md",
+        "Changed in lookback": "5"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "Risk score 0 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control."
+    },
+    {
+      "findingId": "RAC-0043",
+      "classification": "Unknown",
+      "score": 0,
+      "category": "LogsAndEvents",
+      "breadcrumb": "AgentTranscript",
+      "agent": "Aider",
+      "agentId": "aider",
+      "title": "Aider chat history in project bot",
+      "user": "carol",
+      "location": "C:\\Users\\carol\\Downloads\\bot\\.aider.chat.history.md",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [],
+      "allowListEntry": "",
+      "evidence": {
+        "File": "C:\\Users\\carol\\Downloads\\bot\\.aider.chat.history.md",
+        "Size (KB)": "0",
+        "Last modified": "2026-10-23 10:00:00",
+        "Project": "C:\\Users\\carol\\Downloads\\bot"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "Risk score 0 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control."
+    },
+    {
+      "findingId": "RAC-0044",
+      "classification": "Unknown",
+      "score": 0,
+      "category": "LogsAndEvents",
+      "breadcrumb": "AgentTranscript",
+      "agent": "OpenAI Codex CLI",
+      "agentId": "openai-codex",
+      "title": "OpenAI Codex CLI transcripts: 1 file(s), newest 2026-10-23 10:00",
+      "user": "carol",
+      "location": "C:\\Users\\carol\\.codex\\sessions",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [],
+      "allowListEntry": "",
+      "evidence": {
+        "Location": "C:\\Users\\carol\\.codex\\sessions",
+        "Kind": "Transcript",
+        "Files": "1",
+        "Total size (MB)": "0",
+        "Oldest": "2026-10-23 10:00:00",
+        "Newest": "2026-10-23 10:00:00",
+        "Changed in lookback": "1",
+        "Tool-call records": "1 record(s) in 1 file(s)",
+        "Content": "not quoted (summary only)"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "Risk score 0 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control."
+    },
+    {
+      "findingId": "RAC-0045",
+      "classification": "Unknown",
+      "score": 0,
+      "category": "LogsAndEvents",
+      "breadcrumb": "AgentTranscript",
+      "agent": "OpenClaw",
+      "agentId": "openclaw",
+      "title": "OpenClaw transcripts: 2 file(s), newest 2026-10-25 02:41",
+      "user": "bob",
+      "location": "C:\\Users\\bob\\.openclaw\\agents",
+      "eventTime": "2026-10-25 02:41:00",
+      "indicators": [],
+      "allowListEntry": "",
+      "evidence": {
+        "Location": "C:\\Users\\bob\\.openclaw\\agents",
+        "Kind": "Transcript",
+        "Files": "2",
+        "Total size (MB)": "0",
+        "Oldest": "2026-10-25 02:14:00",
+        "Newest": "2026-10-25 02:41:00",
+        "Changed in lookback": "2",
+        "Tool-call records": "3 record(s) in 2 file(s)",
+        "Content": "not quoted (summary only)"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "Risk score 0 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control."
+    },
+    {
+      "findingId": "RAC-0046",
+      "classification": "Unknown",
+      "score": 0,
+      "category": "LogsAndEvents",
+      "breadcrumb": "AgentLog",
+      "agent": "OpenClaw",
+      "agentId": "openclaw",
+      "title": "OpenClaw logs: 1 file(s), newest 2026-10-24 03:05",
+      "user": "bob",
+      "location": "C:\\Users\\bob\\AppData\\Local\\Temp\\openclaw",
+      "eventTime": "2026-10-24 03:05:00",
+      "indicators": [],
+      "allowListEntry": "",
+      "evidence": {
+        "Location": "C:\\Users\\bob\\AppData\\Local\\Temp\\openclaw",
+        "Kind": "Log",
+        "Files": "1",
+        "Total size (MB)": "0",
+        "Oldest": "2026-10-24 03:05:00",
+        "Newest": "2026-10-24 03:05:00",
+        "Changed in lookback": "1",
+        "Content": "not quoted (summary only)"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "Risk score 0 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control."
+    },
+    {
+      "findingId": "RAC-0047",
+      "classification": "Unknown",
+      "score": 0,
+      "category": "LogsAndEvents",
+      "breadcrumb": "SysmonLlmTraffic",
+      "agent": "Script host (possible custom agent)",
+      "agentId": "",
+      "title": "node.exe contacted api.anthropic.com (3 event(s))",
+      "user": "CORP\\bob",
+      "location": "Sysmon: C:\\Program Files\\nodejs\\node.exe",
+      "eventTime": "2026-10-25 02:41:00",
+      "indicators": [],
+      "allowListEntry": "",
+      "evidence": {
+        "Process image": "C:\\Program Files\\nodejs\\node.exe",
+        "Remote host": "api.anthropic.com",
+        "Provider": "Anthropic",
+        "Events": "3 (Sysmon event ID 22, 3)",
+        "First seen": "2026-10-24 03:05:00",
+        "Last seen": "2026-10-25 02:41:00",
+        "User": "CORP\\bob"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "Risk score 0 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask CORP\\bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Identify the program in Process image and confirm it is allowed to call this AI provider."
+    },
+    {
+      "findingId": "RAC-0048",
+      "classification": "Unknown",
+      "score": 0,
+      "category": "Network",
+      "breadcrumb": "AgentListener",
+      "agent": "OpenClaw",
+      "agentId": "openclaw",
+      "title": "OpenClaw listening on port 18789 (OpenClaw gateway)",
+      "user": "CORP\\bob",
+      "location": "TCP 18789 (node.exe (PID 5100))",
+      "eventTime": "2026-10-26 19:32:40",
+      "indicators": [],
+      "allowListEntry": "",
+      "evidence": {
+        "Port": "18789",
+        "Service": "OpenClaw gateway",
+        "Bound to": "127.0.0.1",
+        "Process": "node.exe (PID 5100)",
+        "Owner": "CORP\\bob",
+        "Executable": "C:\\Program Files\\nodejs\\node.exe"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "Risk score 0 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask CORP\\bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Bind the service to 127.0.0.1 or block the port at the host firewall. An exposed agent or model port lets anyone on the network drive it."
+    },
+    {
+      "findingId": "RAC-0049",
+      "classification": "Unknown",
+      "score": 0,
+      "category": "Network",
+      "breadcrumb": "DnsCacheLlm",
+      "agent": "Unattributed (DNS cache)",
+      "agentId": "",
+      "title": "Recent DNS lookup of generativelanguage.googleapis.com (Google Gemini API)",
+      "user": "",
+      "location": "DNS cache: generativelanguage.googleapis.com",
+      "eventTime": "2026-10-26 19:32:40",
+      "indicators": [],
+      "allowListEntry": "",
+      "evidence": {
+        "Hostname": "generativelanguage.googleapis.com",
+        "Provider": "Google Gemini API",
+        "Resolved addresses": "142.250.72.10",
+        "Note": "Looked up recently (cache entries expire with their TTL). No open connection could be tied to a process at scan time. Sysmon Event 22 gives per-process DNS history."
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "Risk score 0 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask the owner what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Attribute the lookup: check the network and Sysmon findings, or rerun with -NetworkSamples to catch the connection. Approve the provider in the allow-list if it is sanctioned."
+    },
+    {
+      "findingId": "RAC-0050",
+      "classification": "Unknown",
+      "score": 0,
+      "category": "Network",
+      "breadcrumb": "ProxyLogLlm",
+      "agent": "Unattributed (proxy log)",
+      "agentId": "",
+      "title": "1 requests to api.groq.com in proxy logs",
+      "user": "",
+      "location": "Proxy logs: api.groq.com",
+      "eventTime": "2026-10-26 19:32:40",
+      "indicators": [],
+      "allowListEntry": "",
+      "evidence": {
+        "Hostname": "api.groq.com",
+        "Provider": "Groq",
+        "Matching log lines": "1",
+        "Log files": "access.log",
+        "Lines scanned": "6"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "Risk score 0 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask the owner what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Use the proxy's client IP and user fields to find the machine and person behind this traffic."
+    },
+    {
+      "findingId": "RAC-0051",
+      "classification": "Unknown",
+      "score": 0,
+      "category": "Network",
+      "breadcrumb": "ProxyLogLlm",
+      "agent": "Unattributed (proxy log)",
+      "agentId": "",
+      "title": "2 requests to api.openai.com in proxy logs",
+      "user": "",
+      "location": "Proxy logs: api.openai.com",
+      "eventTime": "2026-10-26 19:32:40",
+      "indicators": [],
+      "allowListEntry": "",
+      "evidence": {
+        "Hostname": "api.openai.com",
+        "Provider": "OpenAI",
+        "Matching log lines": "2",
+        "Log files": "access.log",
+        "Lines scanned": "6"
+      },
+      "reasons": [
+        "Not on the allow-list.",
+        "Risk score 0 is below the threshold of 40; flagged because it is not approved."
+      ],
+      "recommendation": "Assign an owner and decide. Ask the owner what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Use the proxy's client IP and user fields to find the machine and person behind this traffic."
+    },
+    {
+      "findingId": "RAC-0052",
+      "classification": "Trusted",
+      "score": 25,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "McpServerConfig",
+      "agent": "Claude Desktop",
+      "agentId": "claude-desktop",
+      "title": "MCP server 'filesystem' configured for Claude Desktop",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\AppData\\Roaming\\Claude\\claude_desktop_config.json :: filesystem",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "ShellCapableMcp",
+        "UnpinnedPackage"
+      ],
+      "allowListEntry": "Claude Desktop - company standard",
+      "evidence": {
+        "Config file": "C:\\Users\\alice\\AppData\\Roaming\\Claude\\claude_desktop_config.json",
+        "Server name": "filesystem",
+        "Scope": "User",
+        "Transport": "stdio (local process)",
+        "Command": "npx",
+        "Arguments": "-y @modelcontextprotocol/server-filesystem C:\\Users\\alice\\Documents",
+        "Unpinned package": "@modelcontextprotocol/server-filesystem",
+        "Reaches": "files"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Claude Desktop - company standard' (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1043).",
+        "+15 ShellCapableMcp: MCP server gives the agent shell or file-system access",
+        "+10 UnpinnedPackage: MCP server is launched from an unpinned package (npx -y / uvx without a version), so code can change on every run",
+        "Remaining risk score 25 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Claude Desktop - company standard'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0053",
+      "classification": "Trusted",
+      "score": 25,
+      "category": "Processes",
+      "breadcrumb": "McpServerProcess",
+      "agent": "Claude Desktop",
+      "agentId": "claude-desktop",
+      "title": "MCP server process node.exe (PID 4200) launched by Claude Desktop",
+      "user": "CORP\\alice",
+      "location": "C:\\Program Files\\nodejs\\node.exe",
+      "eventTime": "2026-10-23 10:01:00",
+      "indicators": [
+        "LongRunning",
+        "ShellCapableMcp"
+      ],
+      "allowListEntry": "Claude Desktop - company standard",
+      "evidence": {
+        "Process": "node.exe (PID 4200)",
+        "Executable": "C:\\Program Files\\nodejs\\node.exe",
+        "Command line": "node C:\\Users\\alice\\AppData\\Roaming\\npm\\node_modules\\@modelcontextprotocol\\server-filesystem\\dist\\index.js C:\\Users\\alice\\Documents",
+        "Parent": "claude.exe (PID 4100)",
+        "Owner": "CORP\\alice",
+        "Started": "2026-10-23 10:01:00",
+        "Uptime (hours)": "81.5",
+        "Launched by": "Claude Desktop (PID 4100)",
+        "MCP pattern": "@modelcontextprotocol/",
+        "Reaches": "files"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Claude Desktop - company standard' (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1043).",
+        "+10 LongRunning: Agent process has been running longer than the long-running threshold",
+        "+15 ShellCapableMcp: MCP server gives the agent shell or file-system access",
+        "Remaining risk score 25 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Claude Desktop - company standard'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0054",
+      "classification": "Trusted",
+      "score": 15,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "McpServerConfig",
+      "agent": "Claude Code",
+      "agentId": "claude-code",
+      "title": "MCP server 'github' configured for Claude Code",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\.claude.json :: github",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "SecretInPlaintext"
+      ],
+      "allowListEntry": "Claude Code - Engineering",
+      "evidence": {
+        "Config file": "C:\\Users\\alice\\.claude.json",
+        "Server name": "github",
+        "Scope": "User",
+        "Transport": "stdio (local process)",
+        "Command": "npx",
+        "Arguments": "-y @modelcontextprotocol/server-github@2025.4.8",
+        "Env var names": "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "Plaintext secrets": "GITHUB_PERSONAL_ACCESS_TOKEN (GitHub token)",
+        "Reaches": "code"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Claude Code - Engineering' (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1042).",
+        "+15 SecretInPlaintext: An AI provider key or token is stored in a plaintext file",
+        "Remaining risk score 15 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Claude Code - Engineering'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0055",
+      "classification": "Trusted",
+      "score": 15,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "SecretFile",
+      "agent": "Claude Code",
+      "agentId": "claude-code",
+      "title": "Plaintext key or token in .claude.json (GitHub token)",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\.claude.json",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "SecretInPlaintext"
+      ],
+      "allowListEntry": "Claude Code - Engineering",
+      "evidence": {
+        "File": "C:\\Users\\alice\\.claude.json",
+        "Key formats": "GitHub token",
+        "Line numbers": "9",
+        "Last modified": "2026-10-23 10:00:00",
+        "Values": "not recorded (RAC never stores or prints key values)"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Claude Code - Engineering' (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1042).",
+        "+15 SecretInPlaintext: An AI provider key or token is stored in a plaintext file",
+        "Remaining risk score 15 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Claude Code - Engineering'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0056",
+      "classification": "Trusted",
+      "score": 15,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "SecretFile",
+      "agent": "Claude Desktop",
+      "agentId": "claude-desktop",
+      "title": "Plaintext key or token in claude_desktop_config.json (Slack token)",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\AppData\\Roaming\\Claude\\claude_desktop_config.json",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "SecretInPlaintext"
+      ],
+      "allowListEntry": "Claude Desktop - company standard",
+      "evidence": {
+        "File": "C:\\Users\\alice\\AppData\\Roaming\\Claude\\claude_desktop_config.json",
+        "Key formats": "Slack token",
+        "Line numbers": "25",
+        "Last modified": "2026-10-23 10:00:00",
+        "Values": "not recorded (RAC never stores or prints key values)"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Claude Desktop - company standard' (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1043).",
+        "+15 SecretInPlaintext: An AI provider key or token is stored in a plaintext file",
+        "Remaining risk score 15 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Claude Desktop - company standard'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0057",
+      "classification": "Trusted",
+      "score": 10,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "IdeExtension",
+      "agent": "GitHub Copilot (VS Code agent mode / Copilot CLI)",
+      "agentId": "github-copilot",
+      "title": "GitHub Copilot (VS Code agent mode / Copilot CLI) extension in .vscode (github.copilot)",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\.vscode\\extensions\\github.copilot-1.350.0",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "RecentPackageInstall"
+      ],
+      "allowListEntry": "GitHub Copilot Business",
+      "evidence": {
+        "IDE": ".vscode",
+        "Extension": "github.copilot",
+        "Version": "1.350.0",
+        "Folder": "C:\\Users\\alice\\.vscode\\extensions\\github.copilot-1.350.0",
+        "Installed on": "2026-10-23 10:00:00"
+      },
+      "reasons": [
+        "Matches allow-list entry 'GitHub Copilot Business' (approved by IT Security (J. Admin), on 2026-08-01, expires 2099-12-31).",
+        "+10 RecentPackageInstall: Agent software was installed within the lookback window",
+        "Remaining risk score 10 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'GitHub Copilot Business'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0058",
+      "classification": "Trusted",
+      "score": 10,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "IdeExtension",
+      "agent": "GitHub Copilot (VS Code agent mode / Copilot CLI)",
+      "agentId": "github-copilot",
+      "title": "GitHub Copilot (VS Code agent mode / Copilot CLI) extension in .vscode (github.copilot-chat)",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\.vscode\\extensions\\github.copilot-chat-0.31.0",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "RecentPackageInstall"
+      ],
+      "allowListEntry": "GitHub Copilot Business",
+      "evidence": {
+        "IDE": ".vscode",
+        "Extension": "github.copilot-chat",
+        "Version": "0.31.0",
+        "Folder": "C:\\Users\\alice\\.vscode\\extensions\\github.copilot-chat-0.31.0",
+        "Installed on": "2026-10-23 10:00:00"
+      },
+      "reasons": [
+        "Matches allow-list entry 'GitHub Copilot Business' (approved by IT Security (J. Admin), on 2026-08-01, expires 2099-12-31).",
+        "+10 RecentPackageInstall: Agent software was installed within the lookback window",
+        "Remaining risk score 10 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'GitHub Copilot Business'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0059",
+      "classification": "Trusted",
+      "score": 10,
+      "category": "Processes",
+      "breadcrumb": "AgentProcess",
+      "agent": "Claude Desktop",
+      "agentId": "claude-desktop",
+      "title": "Claude Desktop running (claude.exe, PID 4100)",
+      "user": "CORP\\alice",
+      "location": "C:\\Users\\alice\\AppData\\Local\\AnthropicClaude\\app-1.0.1307\\claude.exe",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "LongRunning"
+      ],
+      "allowListEntry": "Claude Desktop - company standard",
+      "evidence": {
+        "Process": "claude.exe (PID 4100)",
+        "Executable": "C:\\Users\\alice\\AppData\\Local\\AnthropicClaude\\app-1.0.1307\\claude.exe",
+        "Command line": "\"C:\\Users\\alice\\AppData\\Local\\AnthropicClaude\\app-1.0.1307\\claude.exe\"",
+        "Parent": "explorer.exe (PID 801)",
+        "Owner": "CORP\\alice",
+        "Started": "2026-10-23 10:00:00",
+        "Uptime (hours)": "81.5",
+        "Matched because": "process name 'claude.exe'"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Claude Desktop - company standard' (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1043).",
+        "+10 LongRunning: Agent process has been running longer than the long-running threshold",
+        "Remaining risk score 10 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Claude Desktop - company standard'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0060",
+      "classification": "Trusted",
+      "score": 0,
+      "category": "Behavior",
+      "breadcrumb": "PackageInstallActivity",
+      "agent": "Claude Code",
+      "agentId": "claude-code",
+      "title": "Claude Code: 1 package install(s) in the last 7 days",
+      "user": "alice",
+      "location": "Install activity: Claude Code",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "RecentPackageInstall"
+      ],
+      "allowListEntry": "Claude Code - Engineering",
+      "evidence": {
+        "Installs": "1",
+        "Launched by the agent itself": "0",
+        "Most recent": "2026-10-23 10:00 @anthropic-ai/claude-code 2.1.3 (npm global) [install folder date]",
+        "Users": "alice"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Claude Code - Engineering' (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1042).",
+        "Accepted by the approval: RecentPackageInstall (Agent software was installed within the lookback window).",
+        "Remaining risk score 0 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Claude Code - Engineering'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0061",
+      "classification": "Trusted",
+      "score": 0,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "AgentConfigDir",
+      "agent": "Claude Code",
+      "agentId": "claude-code",
+      "title": "Claude Code installed or configured for user alice",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\.claude",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [],
+      "allowListEntry": "Claude Code - Engineering",
+      "evidence": {
+        "Kind": "CLI coding agent",
+        "Vendor": "Anthropic",
+        "Locations": "C:\\Users\\alice\\.claude; C:\\Users\\alice\\.claude.json",
+        "Top-level items": "5",
+        "Last changed": "2026-10-23 10:00:00",
+        "Skills / memory": "skills/code-review, CLAUDE.md",
+        "Changed in lookback": "6"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Claude Code - Engineering' (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1042).",
+        "Remaining risk score 0 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Claude Code - Engineering'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0062",
+      "classification": "Trusted",
+      "score": 0,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "AgentPackage",
+      "agent": "Claude Code",
+      "agentId": "claude-code",
+      "title": "Claude Code package installed: @anthropic-ai/claude-code 2.1.3",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\AppData\\Roaming\\npm\\node_modules\\@anthropic-ai\\claude-code",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "RecentPackageInstall"
+      ],
+      "allowListEntry": "Claude Code - Engineering",
+      "evidence": {
+        "Package": "@anthropic-ai/claude-code",
+        "Ecosystem": "npm",
+        "Installed via": "npm global",
+        "Version": "2.1.3",
+        "Install path": "C:\\Users\\alice\\AppData\\Roaming\\npm\\node_modules\\@anthropic-ai\\claude-code",
+        "Installed on": "2026-10-23 10:00:00"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Claude Code - Engineering' (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1042).",
+        "Accepted by the approval: RecentPackageInstall (Agent software was installed within the lookback window).",
+        "Remaining risk score 0 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Claude Code - Engineering'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0063",
+      "classification": "Trusted",
+      "score": 0,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "AgentConfigDir",
+      "agent": "Claude Desktop",
+      "agentId": "claude-desktop",
+      "title": "Claude Desktop installed or configured for user alice",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\AppData\\Roaming\\Claude",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [],
+      "allowListEntry": "Claude Desktop - company standard",
+      "evidence": {
+        "Kind": "Desktop agent app",
+        "Vendor": "Anthropic",
+        "Locations": "C:\\Users\\alice\\AppData\\Roaming\\Claude",
+        "Top-level items": "2",
+        "Last changed": "2026-10-23 10:00:00",
+        "Changed in lookback": "3"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Claude Desktop - company standard' (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1043).",
+        "Remaining risk score 0 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Claude Desktop - company standard'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0064",
+      "classification": "Trusted",
+      "score": 0,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "McpServerConfig",
+      "agent": "GitHub Copilot (VS Code agent mode / Copilot CLI)",
+      "agentId": "github-copilot",
+      "title": "MCP server 'playwright' configured for GitHub Copilot (VS Code agent mode / Copilot CLI)",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\AppData\\Roaming\\Code\\User\\mcp.json :: playwright",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [],
+      "allowListEntry": "GitHub Copilot Business",
+      "evidence": {
+        "Config file": "C:\\Users\\alice\\AppData\\Roaming\\Code\\User\\mcp.json",
+        "Server name": "playwright",
+        "Scope": "User",
+        "Transport": "stdio (local process)",
+        "Command": "npx",
+        "Arguments": "@playwright/mcp@0.0.41",
+        "Reaches": "browser"
+      },
+      "reasons": [
+        "Matches allow-list entry 'GitHub Copilot Business' (approved by IT Security (J. Admin), on 2026-08-01, expires 2099-12-31).",
+        "Remaining risk score 0 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'GitHub Copilot Business'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0065",
+      "classification": "Trusted",
+      "score": 0,
+      "category": "ConfigAndSecrets",
+      "breadcrumb": "AgentConfigDir",
+      "agent": "Ollama",
+      "agentId": "ollama",
+      "title": "Ollama installed or configured for user alice",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\.ollama",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [],
+      "allowListEntry": "Ollama - local models (alice only)",
+      "evidence": {
+        "Kind": "Local LLM runtime",
+        "Vendor": "Ollama",
+        "Locations": "C:\\Users\\alice\\.ollama; C:\\Users\\alice\\AppData\\Local\\Ollama",
+        "Top-level items": "2",
+        "Last changed": "2026-10-23 10:00:00",
+        "Changed in lookback": "4"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Ollama - local models (alice only)' (approved by IT Security (J. Admin), on 2026-09-15, expires 2099-12-31).",
+        "Remaining risk score 0 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Ollama - local models (alice only)'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0066",
+      "classification": "Trusted",
+      "score": 0,
+      "category": "LogsAndEvents",
+      "breadcrumb": "AgentTranscript",
+      "agent": "Claude Code",
+      "agentId": "claude-code",
+      "title": "Claude Code transcripts: 2 file(s), newest 2026-10-23 10:00",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\.claude\\projects",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [],
+      "allowListEntry": "Claude Code - Engineering",
+      "evidence": {
+        "Location": "C:\\Users\\alice\\.claude\\projects",
+        "Kind": "Transcript",
+        "Files": "2",
+        "Total size (MB)": "0",
+        "Oldest": "2026-10-23 10:00:00",
+        "Newest": "2026-10-23 10:00:00",
+        "Changed in lookback": "2",
+        "Tool-call records": "3 record(s) in 2 file(s)",
+        "Content": "not quoted (summary only)"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Claude Code - Engineering' (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1042).",
+        "Remaining risk score 0 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Claude Code - Engineering'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0067",
+      "classification": "Trusted",
+      "score": 0,
+      "category": "LogsAndEvents",
+      "breadcrumb": "AgentLog",
+      "agent": "Claude Desktop",
+      "agentId": "claude-desktop",
+      "title": "Claude Desktop logs: 3 file(s), newest 2026-10-23 10:00",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\AppData\\Roaming\\Claude\\logs",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [],
+      "allowListEntry": "Claude Desktop - company standard",
+      "evidence": {
+        "Location": "C:\\Users\\alice\\AppData\\Roaming\\Claude\\logs",
+        "Kind": "Log",
+        "Files": "3",
+        "Total size (MB)": "0",
+        "Oldest": "2026-10-23 10:00:00",
+        "Newest": "2026-10-23 10:00:00",
+        "Changed in lookback": "3",
+        "MCP servers in logs": "filesystem, gmail",
+        "Content": "not quoted (summary only)"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Claude Desktop - company standard' (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1043).",
+        "Remaining risk score 0 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Claude Desktop - company standard'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0068",
+      "classification": "Trusted",
+      "score": 0,
+      "category": "LogsAndEvents",
+      "breadcrumb": "SysmonAgentProcess",
+      "agent": "Claude Desktop",
+      "agentId": "claude-desktop",
+      "title": "Claude Desktop: 1 process launch(es) in the last 7 days",
+      "user": "CORP\\alice",
+      "location": "Event log: Sysmon Operational (1)",
+      "eventTime": "2026-10-23 10:01:00",
+      "indicators": [],
+      "allowListEntry": "Claude Desktop - company standard",
+      "evidence": {
+        "Event": "Sysmon process creation (1)",
+        "Launches": "1",
+        "First seen": "2026-10-23 10:01:00",
+        "Last seen": "2026-10-23 10:01:00",
+        "Shells launched by agent": "0",
+        "Images": "node.exe",
+        "Sample command lines": "node C:\\Users\\alice\\AppData\\Roaming\\npm\\node_modules\\@modelcontextprotocol\\server-filesystem\\dist\\index.js C:\\Users\\alice\\Documents",
+        "User": "CORP\\alice"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Claude Desktop - company standard' (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1043).",
+        "Remaining risk score 0 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Claude Desktop - company standard'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0069",
+      "classification": "Trusted",
+      "score": 0,
+      "category": "LogsAndEvents",
+      "breadcrumb": "AgentLog",
+      "agent": "Ollama",
+      "agentId": "ollama",
+      "title": "Ollama logs: 1 file(s), newest 2026-10-23 10:00",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\AppData\\Local\\Ollama",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [],
+      "allowListEntry": "Ollama - local models (alice only)",
+      "evidence": {
+        "Location": "C:\\Users\\alice\\AppData\\Local\\Ollama",
+        "Kind": "Log",
+        "Files": "1",
+        "Total size (MB)": "0",
+        "Oldest": "2026-10-23 10:00:00",
+        "Newest": "2026-10-23 10:00:00",
+        "Changed in lookback": "1",
+        "Content": "not quoted (summary only)"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Ollama - local models (alice only)' (approved by IT Security (J. Admin), on 2026-09-15, expires 2099-12-31).",
+        "Remaining risk score 0 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Ollama - local models (alice only)'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0070",
+      "classification": "Trusted",
+      "score": 0,
+      "category": "LogsAndEvents",
+      "breadcrumb": "AgentHistory",
+      "agent": "Ollama",
+      "agentId": "ollama",
+      "title": "Ollama history: 1 file(s), newest 2026-10-23 10:00",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\.ollama\\history",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [],
+      "allowListEntry": "Ollama - local models (alice only)",
+      "evidence": {
+        "Location": "C:\\Users\\alice\\.ollama\\history",
+        "Kind": "History",
+        "Files": "1",
+        "Total size (MB)": "0",
+        "Oldest": "2026-10-23 10:00:00",
+        "Newest": "2026-10-23 10:00:00",
+        "Changed in lookback": "1",
+        "Tool-call records": "0 record(s) in 1 file(s)",
+        "Content": "not quoted (summary only)"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Ollama - local models (alice only)' (approved by IT Security (J. Admin), on 2026-09-15, expires 2099-12-31).",
+        "Remaining risk score 0 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Ollama - local models (alice only)'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0071",
+      "classification": "Trusted",
+      "score": 0,
+      "category": "Network",
+      "breadcrumb": "LlmConnection",
+      "agent": "Claude Code",
+      "agentId": "claude-code",
+      "title": "claude.exe (PID 4300) connected to api.anthropic.com (Anthropic)",
+      "user": "CORP\\alice",
+      "location": "claude.exe (PID 4300) -> api.anthropic.com",
+      "eventTime": "2026-10-23 11:00:00",
+      "indicators": [
+        "PersistentLlmConnection"
+      ],
+      "allowListEntry": "Claude Code - Engineering",
+      "evidence": {
+        "Process": "claude.exe (PID 4300)",
+        "Remote host": "api.anthropic.com",
+        "Provider": "Anthropic",
+        "Remote address": "160.79.104.10:443",
+        "Open sockets": "1",
+        "Executable": "C:\\Users\\alice\\.local\\bin\\claude.exe",
+        "Command line": "claude.exe",
+        "Owner": "CORP\\alice",
+        "Connected since": "2026-10-23 11:00:00",
+        "Open for (minutes)": "4833",
+        "Hostname source": "local DNS client cache (no lookups performed)"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Claude Code - Engineering' (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1042).",
+        "Accepted by the approval: PersistentLlmConnection (Connection to an LLM API has stayed open for a long time or across samples).",
+        "Remaining risk score 0 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Claude Code - Engineering'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0072",
+      "classification": "Trusted",
+      "score": 0,
+      "category": "Network",
+      "breadcrumb": "DnsCacheLlm",
+      "agent": "Unattributed (DNS cache)",
+      "agentId": "",
+      "title": "Recent DNS lookup of claude.ai (Anthropic)",
+      "user": "",
+      "location": "DNS cache: claude.ai",
+      "eventTime": "2026-10-26 19:32:40",
+      "indicators": [],
+      "allowListEntry": "Sanctioned AI providers (network)",
+      "evidence": {
+        "Hostname": "claude.ai",
+        "Provider": "Anthropic",
+        "Resolved addresses": "160.79.104.20",
+        "Note": "Looked up recently (cache entries expire with their TTL). No open connection could be tied to a process at scan time. Sysmon Event 22 gives per-process DNS history."
+      },
+      "reasons": [
+        "Matches allow-list entry 'Sanctioned AI providers (network)' (approved by IT Security (J. Admin), on 2026-08-01, expires 2099-12-31).",
+        "Remaining risk score 0 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Sanctioned AI providers (network)'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0073",
+      "classification": "Trusted",
+      "score": 0,
+      "category": "Network",
+      "breadcrumb": "ProxyLogLlm",
+      "agent": "Unattributed (proxy log)",
+      "agentId": "",
+      "title": "1 requests to api.anthropic.com in proxy logs",
+      "user": "",
+      "location": "Proxy logs: api.anthropic.com",
+      "eventTime": "2026-10-26 19:32:40",
+      "indicators": [],
+      "allowListEntry": "Sanctioned AI providers (network)",
+      "evidence": {
+        "Hostname": "api.anthropic.com",
+        "Provider": "Anthropic",
+        "Matching log lines": "1",
+        "Log files": "access.log",
+        "Lines scanned": "6"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Sanctioned AI providers (network)' (approved by IT Security (J. Admin), on 2026-08-01, expires 2099-12-31).",
+        "Remaining risk score 0 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Sanctioned AI providers (network)'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0074",
+      "classification": "Trusted",
+      "score": 0,
+      "category": "Persistence",
+      "breadcrumb": "RunKey",
+      "agent": "Claude Desktop",
+      "agentId": "claude-desktop",
+      "title": "Run key 'Claude' starts Claude Desktop at logon",
+      "user": "CORP\\alice",
+      "location": "HKEY_USERS\\S-1-5-21-1-2-3-1001\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\Claude",
+      "eventTime": "",
+      "indicators": [
+        "PersistenceAutostart"
+      ],
+      "allowListEntry": "Claude Desktop - company standard",
+      "evidence": {
+        "Registry key": "HKEY_USERS\\S-1-5-21-1-2-3-1001\\Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+        "Value name": "Claude",
+        "Command": "\"C:\\Users\\alice\\AppData\\Local\\AnthropicClaude\\claude.exe\" --startup",
+        "Applies to": "CORP\\alice",
+        "Matched because": "references the executable of Claude Desktop"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Claude Desktop - company standard' (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1043).",
+        "Accepted by the approval: PersistenceAutostart (Starts automatically without a person launching it).",
+        "Remaining risk score 0 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Claude Desktop - company standard'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0075",
+      "classification": "Trusted",
+      "score": 0,
+      "category": "Persistence",
+      "breadcrumb": "StartupItem",
+      "agent": "Ollama",
+      "agentId": "ollama",
+      "title": "Startup folder entry 'Ollama.lnk' starts Ollama",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\Ollama.lnk",
+      "eventTime": "2026-10-22 10:00:00",
+      "indicators": [
+        "PersistenceAutostart"
+      ],
+      "allowListEntry": "Ollama - local models (alice only)",
+      "evidence": {
+        "Startup entry": "C:\\Users\\alice\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\Ollama.lnk",
+        "Target": "C:\\Users\\alice\\AppData\\Local\\Programs\\Ollama\\ollama app.exe",
+        "Created / changed": "2026-10-22 10:00:00",
+        "Matched because": "references the executable of Ollama"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Ollama - local models (alice only)' (approved by IT Security (J. Admin), on 2026-09-15, expires 2099-12-31).",
+        "Accepted by the approval: PersistenceAutostart (Starts automatically without a person launching it).",
+        "Remaining risk score 0 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Ollama - local models (alice only)'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0076",
+      "classification": "Trusted",
+      "score": 0,
+      "category": "Processes",
+      "breadcrumb": "AgentProcess",
+      "agent": "Claude Code",
+      "agentId": "claude-code",
+      "title": "Claude Code running (claude.exe, PID 4300)",
+      "user": "CORP\\alice",
+      "location": "C:\\Users\\alice\\.local\\bin\\claude.exe",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "LongRunning"
+      ],
+      "allowListEntry": "Claude Code - Engineering",
+      "evidence": {
+        "Process": "claude.exe (PID 4300)",
+        "Executable": "C:\\Users\\alice\\.local\\bin\\claude.exe",
+        "Command line": "claude.exe",
+        "Parent": "explorer.exe (PID 801)",
+        "Owner": "CORP\\alice",
+        "Started": "2026-10-23 10:00:00",
+        "Uptime (hours)": "81.5",
+        "Matched because": "process name 'claude.exe' in a path matching //\\.local/bin/|/claude-code/|/claudecode//"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Claude Code - Engineering' (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1042).",
+        "Accepted by the approval: LongRunning (Agent process has been running longer than the long-running threshold).",
+        "Remaining risk score 0 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Claude Code - Engineering'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0077",
+      "classification": "Trusted",
+      "score": 0,
+      "category": "Processes",
+      "breadcrumb": "AgentProcess",
+      "agent": "Ollama",
+      "agentId": "ollama",
+      "title": "Ollama running (ollama.exe, PID 7100)",
+      "user": "CORP\\alice",
+      "location": "C:\\Users\\alice\\AppData\\Local\\Programs\\Ollama\\ollama.exe",
+      "eventTime": "2026-10-23 08:00:00",
+      "indicators": [
+        "LongRunning"
+      ],
+      "allowListEntry": "Ollama - local models (alice only)",
+      "evidence": {
+        "Process": "ollama.exe (PID 7100)",
+        "Executable": "C:\\Users\\alice\\AppData\\Local\\Programs\\Ollama\\ollama.exe",
+        "Command line": "\"ollama.exe\" serve",
+        "Parent": "explorer.exe (PID 801)",
+        "Owner": "CORP\\alice",
+        "Started": "2026-10-23 08:00:00",
+        "Uptime (hours)": "83.5",
+        "Matched because": "process name 'ollama.exe'"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Ollama - local models (alice only)' (approved by IT Security (J. Admin), on 2026-09-15, expires 2099-12-31).",
+        "Accepted by the approval: LongRunning (Agent process has been running longer than the long-running threshold).",
+        "Remaining risk score 0 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Ollama - local models (alice only)'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0078",
+      "classification": "Trusted",
+      "score": 0,
+      "category": "TokensAndOAuth",
+      "breadcrumb": "BrowserExtension",
+      "agent": "Claude Desktop",
+      "agentId": "claude-desktop",
+      "title": "AI browser extension 'Claude' in Chrome",
+      "user": "alice",
+      "location": "C:\\Users\\alice\\AppData\\Local\\Google\\Chrome\\User Data/Default/Extensions/fcoeoabgfenejglbffodgkkbkcdhcgfn/1.0.36_0",
+      "eventTime": "2026-10-23 10:00:00",
+      "indicators": [
+        "BrowserControlPermission"
+      ],
+      "allowListEntry": "Claude Desktop - company standard",
+      "evidence": {
+        "Browser": "Chrome (Default)",
+        "Extension": "Claude",
+        "Extension ID": "fcoeoabgfenejglbffodgkkbkcdhcgfn",
+        "Version": "1.0.36_0",
+        "Notable permissions": "debugger, nativeMessaging, tabs, sidePanel",
+        "Folder": "C:\\Users\\alice\\AppData\\Local\\Google\\Chrome\\User Data/Default/Extensions/fcoeoabgfenejglbffodgkkbkcdhcgfn/1.0.36_0"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Claude Desktop - company standard' (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1043).",
+        "Accepted by the approval: BrowserControlPermission (Browser extension holds debugger or native-messaging permission (can drive the browser)).",
+        "Remaining risk score 0 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Claude Desktop - company standard'. Re-validate before the approval expires on 2099-12-31."
+    },
+    {
+      "findingId": "RAC-0079",
+      "classification": "Trusted",
+      "score": 0,
+      "category": "TokensAndOAuth",
+      "breadcrumb": "NativeMessagingHost",
+      "agent": "Claude Desktop",
+      "agentId": "claude-desktop",
+      "title": "Browser bridge 'com.anthropic.claude_browser_extension' lets Claude Desktop drive Chrome",
+      "user": "CORP\\alice",
+      "location": "Chrome native messaging: com.anthropic.claude_browser_extension",
+      "eventTime": "",
+      "indicators": [
+        "BrowserControlBridge"
+      ],
+      "allowListEntry": "Claude Desktop - company standard",
+      "evidence": {
+        "Browser": "Chrome",
+        "Registered for": "User (CORP\\alice)",
+        "Host name": "com.anthropic.claude_browser_extension",
+        "Manifest": "C:\\Users\\alice\\AppData\\Local\\AnthropicClaude\\ChromeNativeHost\\com.anthropic.claude_browser_extension.json",
+        "Host program": "C:\\Users\\alice\\AppData\\Local\\AnthropicClaude\\chrome-native-host.exe",
+        "Allowed callers": "chrome-extension://fcoeoabgfenejglbffodgkkbkcdhcgfn/"
+      },
+      "reasons": [
+        "Matches allow-list entry 'Claude Desktop - company standard' (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1043).",
+        "Accepted by the approval: BrowserControlBridge (Native messaging host lets a local program talk to the browser).",
+        "Remaining risk score 0 is below the threshold of 40."
+      ],
+      "recommendation": "No action needed. Approved under 'Claude Desktop - company standard'. Re-validate before the approval expires on 2099-12-31."
+    }
+  ]
+}

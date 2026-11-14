@@ -1,0 +1,768 @@
+{
+  "schemaVersion": 1,
+  "catalogVersion": "2026.10.26",
+  "notes": [
+    "Starter detection catalog for Rogue Agent Checker. Vendors move files around between releases: treat this as living content.",
+    "Regex patterns are matched case-insensitively against NORMALIZED text: lowercase, backslashes converted to forward slashes.",
+    "Path templates use forward slashes and these tokens, expanded per user profile: ~ (profile root), %APPDATA%, %LOCALAPPDATA%, %TEMP%. Machine tokens: %PROGRAMDATA%, %PROGRAMFILES%.",
+    "First matching agent wins, so more specific entries (for example claude-code) must come before generic ones (claude-desktop)."
+  ],
+
+  "agents": [
+    {
+      "id": "claude-code",
+      "name": "Claude Code",
+      "vendor": "Anthropic",
+      "kind": "CLI coding agent",
+      "processes": [ { "name": "claude.exe", "path": "/\\.local/bin/|/claude-code/|/claudecode/" } ],
+      "commandLinePatterns": [ "@anthropic-ai/claude-code", "claude-code/cli\\.m?js" ],
+      "keywords": [ "claude[ -]?code" ],
+      "configPaths": [ "~/.claude", "~/.claude.json" ],
+      "skillPaths": [ "~/.claude/skills", "~/.claude/agents", "~/.claude/commands", "~/.claude/CLAUDE.md" ],
+      "tokenFiles": [ "~/.claude/.credentials.json" ],
+      "logPaths": [
+        { "path": "~/.claude/projects", "filter": "*.jsonl", "kind": "Transcript" },
+        { "path": "~/.claude/history.jsonl", "filter": "", "kind": "History" }
+      ],
+      "mcpConfigFiles": [
+        { "path": "~/.claude.json", "format": "json" },
+        { "path": "~/.claude/settings.json", "format": "json" }
+      ],
+      "ideExtensions": [ "^anthropic\\.claude-code" ],
+      "packages": [ { "ecosystem": "npm", "name": "@anthropic-ai/claude-code" } ],
+      "credentialTargets": [ "claude[ -]?code" ],
+      "endpoints": [ "api.anthropic.com", "claude.ai", "console.anthropic.com" ]
+    },
+    {
+      "id": "claude-desktop",
+      "name": "Claude Desktop",
+      "vendor": "Anthropic",
+      "kind": "Desktop agent app",
+      "processes": [ { "name": "claude.exe" } ],
+      "commandLinePatterns": [],
+      "keywords": [ "claude ?desktop", "anthropicclaude", "anthropic\\.claude" ],
+      "configPaths": [ "%APPDATA%/Claude", "%LOCALAPPDATA%/Packages/Claude_*/LocalCache/Roaming/Claude" ],
+      "skillPaths": [],
+      "tokenFiles": [],
+      "logPaths": [
+        { "path": "%APPDATA%/Claude/logs", "filter": "*.log", "kind": "Log" },
+        { "path": "%LOCALAPPDATA%/Packages/Claude_*/LocalCache/Roaming/Claude/logs", "filter": "*.log", "kind": "Log" }
+      ],
+      "mcpConfigFiles": [
+        { "path": "%APPDATA%/Claude/claude_desktop_config.json", "format": "json" },
+        { "path": "%LOCALAPPDATA%/Packages/Claude_*/LocalCache/Roaming/Claude/claude_desktop_config.json", "format": "json" }
+      ],
+      "ideExtensions": [],
+      "packages": [],
+      "credentialTargets": [ "claude" ],
+      "endpoints": [ "claude.ai", "api.anthropic.com" ]
+    },
+    {
+      "id": "openai-codex",
+      "name": "OpenAI Codex CLI",
+      "vendor": "OpenAI",
+      "kind": "CLI coding agent",
+      "processes": [ { "name": "codex.exe" } ],
+      "commandLinePatterns": [ "@openai/codex", "/codex(-cli)?/bin/codex" ],
+      "keywords": [ "openai[ -]?codex", "\\bcodex\\b" ],
+      "configPaths": [ "~/.codex" ],
+      "skillPaths": [ "~/.codex/AGENTS.md", "~/.codex/skills", "~/.codex/prompts" ],
+      "tokenFiles": [ "~/.codex/auth.json" ],
+      "logPaths": [
+        { "path": "~/.codex/sessions", "filter": "*.jsonl", "kind": "Transcript" },
+        { "path": "~/.codex/history.jsonl", "filter": "", "kind": "History" },
+        { "path": "~/.codex/log", "filter": "*", "kind": "Log" }
+      ],
+      "mcpConfigFiles": [ { "path": "~/.codex/config.toml", "format": "toml" } ],
+      "ideExtensions": [ "^openai\\.chatgpt" ],
+      "packages": [ { "ecosystem": "npm", "name": "@openai/codex" } ],
+      "credentialTargets": [ "codex" ],
+      "endpoints": [ "api.openai.com", "chatgpt.com" ]
+    },
+    {
+      "id": "chatgpt-desktop",
+      "name": "ChatGPT Desktop",
+      "vendor": "OpenAI",
+      "kind": "Desktop AI app",
+      "processes": [ { "name": "chatgpt.exe" } ],
+      "commandLinePatterns": [],
+      "keywords": [ "chatgpt" ],
+      "configPaths": [ "%LOCALAPPDATA%/Packages/OpenAI.ChatGPT-Desktop_*" ],
+      "skillPaths": [],
+      "tokenFiles": [],
+      "logPaths": [],
+      "mcpConfigFiles": [],
+      "ideExtensions": [],
+      "packages": [],
+      "credentialTargets": [ "chatgpt", "openai" ],
+      "endpoints": [ "chatgpt.com", "api.openai.com" ]
+    },
+    {
+      "id": "gemini-cli",
+      "name": "Gemini CLI",
+      "vendor": "Google",
+      "kind": "CLI coding agent",
+      "processes": [],
+      "commandLinePatterns": [ "@google/gemini-cli", "gemini-cli/(dist|bundle)" ],
+      "keywords": [ "gemini[ -]?cli" ],
+      "configPaths": [ "~/.gemini" ],
+      "skillPaths": [ "~/.gemini/GEMINI.md", "~/.gemini/commands", "~/.gemini/extensions" ],
+      "tokenFiles": [ "~/.gemini/oauth_creds.json", "~/.gemini/google_accounts.json" ],
+      "logPaths": [ { "path": "~/.gemini/tmp", "filter": "*.json*", "kind": "Transcript" } ],
+      "mcpConfigFiles": [ { "path": "~/.gemini/settings.json", "format": "json" } ],
+      "ideExtensions": [ "^google\\.geminicodeassist" ],
+      "packages": [ { "ecosystem": "npm", "name": "@google/gemini-cli" } ],
+      "credentialTargets": [ "gemini" ],
+      "endpoints": [ "generativelanguage.googleapis.com", "cloudcode-pa.googleapis.com" ]
+    },
+    {
+      "id": "microsoft-copilot",
+      "name": "Microsoft Copilot (Windows app)",
+      "vendor": "Microsoft",
+      "kind": "Desktop AI app",
+      "processes": [
+        { "name": "copilot.exe", "path": "/windowsapps/microsoft\\.copilot" },
+        { "name": "microsoft.copilot.exe" }
+      ],
+      "commandLinePatterns": [],
+      "keywords": [ "microsoft\\.copilot" ],
+      "configPaths": [],
+      "skillPaths": [],
+      "tokenFiles": [],
+      "logPaths": [],
+      "mcpConfigFiles": [],
+      "ideExtensions": [],
+      "packages": [],
+      "credentialTargets": [],
+      "endpoints": [ "copilot.microsoft.com" ]
+    },
+    {
+      "id": "github-copilot",
+      "name": "GitHub Copilot (VS Code agent mode / Copilot CLI)",
+      "vendor": "GitHub / Microsoft",
+      "kind": "IDE and CLI coding agent",
+      "processes": [ { "name": "copilot.exe", "path": "/npm/|/\\.local/bin/|github" } ],
+      "commandLinePatterns": [ "@github/copilot", "copilot-language-server", "github\\.copilot(-chat)?-[0-9]" ],
+      "keywords": [ "github[ -]?copilot", "copilot-language-server" ],
+      "configPaths": [ "%LOCALAPPDATA%/github-copilot", "~/.copilot" ],
+      "skillPaths": [ "~/.copilot/agents" ],
+      "tokenFiles": [ "%LOCALAPPDATA%/github-copilot/apps.json", "%LOCALAPPDATA%/github-copilot/hosts.json" ],
+      "logPaths": [
+        { "path": "~/.copilot/session-state", "filter": "*", "kind": "Transcript" },
+        { "path": "~/.copilot/logs", "filter": "*.log", "kind": "Log" }
+      ],
+      "mcpConfigFiles": [
+        { "path": "%APPDATA%/Code/User/mcp.json", "format": "json" },
+        { "path": "%APPDATA%/Code/User/settings.json", "format": "json" },
+        { "path": "%APPDATA%/Code - Insiders/User/mcp.json", "format": "json" },
+        { "path": "~/.copilot/mcp-config.json", "format": "json" }
+      ],
+      "ideExtensions": [ "^github\\.copilot" ],
+      "packages": [ { "ecosystem": "npm", "name": "@github/copilot" } ],
+      "credentialTargets": [ "copilot" ],
+      "endpoints": [ "*.githubcopilot.com", "copilot-proxy.githubusercontent.com" ]
+    },
+    {
+      "id": "cursor",
+      "name": "Cursor",
+      "vendor": "Anysphere",
+      "kind": "AI IDE",
+      "processes": [ { "name": "cursor.exe" } ],
+      "commandLinePatterns": [],
+      "keywords": [ "\\bcursor\\b" ],
+      "configPaths": [ "~/.cursor", "%APPDATA%/Cursor" ],
+      "skillPaths": [ "~/.cursor/rules" ],
+      "tokenFiles": [],
+      "logPaths": [ { "path": "%APPDATA%/Cursor/logs", "filter": "*.log", "kind": "Log" } ],
+      "mcpConfigFiles": [ { "path": "~/.cursor/mcp.json", "format": "json" } ],
+      "ideExtensions": [],
+      "packages": [],
+      "credentialTargets": [ "cursor" ],
+      "endpoints": [ "*.cursor.sh", "*.cursor.com" ]
+    },
+    {
+      "id": "windsurf",
+      "name": "Windsurf",
+      "vendor": "Cognition (formerly Codeium)",
+      "kind": "AI IDE",
+      "processes": [ { "name": "windsurf.exe" } ],
+      "commandLinePatterns": [],
+      "keywords": [ "windsurf", "codeium" ],
+      "configPaths": [ "~/.codeium/windsurf", "%APPDATA%/Windsurf" ],
+      "skillPaths": [ "~/.codeium/windsurf/memories", "~/.codeium/windsurf/global_workflows" ],
+      "tokenFiles": [],
+      "logPaths": [ { "path": "%APPDATA%/Windsurf/logs", "filter": "*.log", "kind": "Log" } ],
+      "mcpConfigFiles": [ { "path": "~/.codeium/windsurf/mcp_config.json", "format": "json" } ],
+      "ideExtensions": [ "^codeium\\." ],
+      "packages": [],
+      "credentialTargets": [ "windsurf", "codeium" ],
+      "endpoints": [ "*.codeium.com", "*.windsurf.com" ]
+    },
+    {
+      "id": "cline",
+      "name": "Cline",
+      "vendor": "Cline Bot Inc. (open source)",
+      "kind": "IDE agent extension",
+      "processes": [],
+      "commandLinePatterns": [],
+      "keywords": [ "\\bcline\\b" ],
+      "configPaths": [
+        "%APPDATA%/Code/User/globalStorage/saoudrizwan.claude-dev",
+        "%APPDATA%/Cursor/User/globalStorage/saoudrizwan.claude-dev",
+        "~/Documents/Cline"
+      ],
+      "skillPaths": [ "~/Documents/Cline/Rules", "~/Documents/Cline/Workflows" ],
+      "tokenFiles": [],
+      "logPaths": [
+        { "path": "%APPDATA%/Code/User/globalStorage/saoudrizwan.claude-dev/tasks", "filter": "api_conversation_history.json", "kind": "Transcript" }
+      ],
+      "mcpConfigFiles": [
+        { "path": "%APPDATA%/Code/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json", "format": "json" },
+        { "path": "%APPDATA%/Cursor/User/globalStorage/saoudrizwan.claude-dev/settings/cline_mcp_settings.json", "format": "json" }
+      ],
+      "ideExtensions": [ "^saoudrizwan\\.claude-dev" ],
+      "packages": [],
+      "credentialTargets": [],
+      "endpoints": []
+    },
+    {
+      "id": "roo-code",
+      "name": "Roo Code",
+      "vendor": "Roo Code (open source)",
+      "kind": "IDE agent extension",
+      "processes": [],
+      "commandLinePatterns": [],
+      "keywords": [ "roo[ -]?code", "roo-cline" ],
+      "configPaths": [ "%APPDATA%/Code/User/globalStorage/rooveterinaryinc.roo-cline" ],
+      "skillPaths": [],
+      "tokenFiles": [],
+      "logPaths": [
+        { "path": "%APPDATA%/Code/User/globalStorage/rooveterinaryinc.roo-cline/tasks", "filter": "api_conversation_history.json", "kind": "Transcript" }
+      ],
+      "mcpConfigFiles": [
+        { "path": "%APPDATA%/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/mcp_settings.json", "format": "json" }
+      ],
+      "ideExtensions": [ "^rooveterinaryinc\\.roo-cline" ],
+      "packages": [],
+      "credentialTargets": [],
+      "endpoints": []
+    },
+    {
+      "id": "continue",
+      "name": "Continue",
+      "vendor": "Continue Dev (open source)",
+      "kind": "IDE agent extension / CLI",
+      "processes": [],
+      "commandLinePatterns": [ "@continuedev/cli" ],
+      "keywords": [ "continuedev" ],
+      "configPaths": [ "~/.continue" ],
+      "skillPaths": [ "~/.continue/rules", "~/.continue/prompts" ],
+      "tokenFiles": [],
+      "logPaths": [ { "path": "~/.continue/sessions", "filter": "*.json", "kind": "Transcript" } ],
+      "mcpConfigFiles": [
+        { "path": "~/.continue/config.yaml", "format": "yaml" },
+        { "path": "~/.continue/config.json", "format": "json" }
+      ],
+      "ideExtensions": [ "^continue\\.continue" ],
+      "packages": [ { "ecosystem": "npm", "name": "@continuedev/cli" } ],
+      "credentialTargets": [],
+      "endpoints": []
+    },
+    {
+      "id": "aider",
+      "name": "Aider",
+      "vendor": "Aider (open source)",
+      "kind": "CLI coding agent",
+      "processes": [ { "name": "aider.exe" } ],
+      "commandLinePatterns": [ "(^|[ /\"])aider(\\.exe)?\"?( |$)", "-m aider\\b", "aider_chat" ],
+      "keywords": [ "\\baider\\b" ],
+      "configPaths": [ "~/.aider", "~/.aider.conf.yml" ],
+      "skillPaths": [],
+      "tokenFiles": [],
+      "logPaths": [],
+      "mcpConfigFiles": [],
+      "ideExtensions": [],
+      "packages": [ { "ecosystem": "pypi", "name": "aider-chat" } ],
+      "credentialTargets": [],
+      "endpoints": []
+    },
+    {
+      "id": "openclaw",
+      "name": "OpenClaw",
+      "vendor": "OpenClaw (open source; formerly Clawdbot / Moltbot)",
+      "kind": "Autonomous personal agent with gateway",
+      "processes": [ { "name": "openclaw.exe" } ],
+      "commandLinePatterns": [ "openclaw", "clawdbot", "moltbot" ],
+      "keywords": [ "openclaw", "clawdbot", "moltbot" ],
+      "configPaths": [ "~/.openclaw", "~/.clawdbot", "~/.moltbot" ],
+      "skillPaths": [
+        "~/.openclaw/workspace/skills",
+        "~/.openclaw/skills",
+        "~/.openclaw/workspace/MEMORY.md",
+        "~/.openclaw/workspace/memory",
+        "~/.openclaw/workspace/AGENTS.md",
+        "~/.openclaw/workspace/SOUL.md",
+        "~/.clawdbot/skills"
+      ],
+      "tokenFiles": [ "~/.openclaw/credentials" ],
+      "logPaths": [
+        { "path": "~/.openclaw/agents", "filter": "*.jsonl", "kind": "Transcript" },
+        { "path": "~/.openclaw/logs", "filter": "*.log", "kind": "Log" },
+        { "path": "%TEMP%/openclaw", "filter": "*.log", "kind": "Log" }
+      ],
+      "mcpConfigFiles": [ { "path": "~/.openclaw/openclaw.json", "format": "json" } ],
+      "ideExtensions": [],
+      "packages": [
+        { "ecosystem": "npm", "name": "openclaw" },
+        { "ecosystem": "npm", "name": "clawdbot" },
+        { "ecosystem": "npm", "name": "moltbot" }
+      ],
+      "credentialTargets": [ "openclaw", "clawdbot", "moltbot" ],
+      "endpoints": []
+    },
+    {
+      "id": "goose",
+      "name": "Goose",
+      "vendor": "Block (open source)",
+      "kind": "Desktop / CLI agent",
+      "processes": [ { "name": "goose.exe" }, { "name": "goosed.exe" } ],
+      "commandLinePatterns": [ "/goose(d)?(\\.exe)?\"?( |$)" ],
+      "keywords": [ "\\bgoose\\b" ],
+      "configPaths": [ "%APPDATA%/Block/goose", "~/.config/goose" ],
+      "skillPaths": [],
+      "tokenFiles": [],
+      "logPaths": [
+        { "path": "%APPDATA%/Block/goose/data/sessions", "filter": "*.jsonl", "kind": "Transcript" },
+        { "path": "~/.local/share/goose/sessions", "filter": "*.jsonl", "kind": "Transcript" }
+      ],
+      "mcpConfigFiles": [
+        { "path": "%APPDATA%/Block/goose/config/config.yaml", "format": "yaml" },
+        { "path": "~/.config/goose/config.yaml", "format": "yaml" }
+      ],
+      "ideExtensions": [],
+      "packages": [],
+      "credentialTargets": [ "goose" ],
+      "endpoints": []
+    },
+    {
+      "id": "opencode",
+      "name": "OpenCode",
+      "vendor": "SST (open source)",
+      "kind": "CLI coding agent",
+      "processes": [ { "name": "opencode.exe" } ],
+      "commandLinePatterns": [ "opencode-ai", "/opencode(\\.exe)?\"?( |$)" ],
+      "keywords": [ "opencode" ],
+      "configPaths": [ "~/.config/opencode", "~/.local/share/opencode" ],
+      "skillPaths": [ "~/.config/opencode/agent", "~/.config/opencode/command" ],
+      "tokenFiles": [ "~/.local/share/opencode/auth.json" ],
+      "logPaths": [
+        { "path": "~/.local/share/opencode/storage", "filter": "*.json", "kind": "Transcript" },
+        { "path": "~/.local/share/opencode/log", "filter": "*.log", "kind": "Log" }
+      ],
+      "mcpConfigFiles": [ { "path": "~/.config/opencode/opencode.json", "format": "json" } ],
+      "ideExtensions": [],
+      "packages": [ { "ecosystem": "npm", "name": "opencode-ai" } ],
+      "credentialTargets": [],
+      "endpoints": []
+    },
+    {
+      "id": "kiro-amazon-q",
+      "name": "Kiro / Amazon Q Developer",
+      "vendor": "Amazon Web Services",
+      "kind": "AI IDE / CLI agent",
+      "processes": [ { "name": "kiro.exe" } ],
+      "commandLinePatterns": [ "amazon-q", "\\bqchat\\b" ],
+      "keywords": [ "\\bkiro\\b", "amazon ?q" ],
+      "configPaths": [ "~/.kiro", "~/.aws/amazonq" ],
+      "skillPaths": [ "~/.kiro/steering" ],
+      "tokenFiles": [],
+      "logPaths": [],
+      "mcpConfigFiles": [
+        { "path": "~/.kiro/settings/mcp.json", "format": "json" },
+        { "path": "~/.aws/amazonq/mcp.json", "format": "json" }
+      ],
+      "ideExtensions": [ "^amazonwebservices\\.amazon-q-vscode" ],
+      "packages": [],
+      "credentialTargets": [ "amazon ?q", "kiro" ],
+      "endpoints": [ "q.*.amazonaws.com", "codewhisperer.*.amazonaws.com" ]
+    },
+    {
+      "id": "ollama",
+      "name": "Ollama",
+      "vendor": "Ollama",
+      "kind": "Local LLM runtime",
+      "processes": [ { "name": "ollama.exe" }, { "name": "ollama app.exe" } ],
+      "commandLinePatterns": [ "ollama(\\.exe)?\"? (serve|run)\\b" ],
+      "keywords": [ "ollama" ],
+      "configPaths": [ "~/.ollama", "%LOCALAPPDATA%/Ollama" ],
+      "skillPaths": [],
+      "tokenFiles": [],
+      "logPaths": [
+        { "path": "%LOCALAPPDATA%/Ollama", "filter": "*.log", "kind": "Log" },
+        { "path": "~/.ollama/history", "filter": "", "kind": "History" }
+      ],
+      "mcpConfigFiles": [],
+      "ideExtensions": [],
+      "packages": [],
+      "credentialTargets": [ "ollama" ],
+      "endpoints": [ "ollama.com", "registry.ollama.ai" ]
+    },
+    {
+      "id": "lm-studio",
+      "name": "LM Studio",
+      "vendor": "Element Labs",
+      "kind": "Local LLM runtime",
+      "processes": [ { "name": "lm studio.exe" }, { "name": "lms.exe" } ],
+      "commandLinePatterns": [],
+      "keywords": [ "lm ?studio" ],
+      "configPaths": [ "~/.lmstudio", "~/.cache/lm-studio" ],
+      "skillPaths": [],
+      "tokenFiles": [],
+      "logPaths": [ { "path": "~/.lmstudio/server-logs", "filter": "*.log", "kind": "Log" } ],
+      "mcpConfigFiles": [ { "path": "~/.lmstudio/mcp.json", "format": "json" } ],
+      "ideExtensions": [],
+      "packages": [],
+      "credentialTargets": [],
+      "endpoints": []
+    },
+    {
+      "id": "n8n",
+      "name": "n8n",
+      "vendor": "n8n GmbH",
+      "kind": "Workflow automation with AI agent nodes",
+      "processes": [],
+      "commandLinePatterns": [ "/n8n/bin/n8n", "node_modules/n8n/", "\\bn8n (start|worker|webhook)\\b" ],
+      "keywords": [ "\\bn8n\\b" ],
+      "configPaths": [ "~/.n8n" ],
+      "skillPaths": [],
+      "tokenFiles": [],
+      "logPaths": [ { "path": "~/.n8n/logs", "filter": "*.log", "kind": "Log" } ],
+      "mcpConfigFiles": [],
+      "ideExtensions": [],
+      "packages": [ { "ecosystem": "npm", "name": "n8n" } ],
+      "credentialTargets": [],
+      "endpoints": []
+    },
+    {
+      "id": "perplexity-comet",
+      "name": "Perplexity Comet",
+      "vendor": "Perplexity",
+      "kind": "Agentic browser",
+      "processes": [ { "name": "comet.exe", "path": "perplexity" } ],
+      "commandLinePatterns": [],
+      "keywords": [ "perplexity", "\\bcomet\\b" ],
+      "configPaths": [ "%LOCALAPPDATA%/Perplexity/Comet" ],
+      "skillPaths": [],
+      "tokenFiles": [],
+      "logPaths": [],
+      "mcpConfigFiles": [],
+      "ideExtensions": [],
+      "packages": [],
+      "credentialTargets": [ "perplexity" ],
+      "endpoints": [ "*.perplexity.ai" ]
+    },
+    {
+      "id": "agent-framework",
+      "name": "Agent framework / SDK (custom-built agent)",
+      "vendor": "Various (open source)",
+      "kind": "Custom agent built on a framework or SDK",
+      "processes": [],
+      "commandLinePatterns": [
+        "\\bcrewai\\b",
+        "\\bautogen(_agentchat|studio)?\\b",
+        "\\blanggraph\\b",
+        "\\bsmolagents\\b",
+        "browser[-_]use",
+        "\\bopenhands\\b",
+        "open[-_]interpreter",
+        "\\bautogpt\\b",
+        "\\bpydantic_ai\\b",
+        "\\bletta\\b",
+        "@anthropic-ai/claude-agent-sdk",
+        "claude_agent_sdk",
+        "@openai/agents",
+        "openai[-_]agents",
+        "@mastra/"
+      ],
+      "keywords": [ "crewai", "autogen", "langgraph", "browser[-_ ]use", "open[-_ ]interpreter", "smolagents" ],
+      "configPaths": [],
+      "skillPaths": [],
+      "tokenFiles": [],
+      "logPaths": [],
+      "mcpConfigFiles": [],
+      "ideExtensions": [],
+      "packages": [
+        { "ecosystem": "pypi", "name": "crewai" },
+        { "ecosystem": "pypi", "name": "autogen-agentchat" },
+        { "ecosystem": "pypi", "name": "pyautogen" },
+        { "ecosystem": "pypi", "name": "langgraph" },
+        { "ecosystem": "pypi", "name": "smolagents" },
+        { "ecosystem": "pypi", "name": "browser-use" },
+        { "ecosystem": "pypi", "name": "open-interpreter" },
+        { "ecosystem": "pypi", "name": "openhands-ai" },
+        { "ecosystem": "pypi", "name": "letta" },
+        { "ecosystem": "pypi", "name": "claude-agent-sdk" },
+        { "ecosystem": "pypi", "name": "openai-agents" },
+        { "ecosystem": "npm", "name": "@anthropic-ai/claude-agent-sdk" },
+        { "ecosystem": "npm", "name": "@openai/agents" },
+        { "ecosystem": "npm", "name": "@mastra/core" }
+      ],
+      "credentialTargets": [],
+      "endpoints": []
+    }
+  ],
+
+  "llmEndpoints": [
+    { "pattern": "api.anthropic.com", "provider": "Anthropic" },
+    { "pattern": "claude.ai", "provider": "Anthropic" },
+    { "pattern": "*.claude.ai", "provider": "Anthropic" },
+    { "pattern": "api.openai.com", "provider": "OpenAI" },
+    { "pattern": "chatgpt.com", "provider": "OpenAI" },
+    { "pattern": "*.chatgpt.com", "provider": "OpenAI" },
+    { "pattern": "chat.openai.com", "provider": "OpenAI" },
+    { "pattern": "*.openai.azure.com", "provider": "Azure OpenAI" },
+    { "pattern": "*.services.ai.azure.com", "provider": "Azure AI Foundry" },
+    { "pattern": "generativelanguage.googleapis.com", "provider": "Google Gemini API" },
+    { "pattern": "aiplatform.googleapis.com", "provider": "Google Vertex AI" },
+    { "pattern": "*-aiplatform.googleapis.com", "provider": "Google Vertex AI" },
+    { "pattern": "cloudcode-pa.googleapis.com", "provider": "Google Gemini Code Assist" },
+    { "pattern": "gemini.google.com", "provider": "Google Gemini (web)" },
+    { "pattern": "bedrock-runtime.*.amazonaws.com", "provider": "AWS Bedrock" },
+    { "pattern": "q.*.amazonaws.com", "provider": "Amazon Q" },
+    { "pattern": "api.mistral.ai", "provider": "Mistral" },
+    { "pattern": "api.cohere.com", "provider": "Cohere" },
+    { "pattern": "api.cohere.ai", "provider": "Cohere" },
+    { "pattern": "api.groq.com", "provider": "Groq" },
+    { "pattern": "api.together.xyz", "provider": "Together AI" },
+    { "pattern": "api.together.ai", "provider": "Together AI" },
+    { "pattern": "api.fireworks.ai", "provider": "Fireworks AI" },
+    { "pattern": "api.deepseek.com", "provider": "DeepSeek" },
+    { "pattern": "api.x.ai", "provider": "xAI" },
+    { "pattern": "openrouter.ai", "provider": "OpenRouter" },
+    { "pattern": "api.perplexity.ai", "provider": "Perplexity" },
+    { "pattern": "*.perplexity.ai", "provider": "Perplexity" },
+    { "pattern": "router.huggingface.co", "provider": "Hugging Face Inference" },
+    { "pattern": "api-inference.huggingface.co", "provider": "Hugging Face Inference" },
+    { "pattern": "api.replicate.com", "provider": "Replicate" },
+    { "pattern": "api.cerebras.ai", "provider": "Cerebras" },
+    { "pattern": "api.moonshot.ai", "provider": "Moonshot (Kimi)" },
+    { "pattern": "dashscope*.aliyuncs.com", "provider": "Alibaba Qwen (DashScope)" },
+    { "pattern": "api.githubcopilot.com", "provider": "GitHub Copilot" },
+    { "pattern": "*.githubcopilot.com", "provider": "GitHub Copilot" },
+    { "pattern": "copilot-proxy.githubusercontent.com", "provider": "GitHub Copilot" },
+    { "pattern": "*.cursor.sh", "provider": "Cursor" },
+    { "pattern": "*.codeium.com", "provider": "Windsurf / Codeium" },
+    { "pattern": "*.windsurf.com", "provider": "Windsurf / Codeium" },
+    { "pattern": "copilot.microsoft.com", "provider": "Microsoft Copilot" }
+  ],
+
+  "localServicePorts": [
+    { "port": 11434, "product": "Ollama API", "agentId": "ollama", "requireAgentProcess": false },
+    { "port": 18789, "product": "OpenClaw gateway", "agentId": "openclaw", "requireAgentProcess": false },
+    { "port": 9222, "product": "Chrome DevTools Protocol (full browser remote control)", "agentId": "", "requireAgentProcess": false },
+    { "port": 1234, "product": "LM Studio local server", "agentId": "lm-studio", "requireAgentProcess": true },
+    { "port": 5678, "product": "n8n editor / API", "agentId": "n8n", "requireAgentProcess": true }
+  ],
+
+  "genericPatterns": {
+    "mcpServer": [
+      "@modelcontextprotocol/",
+      "\\bmcp-server-",
+      "-mcp-server\\b",
+      "\\bmcp_server",
+      "\\bfastmcp\\b",
+      "\\bmcp-remote\\b",
+      "@playwright/mcp",
+      "\\bmcp\\b.*--stdio",
+      "\\b[a-z0-9][a-z0-9-]*-mcp(@[^ ]+)?(\"| |$)"
+    ],
+    "headlessBrowser": [
+      "--headless",
+      "--remote-debugging-port",
+      "--remote-debugging-pipe",
+      "--remote-debugging-address",
+      "/ms-playwright/",
+      "puppeteer",
+      "chrome-headless-shell",
+      "--enable-automation"
+    ],
+    "packageInstall": [
+      "\\bnpm(\\.cmd)?\"? +(i|install|add)\\b",
+      "\\bnpx(\\.cmd)?\"? +(-y|--yes)\\b",
+      "\\bpnpm(\\.cmd)?\"? +(add|install|dlx)\\b",
+      "\\byarn(\\.cmd)?\"? +(add|global add|dlx)\\b",
+      "\\bpip3?(\\.exe)?\"? +install\\b",
+      "-m +pip +install\\b",
+      "\\buv(\\.exe)?\"? +(pip install|tool install|add)\\b",
+      "\\buvx(\\.exe)?\"? ",
+      "\\bwinget(\\.exe)?\"? +install\\b",
+      "\\bchoco(\\.exe)?\"? +install\\b",
+      "\\bscoop +install\\b",
+      "\\binstall-module\\b",
+      "\\bbun(\\.exe)?\"? +(add|install)\\b"
+    ],
+    "stealthLaunch": [
+      "(^| )-e(nc|ncodedcommand)? +[a-z0-9+/=]{16,}",
+      "(^| )-w(in|indowstyle)? +h(idden)?\\b",
+      "\\bmshta(\\.exe)?\\b",
+      "\\bwscript(\\.exe)?\"? .*\\.vbs",
+      "start +(\"\" +)?/min\\b"
+    ],
+    "userWritablePaths": [
+      "/appdata/local/temp/",
+      "/downloads/",
+      "/users/public/",
+      "/windows/temp/",
+      "/\\$recycle\\.bin/"
+    ],
+    "browserProcessNames": [
+      "chrome.exe", "msedge.exe", "firefox.exe", "brave.exe", "chromium.exe", "opera.exe",
+      "vivaldi.exe", "arc.exe", "headless_shell.exe", "chrome-headless-shell.exe"
+    ],
+    "shellProcessNames": [ "cmd.exe", "powershell.exe", "pwsh.exe", "bash.exe", "sh.exe", "wsl.exe" ],
+    "scriptHostNames": [
+      "node.exe", "python.exe", "pythonw.exe", "py.exe", "bun.exe", "deno.exe", "uv.exe", "uvx.exe",
+      "powershell.exe", "pwsh.exe", "cmd.exe"
+    ],
+    "toolCallRecord": "\"type\"\\s*:\\s*\"(tool_use|tool_call|function_call|tool-call|toolcall)\"|\"tool_calls\"\\s*:|\"toolUse\"\\s*:|\"functionCall\"\\s*:"
+  },
+
+  "aiKeywordPattern": "claude|anthropic|openai|chatgpt|codex|copilot|gemini|cursor|windsurf|codeium|perplexity|ollama|openclaw|clawdbot|moltbot|huggingface|\\bmcp\\b|ai agent|browser agent|agentic|\\bmanus\\b|\\bmonica\\b|\\bsider\\b|\\bharpa\\b|\\bmaxai\\b|\\bmerlin\\b",
+
+  "knownBrowserExtensions": [
+    { "id": "fcoeoabgfenejglbffodgkkbkcdhcgfn", "name": "Claude in Chrome", "agentId": "claude-desktop" }
+  ],
+
+  "browserProfiles": [
+    { "browser": "Chrome", "path": "%LOCALAPPDATA%/Google/Chrome/User Data" },
+    { "browser": "Edge", "path": "%LOCALAPPDATA%/Microsoft/Edge/User Data" },
+    { "browser": "Brave", "path": "%LOCALAPPDATA%/BraveSoftware/Brave-Browser/User Data" },
+    { "browser": "Comet", "path": "%LOCALAPPDATA%/Perplexity/Comet/User Data" }
+  ],
+
+  "ideExtensionDirs": [
+    "~/.vscode/extensions",
+    "~/.vscode-insiders/extensions",
+    "~/.cursor/extensions",
+    "~/.windsurf/extensions",
+    "~/.kiro/extensions"
+  ],
+
+  "packageLocations": {
+    "npm": [
+      "%APPDATA%/npm/node_modules",
+      "%APPDATA%/nvm/*/node_modules",
+      "%LOCALAPPDATA%/pnpm/global/*/node_modules",
+      "~/.bun/install/global/node_modules",
+      "%PROGRAMFILES%/nodejs/node_modules"
+    ],
+    "pipx": [ "~/.local/pipx/venvs", "~/pipx/venvs", "%LOCALAPPDATA%/pipx/pipx/venvs" ],
+    "uv": [ "%APPDATA%/uv/tools", "~/.local/share/uv/tools" ],
+    "sitePackages": [
+      "%APPDATA%/Python/Python3*/site-packages",
+      "%LOCALAPPDATA%/Programs/Python/Python3*/Lib/site-packages",
+      "%PROGRAMFILES%/Python3*/Lib/site-packages"
+    ]
+  },
+
+  "projectFiles": {
+    "searchRootNames": [ "Desktop", "Documents", "Downloads", "source", "src", "dev", "code", "repos", "projects", "git", "GitHub", "workspace", "work" ],
+    "excludeDirs": [
+      "node_modules", ".git", ".venv", "venv", "__pycache__", "site-packages", ".next", ".cache",
+      "AppData", "$RECYCLE.BIN", ".nuget", ".gradle", ".m2", "obj", "OneDrive"
+    ],
+    "maxDepth": 4,
+    "maxDirectories": 20000,
+    "envFileNames": [ ".env", ".env.*" ],
+    "envFileIgnore": [ ".env.example", ".env.sample", ".env.template", ".env.dist" ],
+    "mcpConfigFiles": [
+      { "relativePath": ".mcp.json", "agentId": "claude-code" },
+      { "relativePath": ".vscode/mcp.json", "agentId": "github-copilot" },
+      { "relativePath": ".vscode/settings.json", "agentId": "github-copilot" },
+      { "relativePath": ".cursor/mcp.json", "agentId": "cursor" },
+      { "relativePath": ".roo/mcp.json", "agentId": "roo-code" },
+      { "relativePath": ".gemini/settings.json", "agentId": "gemini-cli" }
+    ],
+    "transcriptFiles": [
+      { "name": ".aider.chat.history.md", "agentId": "aider" },
+      { "name": ".aider.input.history", "agentId": "aider" }
+    ]
+  },
+
+  "secretPatterns": [
+    { "id": "anthropic-key", "name": "Anthropic API key", "regex": "sk-ant-[A-Za-z0-9_\\-]{20,}" },
+    { "id": "openrouter-key", "name": "OpenRouter API key", "regex": "sk-or-v1-[A-Za-z0-9]{20,}" },
+    { "id": "openai-key", "name": "OpenAI API key", "regex": "sk-(proj|svcacct|admin)-[A-Za-z0-9_\\-]{20,}" },
+    { "id": "openai-style-key", "name": "OpenAI-style secret key", "regex": "\\bsk-[A-Za-z0-9]{32,}" },
+    { "id": "google-api-key", "name": "Google API key", "regex": "AIza[0-9A-Za-z_\\-]{35,}" },
+    { "id": "groq-key", "name": "Groq API key", "regex": "gsk_[A-Za-z0-9]{20,}" },
+    { "id": "xai-key", "name": "xAI API key", "regex": "xai-[A-Za-z0-9]{20,}" },
+    { "id": "huggingface-token", "name": "Hugging Face token", "regex": "hf_[A-Za-z0-9]{30,}" },
+    { "id": "perplexity-key", "name": "Perplexity API key", "regex": "pplx-[A-Za-z0-9]{32,}" },
+    { "id": "github-token", "name": "GitHub token", "regex": "(ghp|gho|ghu|ghs|ghr)_[A-Za-z0-9]{30,}|github_pat_[A-Za-z0-9_]{50,}" },
+    { "id": "slack-token", "name": "Slack token", "regex": "xox[abposr]-[A-Za-z0-9\\-]{10,}" },
+    { "id": "aws-access-key", "name": "AWS access key ID", "regex": "\\b(AKIA|ASIA)[0-9A-Z]{16}\\b" },
+    { "id": "jwt", "name": "JSON Web Token", "regex": "eyJ[A-Za-z0-9_\\-]{10,}\\.eyJ[A-Za-z0-9_\\-]{10,}\\.[A-Za-z0-9_\\-]{10,}" },
+    { "id": "private-key", "name": "Private key block", "regex": "-----BEGIN [A-Z ]*PRIVATE KEY-----" }
+  ],
+
+  "secretEnvNamePattern": "^(CO_API_KEY|([A-Z0-9_]*_)?(OPENAI|ANTHROPIC|CLAUDE|GEMINI|GOOGLE_(GENAI|GENERATIVE_AI|AI)|VERTEX|MISTRAL|GROQ|COHERE|OPENROUTER|DEEPSEEK|XAI|GROK|PERPLEXITY|PPLX|HF|HUGGING_?FACE(_HUB)?|TOGETHER|FIREWORKS|AZURE_OPENAI|AZURE_AI|REPLICATE|CEREBRAS|MOONSHOT|DASHSCOPE|OPENCLAW|LANGCHAIN|LANGSMITH|TAVILY|EXA|FIRECRAWL|BRAVE)[A-Z0-9_]*(KEY|TOKEN|SECRET))$",
+
+  "mcpAppCategories": {
+    "email":    [ "gmail", "outlook", "imap", "smtp", "mail", "email", "exchange", "sendgrid", "mailgun", "resend" ],
+    "chat":     [ "slack", "teams", "discord", "telegram", "whatsapp", "signal", "mattermost", "matrix", "sms", "twilio", "imessage" ],
+    "code":     [ "github", "gitlab", "bitbucket", "git", "azure-devops" ],
+    "files":    [ "filesystem", "file-system", "files", "google-drive", "gdrive", "drive", "onedrive", "sharepoint", "dropbox", "box", "s3" ],
+    "shell":    [ "shell", "terminal", "exec", "powershell", "bash", "cmd", "desktop-commander", "run-command", "ssh", "computer-use", "windows-mcp" ],
+    "browser":  [ "playwright", "puppeteer", "browser", "chrome", "chrome-devtools", "browserbase", "browser-use", "selenium" ],
+    "web":      [ "fetch", "brave-search", "tavily", "exa", "firecrawl", "web-search", "websearch", "search", "scrape", "crawl" ],
+    "docs":     [ "notion", "confluence", "jira", "linear", "asana", "trello", "clickup", "obsidian", "google-docs", "gdocs" ],
+    "crm":      [ "salesforce", "hubspot", "zendesk", "intercom", "pipedrive" ],
+    "db":       [ "postgres", "postgresql", "mysql", "sqlite", "mongodb", "mongo", "redis", "supabase", "snowflake", "bigquery", "database", "mssql" ],
+    "cloud":    [ "aws", "azure", "gcp", "cloudflare", "kubernetes", "k8s", "docker", "terraform", "vercel" ],
+    "payments": [ "stripe", "paypal", "square", "plaid", "quickbooks", "xero" ],
+    "calendar": [ "calendar", "gcal", "google-calendar" ]
+  },
+
+  "mcpCategoryRoles": {
+    "privateData":    [ "email", "files", "docs", "db", "crm", "payments", "cloud", "code", "calendar", "shell" ],
+    "untrustedInput": [ "browser", "web", "email", "chat" ],
+    "externalComms":  [ "email", "chat", "browser", "web", "code", "shell" ]
+  },
+
+  "scoring": {
+    "suspiciousThreshold": 40,
+    "indicators": {
+      "LongRunning":              { "weight": 10, "description": "Agent process has been running longer than the long-running threshold" },
+      "RemoteDebuggingPort":      { "weight": 30, "description": "Browser exposes the Chrome DevTools Protocol, which allows full remote control of the browser and its sessions" },
+      "ListensOnAllInterfaces":   { "weight": 35, "description": "Agent or model service listens on all network interfaces, so other machines can drive it" },
+      "RemoteClientOnAgentPort":  { "weight": 30, "description": "Another machine is connected to a local agent or model port" },
+      "UserWritableExecPath":     { "weight": 30, "description": "Runs from a user-writable staging folder (Temp, Downloads, Public)" },
+      "StealthLaunch":            { "weight": 40, "description": "Launched hidden or with an encoded command line" },
+      "SystemContext":            { "weight": 30, "description": "Runs as SYSTEM or a service account rather than as a person" },
+      "LlmFromNonAgentProcess":   { "weight": 40, "description": "A process that is not a known AI application is talking to an LLM API" },
+      "PersistentLlmConnection":  { "weight": 10, "description": "Connection to an LLM API has stayed open for a long time or across samples" },
+      "PersistenceAutostart":     { "weight": 10, "description": "Starts automatically without a person launching it" },
+      "PersistenceWmi":           { "weight": 50, "description": "Uses a WMI event subscription, a stealth persistence technique" },
+      "HiddenTask":               { "weight": 20, "description": "Scheduled task is marked hidden" },
+      "SecretInPlaintext":        { "weight": 15, "description": "An AI provider key or token is stored in a plaintext file" },
+      "SecretWorldReadable":      { "weight": 40, "description": "A file holding a key or token is readable by Everyone, Users, or Authenticated Users" },
+      "MachineWideSecret":        { "weight": 25, "description": "An AI provider key is set machine-wide, so every user and process inherits it" },
+      "StoredOAuthToken":         { "weight": 10, "description": "Stored OAuth or session token for an AI application" },
+      "ShellCapableMcp":          { "weight": 15, "description": "MCP server gives the agent shell or file-system access" },
+      "RemoteMcpServer":          { "weight": 15, "description": "MCP server runs on a remote host the organization may not control" },
+      "UnpinnedPackage":          { "weight": 10, "description": "MCP server is launched from an unpinned package (npx -y / uvx without a version), so code can change on every run" },
+      "BrowserControlPermission": { "weight": 20, "description": "Browser extension holds debugger or native-messaging permission (can drive the browser)" },
+      "BrowserControlBridge":     { "weight": 15, "description": "Native messaging host lets a local program talk to the browser" },
+      "OffHoursActivity":         { "weight": 15, "description": "Agent activity outside business hours" },
+      "CrossAppReach":            { "weight": 20, "description": "One agent identity can act across three or more application categories" },
+      "LethalTrifecta":           { "weight": 30, "description": "Agent combines private-data access, untrusted input, and an outbound channel (prompt-injection exfiltration risk)" },
+      "RecentPackageInstall":     { "weight": 10, "description": "Agent software was installed within the lookback window" },
+      "AgentInstallsPackages":    { "weight": 20, "description": "An agent process launched package installs on its own" },
+      "SelfModification":         { "weight": 20, "description": "Agent skills, memory, or instruction files changed within the lookback window" },
+      "SelfModificationByAgent":  { "weight": 15, "description": "Event logs show an agent process writing to its own skills or memory" },
+      "AgentSpawnedShell":        { "weight": 10, "description": "Agent process launched command shells" },
+      "LlmCallFromScript":        { "weight": 25, "description": "A PowerShell script block called an LLM API directly" }
+    }
+  }
+}

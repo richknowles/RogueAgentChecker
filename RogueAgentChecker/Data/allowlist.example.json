@@ -1,0 +1,85 @@
+// Rogue Agent Checker allow-list (JSON; // comments are allowed in this file).
+//
+// One entry per APPROVED agent. Anything the scan finds that no entry matches is
+// flagged as Unknown or Suspicious. Nothing is ever blocked.
+//
+// Agent ............ an agent id from Get-RacSignature (for example "claude-code"),
+//                    an agent name, a wildcard, or "*". "*" is only accepted when
+//                    Categories or Breadcrumbs narrow it.
+// Optional scope ... Users, Computers, PathPattern, Categories, Breadcrumbs,
+//                    McpServers (approved MCP server names), Endpoints (approved API hosts).
+//                    Every scope you set must match. Wildcards (*) are allowed.
+// AllowedIndicators  risk signals you accept for this agent by design, for example
+//                    "PersistenceAutostart" for an app that starts at logon. Any risk
+//                    you do NOT list still counts, so an approved agent can still be
+//                    Suspicious.
+// Audit fields ..... ApprovedBy, ApprovedOn, Expires (yyyy-MM-dd), Ticket, Notes.
+//                    Expired entries stop matching on the expiry date.
+{
+  "entries": [
+    {
+      "Name": "Claude Code - Engineering team",
+      "Agent": "claude-code",
+      "Users": [ "jsmith", "adeleon" ],
+      "Endpoints": [ "api.anthropic.com", "claude.ai" ],
+      "McpServers": [ "github", "filesystem" ],
+      "AllowedIndicators": [ "LongRunning", "PersistentLlmConnection" ],
+      "ApprovedBy": "IT Security (Jane Admin)",
+      "ApprovedOn": "2026-10-01",
+      "Expires": "2027-04-01",
+      "Ticket": "CHG-1042",
+      "Notes": "Approved for work repositories only."
+    },
+    {
+      "Name": "GitHub Copilot Business - all staff",
+      "Agent": "github-copilot",
+      "AllowedIndicators": [ "LongRunning", "PersistentLlmConnection" ],
+      "ApprovedBy": "IT Security (Jane Admin)",
+      "ApprovedOn": "2026-08-01",
+      "Expires": "2027-08-01",
+      "Ticket": "CHG-0981"
+    },
+    {
+      "Name": "Microsoft Copilot app - all staff",
+      "Agent": "microsoft-copilot",
+      "AllowedIndicators": [ "PersistenceAutostart", "LongRunning" ],
+      "ApprovedBy": "IT Security (Jane Admin)",
+      "ApprovedOn": "2026-08-01",
+      "Expires": "2027-08-01",
+      "Ticket": "CHG-0982"
+    },
+    {
+      "Name": "Ollama on the AI lab workstation",
+      "Agent": "ollama",
+      "Computers": [ "AILAB-01" ],
+      "AllowedIndicators": [ "PersistenceAutostart", "LongRunning" ],
+      "ApprovedBy": "IT Security (Jane Admin)",
+      "ApprovedOn": "2026-09-15",
+      "Expires": "2027-03-15",
+      "Ticket": "CHG-1007",
+      "Notes": "Must stay bound to 127.0.0.1. Exposure on the network is NOT approved."
+    },
+    {
+      "Name": "Sanctioned AI provider endpoints (DNS and proxy evidence)",
+      "Agent": "*",
+      "Breadcrumbs": [ "DnsCacheLlm", "ProxyLogLlm" ],
+      "Endpoints": [ "api.anthropic.com", "claude.ai", "*.githubcopilot.com", "copilot.microsoft.com" ],
+      "ApprovedBy": "IT Security (Jane Admin)",
+      "ApprovedOn": "2026-08-01",
+      "Expires": "2027-08-01",
+      "Ticket": "POL-0007"
+    },
+    {
+      "Name": "In-house invoice bot (custom Python agent)",
+      "Agent": "*",
+      "Categories": [ "Processes", "Network", "Persistence" ],
+      "PathPattern": [ "C:\\Bots\\InvoiceBot\\*" ],
+      "AllowedIndicators": [ "PersistenceAutostart", "LongRunning", "PersistentLlmConnection", "SystemContext" ],
+      "ApprovedBy": "CFO and IT Security",
+      "ApprovedOn": "2026-07-01",
+      "Expires": "2027-01-01",
+      "Ticket": "CHG-0900",
+      "Notes": "Runs as a service account by design."
+    }
+  ]
+}

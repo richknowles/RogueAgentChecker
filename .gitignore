@@ -1,0 +1,6 @@
+# Scan output (contains machine details)
+RogueAgentReports/
+
+# Your local allow-list (start from Data/allowlist.example.json)
+/allowlist.json
+/allowlist.csv
