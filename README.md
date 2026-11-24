@@ -1,3 +1,5 @@
+<p align="center"><img src="docs/logo.png" width="300" alt="Rogue Agent Checker logo"></p>
+
 # Rogue Agent Checker
 
 **Find the AI agents nobody told you about.**
