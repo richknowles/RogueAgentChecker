@@ -103,9 +103,12 @@ Be clear about these before you call a machine clean:
 - **Other machines.** v0.1 scans the machine it runs on. For a fleet, see *Running at scale*.
 - **AI agents driving the machine remotely.** A cloud-hosted agent that works over
   SSH, WinRM or RDP, with nothing agent-specific installed locally, leaves almost
-  nothing RAC v0.1 looks for. Tested on the Windows 11 VM: a cloud agent's hidden,
-  base64-encoded PowerShell process, started over SSH, was not reported. Closing this
-  gap is the top item for v0.2.
+  nothing RAC v0.1 looks for. Tested on the Windows 11 VM with an early 0.1.1 build,
+  before the script check existed: a cloud agent's hidden, base64-encoded PowerShell
+  process, started over SSH, was not reported. 0.1.1 now decodes encoded commands, but
+  reports them only when they use AI on this machine, and a remote agent's commands
+  usually don't: its model runs in the cloud. Closing this gap is the top item for
+  v0.2.
 - **Tenant-side OAuth grants.** Consents granted to AI apps in Entra ID or Google
   Workspace live in the cloud, not on the endpoint. Review them in the admin consoles.
 - **Agents inside WSL2, Docker or a VM.** RAC sees their ports and connections from
@@ -524,6 +527,13 @@ give.
 To change RAC's code, read `AGENTS.md` first.
 
 ---
+
+## How this was built
+
+Rogue Agent Checker was built by Rich Knowles (WieldAI) with an AI coding assistant.
+Every release is tested by hand on real Windows. The live test, including what RAC
+missed and the predictions we got wrong, is in `docs/LIVE-TEST.md`. A tool that looks
+for undisclosed AI should disclose its own.
 
 ## License
 

@@ -343,8 +343,10 @@ examined, so "no findings" is never confused with "didn't look".
 - Local machine only. Fleet scanning is a wrapper concern (see roadmap).
 - An AI agent driving the machine remotely (over SSH, WinRM or RDP) with nothing
   agent-specific installed leaves almost nothing RAC looks for. On the Windows 11 test
-  VM, a cloud agent's hidden, base64-encoded PowerShell process started over SSH was
-  not reported. This is the first item for v0.2.
+  VM, with an early 0.1.1 build before the script check existed, a cloud agent's
+  hidden, base64-encoded PowerShell process started over SSH was not reported. The
+  script check decodes such commands but reports them only when they use AI locally,
+  and a remote agent's model runs elsewhere. This is the first item for v0.2.
 - Signature-driven plus generic patterns: a fully custom agent with no MCP, no known
   framework, and no LLM endpoint in DNS cache can slip through. Sysmon closes much of
   that gap.
