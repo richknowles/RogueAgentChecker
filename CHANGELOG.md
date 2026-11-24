@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.1 (2026-11-20)
+## 0.1.1 (2026-11-24)
 
 Fixes from the first runs on real Windows (Windows 11 25H2, build 26200, Windows
 PowerShell 5.1, standard user and elevated), and one new check added after a live
