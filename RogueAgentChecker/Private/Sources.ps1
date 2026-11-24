@@ -50,6 +50,47 @@ function Get-RacComputerName {
     return [System.Environment]::MachineName
 }
 
+function Get-RacSelfPath {
+    <#
+        Folders that hold Rogue Agent Checker itself, so it never reports its own
+        code (for example its tests, picked up by PowerShell script block logging):
+        the module folder, plus the repository folder when RAC runs from a copy of
+        the repository (recognized by Start-RogueAgentScan.ps1 next to the module).
+    #>
+    if ($script:RacSelfPathCache) { return $script:RacSelfPathCache }
+    $paths = @($script:RacModuleRoot)
+    $parent = Split-Path -Parent $script:RacModuleRoot
+    if ($parent -and (Test-RacPath -Path ([System.IO.Path]::Combine($parent, 'Start-RogueAgentScan.ps1')))) { $paths += $parent }
+    $script:RacSelfPathCache = $paths
+    return $paths
+}
+
+function Get-RacSelfScriptText {
+    <#
+        The text of Rogue Agent Checker's own PowerShell files (the module, plus the
+        tests when RAC runs from its repository), with line endings normalized.
+        Analyze-Logs uses it to recognize RAC's own code in script block logs by
+        what the code IS, not by where it was logged from. A path or a marker string
+        can be copied by any script; RAC's exact text cannot be reused to hide
+        anything except RAC's own code.
+    #>
+    if ($null -ne $script:RacSelfScriptCache) { return $script:RacSelfScriptCache }
+    $seen = @{}
+    $texts = @()
+    foreach ($root in @(Get-RacSelfPath)) {
+        if (-not $root) { continue }
+        foreach ($f in @(Get-RacChildItem -Path $root -Recurse -File -MaxItems 500)) {
+            if (-not $f -or $seen.ContainsKey($f.FullName)) { continue }
+            if (@('.ps1', '.psm1', '.psd1') -notcontains [System.IO.Path]::GetExtension($f.Name).ToLowerInvariant()) { continue }
+            $seen[$f.FullName] = $true
+            $text = Read-RacTextFile -Path $f.FullName -MaxBytes 4MB
+            if ($text) { $texts += $text.Replace("`r`n", "`n") }
+        }
+    }
+    $script:RacSelfScriptCache = $texts
+    return $texts
+}
+
 function Get-RacOsDescription {
     try { return [System.Runtime.InteropServices.RuntimeInformation]::OSDescription } catch { Write-Verbose ('RuntimeInformation unavailable (older .NET): ' + $_.Exception.Message) }
     return [System.Environment]::OSVersion.VersionString
@@ -251,7 +292,16 @@ function Get-RacRawDnsCache {
             TimeToLive = [int]$e.TimeToLive
         }
     }
-    Add-RacCoverage -Source 'DNS client cache' -Status 'Checked' -ItemCount @($out).Count -Detail 'Only recent lookups are present; entries expire with their TTL.'
+    $count = @($out).Count
+    if ($count -eq 0 -and -not (Get-RacIsElevated)) {
+        # Seen on Windows 11 24H2: a non-elevated session gets an EMPTY cache, not
+        # an access-denied error. A live machine almost never has an empty cache,
+        # so "Checked, 0 entries" would claim coverage the scan did not have.
+        Add-RacCoverage -Source 'DNS client cache' -Status 'Partial' -ItemCount 0 -Detail 'No entries came back. Windows can return an empty DNS cache to a non-elevated session instead of refusing. Run elevated so network findings can be tied to hostnames.'
+    }
+    else {
+        Add-RacCoverage -Source 'DNS client cache' -Status 'Checked' -ItemCount $count -Detail 'Only recent lookups are present; entries expire with their TTL.'
+    }
     return $out
 }
 
@@ -385,30 +435,64 @@ function Get-RacLoadedUserHive {
     <#
         Registry hives of users who are currently loaded (logged on or running
         something). RAC never loads offline hives: 'reg load' is a write.
-        The user name comes from the hive's own Volatile Environment key.
+
+        Hive NAMES are listed with the .NET registry API, which only needs
+        permission to list HKEY_USERS itself. Get-ChildItem opens every subkey
+        while listing, fails on service-account hives such as S-1-5-19 when not
+        elevated, and in v0.1.0 that made a standard-user scan skip even the
+        user's OWN hive. The account running the scan is always included.
+
+        Readable says whether this session can open the hive. The user name
+        comes from the hive's own Volatile Environment key (no SID lookups).
     #>
-    $result = @()
+    $sids = @()
+    try { $sids = @([Microsoft.Win32.Registry]::Users.GetSubKeyNames()) }
+    catch { Write-RacLog -Level WARN -Message ('Could not list HKEY_USERS: ' + $_.Exception.Message) }
     try {
-        $sids = @(Get-ChildItem -LiteralPath 'Registry::HKEY_USERS' -ErrorAction Stop | ForEach-Object { $_.PSChildName })
+        $me = [System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+        if ($me -and $sids -notcontains $me -and (Test-RacPath -Path ('Registry::HKEY_USERS\' + $me))) { $sids += $me }
     }
-    catch {
-        return $result
-    }
+    catch { Write-Verbose ('Current user SID unavailable: ' + $_.Exception.Message) }
+
+    $result = @()
     foreach ($sid in $sids) {
         if ($sid -notmatch '^S-1-5-21-\d+-\d+-\d+-\d+$' -and $sid -notmatch '^S-1-12-1-\d+-\d+-\d+-\d+$') { continue }
         $root = 'Registry::HKEY_USERS\' + $sid
+        $readable = $true
+        try { $null = Get-Item -LiteralPath $root -ErrorAction Stop }
+        catch { $readable = $false }
+
         $user = $sid
-        try {
-            $ve = Get-Item -LiteralPath ($root + '\Volatile Environment') -ErrorAction Stop
-            $name = [string]$ve.GetValue('USERNAME')
-            $domain = [string]$ve.GetValue('USERDOMAIN')
-            if ($name -and $domain) { $user = $domain + '\' + $name }
-            elseif ($name) { $user = $name }
+        if ($readable) {
+            try {
+                $ve = Get-Item -LiteralPath ($root + '\Volatile Environment') -ErrorAction Stop
+                $name = [string]$ve.GetValue('USERNAME')
+                $domain = [string]$ve.GetValue('USERDOMAIN')
+                if ($name -and $domain) { $user = $domain + '\' + $name }
+                elseif ($name) { $user = $name }
+            }
+            catch { Write-Verbose ('No Volatile Environment for ' + $sid + '; showing the SID instead.') }
         }
-        catch { Write-Verbose ('No Volatile Environment for ' + $sid + '; showing the SID instead.') }
-        $result += [pscustomobject]@{ Sid = $sid; User = $user; Root = $root }
+        $result += [pscustomobject]@{ Sid = $sid; User = $user; Root = $root; Readable = $readable }
     }
     return $result
+}
+
+function Get-RacHiveCoverage {
+    <#
+        Coverage status + wording for a source that reads user hives, so the
+        report never says "Checked" when some loaded hives could not be opened.
+    #>
+    param([object[]]$Hives)
+    $readable = @($Hives | Where-Object { $_.Readable }).Count
+    $blocked = @($Hives | Where-Object { -not $_.Readable }).Count
+    $text = '{0} user hive(s) read' -f $readable
+    $status = 'Checked'
+    if ($blocked -gt 0) {
+        $text += '; {0} loaded hive(s) of other users not readable without elevation' -f $blocked
+        $status = 'Partial'
+    }
+    return [pscustomobject]@{ Status = $status; Text = $text }
 }
 
 function Get-RacRawRunKey {
@@ -429,7 +513,7 @@ function Get-RacRawRunKey {
     $targets = @()
     foreach ($k in $machineKeys) { $targets += [pscustomobject]@{ Hive = 'HKLM'; User = ''; Path = 'Registry::HKEY_LOCAL_MACHINE\' + $k } }
     $hives = @(Get-RacLoadedUserHive)
-    foreach ($h in $hives) {
+    foreach ($h in @($hives | Where-Object { $_.Readable })) {
         foreach ($k in $userKeys) { $targets += [pscustomobject]@{ Hive = 'HKU\' + $h.Sid; User = $h.User; Path = $h.Root + '\' + $k } }
     }
 
@@ -444,7 +528,8 @@ function Get-RacRawRunKey {
             }
         }
     }
-    Add-RacCoverage -Source 'Run / RunOnce registry keys' -Status 'Checked' -ItemCount @($out).Count -Detail ("HKLM plus {0} loaded user hive(s). Users who are not logged on are not covered (their hives are not loaded, and RAC never loads them)." -f $hives.Count)
+    $hiveCoverage = Get-RacHiveCoverage -Hives $hives
+    Add-RacCoverage -Source 'Run / RunOnce registry keys' -Status $hiveCoverage.Status -ItemCount @($out).Count -Detail ("HKLM plus {0}. Users who are not logged on are not covered (their hives are not loaded, and RAC never loads them)." -f $hiveCoverage.Text)
     return $out
 }
 
@@ -457,7 +542,11 @@ function Get-RacRawStartupItem {
     param([object[]]$ProfileRoot)
 
     $folders = @()
+    $skipped = @()
     foreach ($p in $ProfileRoot) {
+        # Profiles this session cannot read are skipped and reported, instead of
+        # letting Test-Path print a red "Access is denied" (v0.1.0 did).
+        if ($p.PSObject.Properties['Readable'] -and -not $p.Readable) { $skipped += $p.User; continue }
         $path = Expand-RacPathTemplate -Template '%APPDATA%/Microsoft/Windows/Start Menu/Programs/Startup' -ProfileRoot $p.Path
         if ($path) { $folders += [pscustomobject]@{ User = $p.User; Path = $path } }
     }
@@ -469,7 +558,7 @@ function Get-RacRawStartupItem {
     try { $shell = New-Object -ComObject WScript.Shell -ErrorAction Stop } catch { Write-RacLog -Level SKIP -Message ('WScript.Shell unavailable; startup shortcut targets will show the .lnk path only: ' + $_.Exception.Message) }
 
     $out = foreach ($f in $folders) {
-        if (-not (Test-Path -LiteralPath $f.Path)) { continue }
+        if (-not (Test-RacPath -Path $f.Path)) { continue }
         foreach ($file in @(Get-ChildItem -LiteralPath $f.Path -File -Force -ErrorAction SilentlyContinue)) {
             if ($file.Name -eq 'desktop.ini') { continue }
             $target = $file.FullName
@@ -491,7 +580,12 @@ function Get-RacRawStartupItem {
             }
         }
     }
-    Add-RacCoverage -Source 'Startup folders' -Status 'Checked' -ItemCount @($out).Count -Detail ('{0} folder(s) examined.' -f $folders.Count)
+    if ($skipped.Count -gt 0) {
+        Add-RacCoverage -Source 'Startup folders' -Status 'Partial' -ItemCount @($out).Count -Detail ('{0} folder(s) examined. Not readable without elevation: {1}' -f $folders.Count, ($skipped -join ', '))
+    }
+    else {
+        Add-RacCoverage -Source 'Startup folders' -Status 'Checked' -ItemCount @($out).Count -Detail ('{0} folder(s) examined.' -f $folders.Count)
+    }
     return $out
 }
 
@@ -552,12 +646,14 @@ function Get-RacRawEnvironmentVariable {
     foreach ($v in @(Read-RacRegistryValue -Path 'Registry::HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment' -NamesOnly)) {
         $out += [pscustomobject]@{ Scope = 'Machine'; User = ''; Name = $v.Name }
     }
-    foreach ($h in @(Get-RacLoadedUserHive)) {
+    $hives = @(Get-RacLoadedUserHive)
+    foreach ($h in @($hives | Where-Object { $_.Readable })) {
         foreach ($v in @(Read-RacRegistryValue -Path ($h.Root + '\Environment') -NamesOnly)) {
             $out += [pscustomobject]@{ Scope = 'User'; User = $h.User; Name = $v.Name }
         }
     }
-    Add-RacCoverage -Source 'Environment variables (names only)' -Status 'Checked' -ItemCount $out.Count -Detail 'Machine scope plus loaded user hives. Values are never read.'
+    $hiveCoverage = Get-RacHiveCoverage -Hives $hives
+    Add-RacCoverage -Source 'Environment variables (names only)' -Status $hiveCoverage.Status -ItemCount $out.Count -Detail ('Machine scope plus {0}. Values are never read.' -f $hiveCoverage.Text)
     return $out
 }
 
@@ -597,7 +693,8 @@ function Get-RacRawNativeMessagingHost {
         [pscustomobject]@{ Scope = 'Machine'; User = ''; Prefix = 'Registry::HKEY_LOCAL_MACHINE\SOFTWARE\' },
         [pscustomobject]@{ Scope = 'Machine (32-bit)'; User = ''; Prefix = 'Registry::HKEY_LOCAL_MACHINE\SOFTWARE\WOW6432Node\' }
     )
-    foreach ($h in @(Get-RacLoadedUserHive)) {
+    $hives = @(Get-RacLoadedUserHive)
+    foreach ($h in @($hives | Where-Object { $_.Readable })) {
         $roots += [pscustomobject]@{ Scope = 'User'; User = $h.User; Prefix = $h.Root + '\Software\' }
     }
 
@@ -617,13 +714,47 @@ function Get-RacRawNativeMessagingHost {
             }
         }
     }
-    Add-RacCoverage -Source 'Browser native messaging hosts' -Status 'Checked' -ItemCount @($out).Count
+    $hiveCoverage = Get-RacHiveCoverage -Hives $hives
+    Add-RacCoverage -Source 'Browser native messaging hosts' -Status $hiveCoverage.Status -ItemCount @($out).Count -Detail ('Machine scope plus {0}.' -f $hiveCoverage.Text)
     return $out
 }
 
 # ---------------------------------------------------------------------------
 # Event logs
 # ---------------------------------------------------------------------------
+
+$script:RacHiddenLogNote = 'No events came back without elevation. For this log Windows can report "no events" instead of "access denied", so 0 does not mean clean. Run elevated (or add the account to Event Log Readers).'
+
+function Test-RacHiddenEventLog {
+    <#
+        True when an empty result from this log cannot be trusted: the Security
+        log read from a non-elevated session. On the Windows 11 test VM it
+        returned "no matching events" to a standard user and 23 events as admin.
+    #>
+    param([string]$LogName)
+    return ($LogName -eq 'Security' -and -not (Get-RacIsElevated))
+}
+
+function Get-RacRawEventLogInfo {
+    <#
+        Size, retention mode and oldest event of one event log, or $null when
+        Windows will not say. Read-only: Get-WinEvent -ListLog reads the log's
+        configuration, and -Oldest -MaxEvents 1 reads a single event.
+    #>
+    param([Parameter(Mandatory = $true)][string]$LogName)
+    $log = Get-WinEvent -ListLog $LogName -ErrorAction SilentlyContinue
+    if (-not $log) { return $null }
+    $oldest = $null
+    $first = Get-WinEvent -LogName $LogName -MaxEvents 1 -Oldest -ErrorAction SilentlyContinue
+    if ($first) { $oldest = $first.TimeCreated }
+    [pscustomobject]@{
+        LogName     = $LogName
+        LogMode     = [string]$log.LogMode
+        MaxBytes    = [long]$log.MaximumSizeInBytes
+        FileBytes   = [long]$log.FileSize
+        OldestEvent = $oldest
+    }
+}
 
 function Get-RacRawWinEvent {
     <#
@@ -645,6 +776,8 @@ function Get-RacRawWinEvent {
     $filter = @{ LogName = $LogName }
     if ($Id) { $filter.Id = $Id }
     if ($StartTime) { $filter.StartTime = $StartTime }
+    $lookbackStart = $null
+    if ($PSBoundParameters.ContainsKey('StartTime')) { $lookbackStart = $StartTime }
 
     try {
         $events = @(Get-WinEvent -FilterHashtable $filter -MaxEvents $MaxEvents -ErrorAction Stop)
@@ -653,7 +786,17 @@ function Get-RacRawWinEvent {
         $fqid = [string]$_.FullyQualifiedErrorId
         $message = $_.Exception.Message
         if ($fqid -match 'NoMatchingEventsFound') {
-            Add-RacCoverage -Source "Event log: $LogName" -Status 'Checked' -ItemCount 0 -Detail ('Event IDs ' + ($Id -join ', '))
+            if (Test-RacHiddenEventLog -LogName $LogName) {
+                Add-RacCoverage -Source "Event log: $LogName" -Status 'Partial' -ItemCount 0 -Detail $script:RacHiddenLogNote
+            }
+            else {
+                # "No matching events" only means something if the log still holds
+                # the whole lookback window.
+                $reach = Get-RacEventLogReach -Info (Get-RacRawEventLogInfo -LogName $LogName) -LookbackStart $lookbackStart
+                $status = 'Checked'
+                if ($reach.Partial) { $status = 'Partial' }
+                Add-RacCoverage -Source "Event log: $LogName" -Status $status -ItemCount 0 -Detail (('Event IDs ' + ($Id -join ', ') + '. ' + $reach.Note).Trim())
+            }
         }
         elseif ($fqid -match 'NoMatchingLogsFound' -or $message -match 'not an event log|could not be found') {
             Add-RacCoverage -Source "Event log: $LogName" -Status 'Skipped' -Detail 'Log not present on this machine (for Sysmon: Sysmon is not installed).'
@@ -686,7 +829,15 @@ function Get-RacRawWinEvent {
     }
     $detail = 'Event IDs ' + ($Id -join ', ')
     if (@($out).Count -ge $MaxEvents) { $detail += "; capped at $MaxEvents newest events (raise -MaxEventsPerLog to see more)" }
-    Add-RacCoverage -Source "Event log: $LogName" -Status 'Checked' -ItemCount @($out).Count -Detail $detail
+    if (@($out).Count -eq 0 -and (Test-RacHiddenEventLog -LogName $LogName)) {
+        Add-RacCoverage -Source "Event log: $LogName" -Status 'Partial' -ItemCount 0 -Detail $script:RacHiddenLogNote
+    }
+    else {
+        $reach = Get-RacEventLogReach -Info (Get-RacRawEventLogInfo -LogName $LogName) -LookbackStart $lookbackStart
+        $status = 'Checked'
+        if ($reach.Partial) { $status = 'Partial' }
+        Add-RacCoverage -Source "Event log: $LogName" -Status $status -ItemCount @($out).Count -Detail (($detail + '. ' + $reach.Note).Trim())
+    }
     return $out
 }
 
@@ -800,6 +951,16 @@ function Read-RacTextFile {
         if ($reader) { $reader.Dispose() }
         elseif ($stream) { $stream.Dispose() }
     }
+}
+
+function Get-RacDriveType {
+    <#
+        Drive type for a drive letter ('Fixed', 'Removable', 'Network', ...), or ''
+        if it cannot be determined. RAC uses it to avoid opening files on mapped
+        network drives: reading one would send traffic off the machine.
+    #>
+    param([string]$Letter)
+    try { return [string]([System.IO.DriveInfo]::new($Letter).DriveType) } catch { return '' }
 }
 
 function Measure-RacPatternInFile {

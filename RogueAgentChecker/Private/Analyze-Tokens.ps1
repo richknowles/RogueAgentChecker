@@ -115,15 +115,18 @@ function Find-RacTokenFinding {
                     $indicators = @()
                     if ($notable -contains 'debugger' -or $notable -contains 'nativeMessaging') { $indicators += 'BrowserControlPermission' }
 
-                    $agentName = 'Unidentified AI browser extension'
-                    $agentId = ''
+                    # Only a known extension ID ties an extension to a catalog agent.
+                    # Matching on the NAME mislabeled "ChatGPT Reader" and "HARPA AI ...
+                    # ChatGPT ..." as the ChatGPT Desktop app in v0.1.0. Any other AI
+                    # extension is named after itself, with an ID that survives
+                    # updates, so the allow-list can approve it as "ext:<id>".
+                    $label = $name
+                    if ($label.Length -gt 60) { $label = $label.Substring(0, 57) + '...' }
+                    $agentName = $label + ' (browser extension)'
+                    $agentId = 'ext:' + $extDir.Name
                     if ($known -and $known.agentId -and $sig._AgentById.ContainsKey([string]$known.agentId)) {
                         $agentName = $sig._AgentById[[string]$known.agentId].name
                         $agentId = [string]$known.agentId
-                    }
-                    else {
-                        $byText = Find-RacAgentByText -Signatures $sig -Text $name -KeywordsOnly
-                        if ($byText) { $agentName = $byText.Agent.name; $agentId = $byText.Agent.id }
                     }
 
                     $evidence = [ordered]@{

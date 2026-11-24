@@ -159,6 +159,29 @@ Describe 'Windows PowerShell 5.1 compatibility' {
         }
     }
 
+    It 'counts only arrays in the test code (5.1 gives a single object no .Count)' {
+        # Windows PowerShell 5.1 returns $null for .Count on a single [pscustomobject];
+        # PowerShell 7 returns 1. v0.1.0's tests passed on 7 and failed 28 times on 5.1.
+        $testFiles = @(Get-ChildItem -LiteralPath $PSScriptRoot -Recurse -Filter '*.ps1')
+        $hits = foreach ($file in $testFiles) {
+            $ast = Get-RacTestAst -Path $file.FullName
+            $arrayVars = @{}
+            foreach ($a in $ast.FindAll({ param($n) $n -is [System.Management.Automation.Language.AssignmentStatementAst] -and $n.Left -is [System.Management.Automation.Language.VariableExpressionAst] }, $true)) {
+                $name = $a.Left.VariablePath.UserPath -replace '^script:', ''
+                $isArray = ($a.Right -is [System.Management.Automation.Language.CommandExpressionAst] -and $a.Right.Expression -is [System.Management.Automation.Language.ArrayExpressionAst])
+                if (-not $arrayVars.ContainsKey($name)) { $arrayVars[$name] = $true }
+                if (-not $isArray) { $arrayVars[$name] = $false }
+            }
+            foreach ($m in $ast.FindAll({ param($n) $n -is [System.Management.Automation.Language.MemberExpressionAst] -and $n.Member.Extent.Text -eq 'Count' }, $true)) {
+                $target = $m.Expression
+                if ($target -is [System.Management.Automation.Language.ArrayExpressionAst]) { continue }
+                if ($target -is [System.Management.Automation.Language.VariableExpressionAst] -and $arrayVars[($target.VariablePath.UserPath -replace '^script:', '')]) { continue }
+                '{0}:{1}: {2}' -f $file.Name, $m.Extent.StartLineNumber, $m.Extent.Text
+            }
+        }
+        $hits | Should -BeNullOrEmpty
+    }
+
     It 'has no "a, b + c" precedence traps (the comma binds first and silently drops "+ c")' {
         $hits = foreach ($file in $codeFiles) {
             $ast = Get-RacTestAst -Path $file.FullName

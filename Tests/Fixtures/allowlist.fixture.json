@@ -16,7 +16,7 @@
       "Name": "Claude Desktop - company standard",
       "Agent": "claude-desktop",
       "McpServers": [ "filesystem", "github" ],
-      "AllowedIndicators": [ "PersistenceAutostart", "BrowserControlPermission", "BrowserControlBridge" ],
+      "AllowedIndicators": [ "PersistenceAutostart", "BrowserControlBridge" ],
       "ApprovedBy": "IT Security (J. Admin)",
       "ApprovedOn": "2026-09-01",
       "Expires": "2099-12-31",

@@ -121,6 +121,8 @@ function New-RacFakeAgentEnvironment {
     Write-Fake (Join-FakePath $extBase 'fcoeoabgfenejglbffodgkkbkcdhcgfn' '1.0.36_0' 'manifest.json') '{ "manifest_version": 3, "name": "__MSG_appName__", "version": "1.0.36", "permissions": ["debugger", "nativeMessaging", "tabs", "sidePanel"] }'
     Write-Fake (Join-FakePath $extBase 'fcoeoabgfenejglbffodgkkbkcdhcgfn' '1.0.36_0' '_locales' 'en' 'messages.json') '{ "appName": { "message": "Claude" } }'
     Write-Fake (Join-FakePath $extBase 'aapocclcgogkmnckokdopfmhonfmgoek' '0.10_0' 'manifest.json') '{ "manifest_version": 2, "name": "Slides", "version": "0.10" }'
+    # Third-party extension whose NAME mentions ChatGPT: must not be labeled as the ChatGPT Desktop app
+    Write-Fake (Join-FakePath $extBase 'kfakechatgptsidebarhelper000000a' '3.1.0_0' 'manifest.json') '{ "manifest_version": 3, "name": "ChatGPT Sidebar Helper", "version": "3.1.0", "permissions": ["tabs", "scripting"] }'
 
     $nativeHostManifest = Join-FakePath $alice 'AppData' 'Local' 'AnthropicClaude' 'ChromeNativeHost' 'com.anthropic.claude_browser_extension.json'
     Write-Fake $nativeHostManifest '{ "name": "com.anthropic.claude_browser_extension", "description": "Claude Browser Extension Native Host", "path": "C:\\Users\\alice\\AppData\\Local\\AnthropicClaude\\chrome-native-host.exe", "type": "stdio", "allowed_origins": ["chrome-extension://fcoeoabgfenejglbffodgkkbkcdhcgfn/"] }'
@@ -195,6 +197,32 @@ function New-RacFakeAgentEnvironment {
         ) -join "`n")
 
     # =====================================================================
+    # Scripts that processes and scheduled tasks run (added after the 0.1.1
+    # live test). Nothing in their command lines names AI; only RAC's look
+    # inside the script finds them.
+    # =====================================================================
+    # bob: the live test's rogue, disguised as a OneDrive helper. It calls OpenAI
+    # every 30 seconds and carries a fallback key that must never reach a report.
+    $rogueScript = Join-FakePath $bob 'AppData' 'Local' 'OneDriveSyncHelper' 'sync.ps1'
+    Write-Fake $rogueScript (@(
+            ('$fallback = ''{0}''' -f $secrets.OpenAI),
+            '$key = $env:OPENAI_API_KEY',
+            'if (-not $key) { $key = $fallback }',
+            'while ($true) {',
+            '    Invoke-RestMethod -Uri ''https://api.openai.com/v1/models'' -Headers @{ Authorization = "Bearer $key" } | Out-Null',
+            '    Start-Sleep -Seconds 30',
+            '}'
+        ) -join "`n")
+
+    # carol: a visible Python script using the OpenAI SDK. No host name in it.
+    $sdkScript = Join-FakePath $carol 'Documents' 'scripts' 'summarize.py'
+    Write-Fake $sdkScript (@('from openai import OpenAI', 'client = OpenAI()', 'print(client.models.list())') -join "`n")
+
+    # alice: an ordinary script that has nothing to do with AI.
+    $plainScript = Join-FakePath $alice 'Documents' 'scripts' 'backup.ps1'
+    Write-Fake $plainScript 'Get-ChildItem C:\Data -Recurse | Copy-Item -Destination D:\Backup'
+
+    # =====================================================================
     # A proxy log (Squid format) with LLM traffic from the office network
     # =====================================================================
     $proxyLog = Join-FakePath $Root 'proxy' 'access.log'
@@ -225,6 +253,9 @@ function New-RacFakeAgentEnvironment {
         Carol              = $carol
         NativeHostManifest = $nativeHostManifest
         ProxyLog           = $proxyLog
+        RogueScript        = $rogueScript
+        SdkScript          = $sdkScript
+        PlainScript        = $plainScript
         Secrets            = $secrets
         Now                = $now
         BusinessTime       = $biz

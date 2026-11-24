@@ -162,6 +162,7 @@ function Invoke-RogueAgentScan {
             TcpSamples      = @()
             DnsCache        = @()
             SeenPaths       = @{}
+            ScriptTexts     = @{}
             BehaviorSignals = [pscustomobject]@{
                 PackageInstalls = New-Object System.Collections.Generic.List[object]
                 SelfMod         = New-Object System.Collections.Generic.List[object]

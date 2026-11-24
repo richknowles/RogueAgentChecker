@@ -24,21 +24,21 @@ AfterAll {
 
 Describe 'Category 1 - processes, headless browsers, MCP servers' {
     It 'flags the OpenClaw gateway as a long-running agent process' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'AgentProcess' -AgentId 'openclaw'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'AgentProcess' -AgentId 'openclaw')
         $f.Count | Should -Be 1
         $f[0].Indicators | Should -Contain 'LongRunning'
         $f[0].Evidence['Process'] | Should -Be 'node.exe (PID 5100)'
     }
 
     It 'attributes an MCP server process to the agent that launched it' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'McpServerProcess'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'McpServerProcess')
         $f.Count | Should -Be 1
         $f[0].Agent | Should -Be 'Claude Desktop'
         $f[0].Evidence['Launched by'] | Should -Match 'Claude Desktop \(PID 4100\)'
     }
 
     It 'detects a headless browser with remote debugging and ties it to OpenClaw' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'HeadlessBrowser'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'HeadlessBrowser')
         $f.Count | Should -Be 1
         $f[0].Agent | Should -Be 'OpenClaw'
         $f[0].Indicators | Should -Contain 'RemoteDebuggingPort'
@@ -54,7 +54,7 @@ Describe 'Category 1 - processes, headless browsers, MCP servers' {
     }
 
     It 'flags a CrewAI agent running from Downloads as suspicious' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'AgentProcess' -AgentId 'agent-framework'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'AgentProcess' -AgentId 'agent-framework')
         $f.Count | Should -Be 1
         $f[0].Indicators | Should -Contain 'UserWritableExecPath'
         $f[0].Classification | Should -Be 'Suspicious'
@@ -62,16 +62,82 @@ Describe 'Category 1 - processes, headless browsers, MCP servers' {
 
     It 'marks approved agents (Claude Code, Claude Desktop, Ollama) as Trusted' {
         foreach ($id in 'claude-code', 'claude-desktop', 'ollama') {
-            $f = Get-RacTestFinding $scan -Breadcrumb 'AgentProcess' -AgentId $id
+            $f = @(Get-RacTestFinding $scan -Breadcrumb 'AgentProcess' -AgentId $id)
             $f.Count | Should -Be 1 -Because "$id should be found"
             $f[0].Classification | Should -Be 'Trusted' -Because "$id is on the allow-list"
         }
     }
 }
 
+Describe 'Scripts that processes and autostarts run (added after the 0.1.1 live test)' {
+    # In the live test, a hidden PowerShell kept one connection to api.openai.com
+    # open for over an hour. The DNS cache forgot the hostname after 60 seconds, so
+    # the network check missed it in three of four scans. These tests prove RAC
+    # now finds it by what it runs, with no network evidence at all.
+
+    It 'catches a hidden PowerShell by the script it runs, with no network evidence' {
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'LlmScriptProcess' -TitleLike '*PID 6600*')
+        $f.Count | Should -Be 1
+        $f[0].Title | Should -Be 'powershell.exe (PID 6600) runs a script that calls api.openai.com'
+        $f[0].Classification | Should -Be 'Suspicious'
+        $f[0].Agent | Should -Be 'Unidentified script'
+        $f[0].User | Should -Be 'CORP\bob'
+        $f[0].Indicators | Should -Contain 'StealthLaunch'
+        $f[0].Indicators | Should -Contain 'LlmCallFromScript'
+        $f[0].Location | Should -Be $scan.Environment.RogueScript
+        $f[0].Evidence['Script'] | Should -Be $scan.Environment.RogueScript
+        $f[0].Evidence['LLM host referenced'] | Should -Be 'api.openai.com'
+        $f[0].Evidence['Key variables used'] | Should -Be 'OPENAI_API_KEY'
+        @(Get-RacTestFinding $scan -Breadcrumb 'LlmConnection' -TitleLike '*PID 6600*').Count | Should -Be 0 -Because 'this process has no connection RAC can name, like the live test after the first minute'
+    }
+
+    It 'shows a redacted sample, never the key the script carries' {
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'LlmScriptProcess' -TitleLike '*PID 6600*')
+        $f[0].Evidence['Sample (redacted)'] | Should -Match 'api\.openai\.com'
+        (@($f[0].Evidence.Values) -join ' ') | Should -Not -Match 'RACTESTKEY'
+    }
+
+    It 'reports a visible script that uses an AI SDK, below the hidden one' {
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'LlmScriptProcess' -TitleLike '*PID 6700*')
+        $f.Count | Should -Be 1
+        $f[0].Title | Should -Be 'python.exe (PID 6700) runs a script that uses an AI SDK (from openai)'
+        $f[0].Indicators | Should -Contain 'LlmCallFromScript'
+        $f[0].Indicators | Should -Not -Contain 'StealthLaunch'
+        $rogue = @(Get-RacTestFinding $scan -Breadcrumb 'LlmScriptProcess' -TitleLike '*PID 6600*')[0]
+        $f[0].Score | Should -BeLessThan $rogue.Score
+    }
+
+    It 'ignores scripts with nothing to do with AI, and an encoded command that only names a cmdlet' {
+        @($findings | Where-Object { $_.Title -like '*PID 6800*' -or $_.Location -eq $scan.Environment.PlainScript }).Count | Should -Be 0
+        @(Get-RacTestFinding $scan -TitleLike '*Nightly Backup*').Count | Should -Be 0
+        @(Get-RacTestFinding $scan -Breadcrumb 'LlmScriptProcess' -TitleLike '*PID 802*').Count | Should -Be 0
+        @(Get-RacTestFinding $scan -Breadcrumb 'LlmScriptProcess').Count | Should -Be 2
+    }
+
+    It 'catches the hidden task that starts the rogue script' {
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'ScheduledTask' -TitleLike '*OneDrive Sync Helper*')
+        $f.Count | Should -Be 1
+        $f[0].Classification | Should -Be 'Suspicious'
+        $f[0].Indicators | Should -Contain 'HiddenTask'
+        $f[0].Indicators | Should -Contain 'StealthLaunch'
+        $f[0].Indicators | Should -Contain 'LlmCallFromScript'
+        $f[0].Evidence['Matched because'] | Should -Be ('runs the script {0}, which calls api.openai.com (key variables: OPENAI_API_KEY)' -f $scan.Environment.RogueScript)
+        $f[0].Evidence['Script'] | Should -Be $scan.Environment.RogueScript
+    }
+
+    It 'decodes an encoded PowerShell command in a task and reads it, without running it' {
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'ScheduledTask' -TitleLike '*Telemetry Refresh*')
+        $f.Count | Should -Be 1
+        $f[0].Evidence['Matched because'] | Should -Be 'runs an encoded PowerShell command that calls api.groq.com (key variables: GROQ_API_KEY)'
+        $f[0].Indicators | Should -Contain 'LlmCallFromScript'
+        $f[0].Indicators | Should -Contain 'StealthLaunch' -Because 'an encoded command hides what runs, by design'
+        $f[0].Classification | Should -Be 'Suspicious'
+    }
+}
+
 Describe 'Category 2 - network' {
     It 'flags a hidden SYSTEM PowerShell talking to the OpenAI API' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'LlmConnection' -TitleLike 'powershell.exe*'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'LlmConnection' -TitleLike 'powershell.exe*')
         $f.Count | Should -Be 1
         $f[0].Classification | Should -Be 'Suspicious'
         $f[0].Indicators | Should -Contain 'LlmFromNonAgentProcess'
@@ -81,32 +147,32 @@ Describe 'Category 2 - network' {
     }
 
     It 'resolves hostnames through CNAME entries in the DNS cache' {
-        (Get-RacTestFinding $scan -Breadcrumb 'LlmConnection' -TitleLike '*api.openai.com*').Count | Should -Be 1
+        @(Get-RacTestFinding $scan -Breadcrumb 'LlmConnection' -TitleLike '*api.openai.com*').Count | Should -Be 1
     }
 
     It 'trusts the approved agent''s connection to an approved endpoint' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'LlmConnection' -AgentId 'claude-code'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'LlmConnection' -AgentId 'claude-code')
         $f.Count | Should -Be 1
         $f[0].Classification | Should -Be 'Trusted'
         $f[0].Indicators | Should -Contain 'PersistentLlmConnection'
     }
 
     It 'does not itemize ordinary browser sessions, but counts them in coverage' {
-        (Get-RacTestFinding $scan -Breadcrumb 'LlmConnection' -TitleLike '*chatgpt.com*').Count | Should -Be 0
+        @(Get-RacTestFinding $scan -Breadcrumb 'LlmConnection' -TitleLike '*chatgpt.com*').Count | Should -Be 0
         $row = $scan.Result.Coverage | Where-Object { $_.Source -eq 'Browser AI sessions' }
         $row.ItemCount | Should -Be 1
     }
 
     It 'reports LLM lookups that have no attributable connection' {
-        $gemini = Get-RacTestFinding $scan -Breadcrumb 'DnsCacheLlm' -TitleLike '*generativelanguage.googleapis.com*'
+        $gemini = @(Get-RacTestFinding $scan -Breadcrumb 'DnsCacheLlm' -TitleLike '*generativelanguage.googleapis.com*')
         $gemini.Count | Should -Be 1
         $gemini[0].Classification | Should -Be 'Unknown'
-        $claude = Get-RacTestFinding $scan -Breadcrumb 'DnsCacheLlm' -TitleLike '*claude.ai*'
+        $claude = @(Get-RacTestFinding $scan -Breadcrumb 'DnsCacheLlm' -TitleLike '*claude.ai*')
         $claude[0].Classification | Should -Be 'Trusted' -Because 'claude.ai is a sanctioned provider endpoint'
     }
 
     It 'flags an approved Ollama that listens on all interfaces with a LAN client' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'AgentListener' -AgentId 'ollama'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'AgentListener' -AgentId 'ollama')
         $f.Count | Should -Be 1
         $f[0].Indicators | Should -Contain 'ListensOnAllInterfaces'
         $f[0].Indicators | Should -Contain 'RemoteClientOnAgentPort'
@@ -116,26 +182,26 @@ Describe 'Category 2 - network' {
     }
 
     It 'reports the Chrome DevTools port and the loopback OpenClaw gateway' {
-        (Get-RacTestFinding $scan -Breadcrumb 'AgentListener' -TitleLike '*port 9222*').Count | Should -Be 1
-        $gw = Get-RacTestFinding $scan -Breadcrumb 'AgentListener' -TitleLike '*port 18789*'
+        @(Get-RacTestFinding $scan -Breadcrumb 'AgentListener' -TitleLike '*port 9222*').Count | Should -Be 1
+        $gw = @(Get-RacTestFinding $scan -Breadcrumb 'AgentListener' -TitleLike '*port 18789*')
         $gw.Count | Should -Be 1
         $gw[0].Indicators | Should -Not -Contain 'ListensOnAllInterfaces'
     }
 
     It 'counts LLM hosts in proxy logs and ignores look-alike domains' {
-        $openai = Get-RacTestFinding $scan -Breadcrumb 'ProxyLogLlm' -TitleLike '*api.openai.com*'
+        $openai = @(Get-RacTestFinding $scan -Breadcrumb 'ProxyLogLlm' -TitleLike '*api.openai.com*')
         $openai.Count | Should -Be 1
         $openai[0].Evidence['Matching log lines'] | Should -Be '2'
-        (Get-RacTestFinding $scan -Breadcrumb 'ProxyLogLlm' -TitleLike '*evil*').Count | Should -Be 0
-        (Get-RacTestFinding $scan -Breadcrumb 'ProxyLogLlm' -TitleLike '*api.groq.com*').Count | Should -Be 1
+        @(Get-RacTestFinding $scan -Breadcrumb 'ProxyLogLlm' -TitleLike '*evil*').Count | Should -Be 0
+        @(Get-RacTestFinding $scan -Breadcrumb 'ProxyLogLlm' -TitleLike '*api.groq.com*').Count | Should -Be 1
     }
 }
 
 Describe 'Category 3 - config, memory, skills and secrets' {
     It 'finds each agent''s config folder in the right profile' {
-        (Get-RacTestFinding $scan -Breadcrumb 'AgentConfigDir' -AgentId 'claude-code' -User 'alice').Count | Should -Be 1
-        (Get-RacTestFinding $scan -Breadcrumb 'AgentConfigDir' -AgentId 'openclaw' -User 'bob').Count | Should -Be 1
-        (Get-RacTestFinding $scan -Breadcrumb 'AgentConfigDir' -AgentId 'openai-codex' -User 'carol').Count | Should -Be 1
+        @(Get-RacTestFinding $scan -Breadcrumb 'AgentConfigDir' -AgentId 'claude-code' -User 'alice').Count | Should -Be 1
+        @(Get-RacTestFinding $scan -Breadcrumb 'AgentConfigDir' -AgentId 'openclaw' -User 'bob').Count | Should -Be 1
+        @(Get-RacTestFinding $scan -Breadcrumb 'AgentConfigDir' -AgentId 'openai-codex' -User 'carol').Count | Should -Be 1
     }
 
     It 'inventories MCP servers from JSON, JSONC, TOML and YAML configs' {
@@ -146,38 +212,38 @@ Describe 'Category 3 - config, memory, skills and secrets' {
     }
 
     It 'flags unpinned packages but not pinned ones' {
-        $gmail = Get-RacTestFinding $scan -Breadcrumb 'McpServerConfig' -TitleLike "*'gmail'*"
+        $gmail = @(Get-RacTestFinding $scan -Breadcrumb 'McpServerConfig' -TitleLike "*'gmail'*")
         $gmail[0].Indicators | Should -Contain 'UnpinnedPackage'
-        $playwright = Get-RacTestFinding $scan -Breadcrumb 'McpServerConfig' -TitleLike "*'playwright'*"
+        $playwright = @(Get-RacTestFinding $scan -Breadcrumb 'McpServerConfig' -TitleLike "*'playwright'*")
         $playwright[0].Indicators | Should -Not -Contain 'UnpinnedPackage'
-        $github = Get-RacTestFinding $scan -Breadcrumb 'McpServerConfig' -TitleLike "*'github'*"
+        $github = @(Get-RacTestFinding $scan -Breadcrumb 'McpServerConfig' -TitleLike "*'github'*")
         $github[0].Indicators | Should -Not -Contain 'UnpinnedPackage'
     }
 
     It 'flags a remote MCP server and reports only its host' {
-        $sentry = Get-RacTestFinding $scan -Breadcrumb 'McpServerConfig' -TitleLike "*'sentry'*"
+        $sentry = @(Get-RacTestFinding $scan -Breadcrumb 'McpServerConfig' -TitleLike "*'sentry'*")
         $sentry[0].Indicators | Should -Contain 'RemoteMcpServer'
         $sentry[0].Evidence['Remote host'] | Should -Be 'mcp.sentry.dev'
         $sentry[0].Evidence['Scope'] | Should -Match '^Project '
     }
 
     It 'lists env var names for MCP servers but never their values' {
-        $slack = Get-RacTestFinding $scan -Breadcrumb 'McpServerConfig' -TitleLike "*'slack'*"
+        $slack = @(Get-RacTestFinding $scan -Breadcrumb 'McpServerConfig' -TitleLike "*'slack'*")
         $slack[0].Evidence['Env var names'] | Should -Match 'SLACK_BOT_TOKEN'
         $slack[0].Evidence['Plaintext secrets'] | Should -Match 'SLACK_BOT_TOKEN \(Slack token\)'
         $slack[0].Indicators | Should -Contain 'SecretInPlaintext'
     }
 
     It 'gives an approved agent no pass for unapproved MCP servers' {
-        $fs = Get-RacTestFinding $scan -Breadcrumb 'McpServerConfig' -TitleLike "*'filesystem'*"
+        $fs = @(Get-RacTestFinding $scan -Breadcrumb 'McpServerConfig' -TitleLike "*'filesystem'*")
         $fs[0].Classification | Should -Be 'Trusted'
-        $dc = Get-RacTestFinding $scan -Breadcrumb 'McpServerConfig' -TitleLike "*'desktop-commander'*"
+        $dc = @(Get-RacTestFinding $scan -Breadcrumb 'McpServerConfig' -TitleLike "*'desktop-commander'*")
         $dc[0].Classification | Should -Not -Be 'Trusted'
         $dc[0].Indicators | Should -Contain 'ShellCapableMcp'
     }
 
     It 'marks a Codex shell server with a key in its config as suspicious' {
-        $shell = Get-RacTestFinding $scan -Breadcrumb 'McpServerConfig' -AgentId 'openai-codex'
+        $shell = @(Get-RacTestFinding $scan -Breadcrumb 'McpServerConfig' -AgentId 'openai-codex')
         $shell[0].Classification | Should -Be 'Suspicious'
         $shell[0].Indicators | Should -Contain 'ShellCapableMcp'
         $shell[0].Indicators | Should -Contain 'UnpinnedPackage'
@@ -185,7 +251,7 @@ Describe 'Category 3 - config, memory, skills and secrets' {
     }
 
     It 'reports a world-readable .env file as suspicious, by key name and format only' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'SecretFile' -User 'carol' | Where-Object { $_.Location -like '*Downloads*' }
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'SecretFile' -User 'carol' | Where-Object { $_.Location -like '*Downloads*' })
         $f.Count | Should -Be 1
         $f[0].Classification | Should -Be 'Suspicious'
         $f[0].Indicators | Should -Contain 'SecretWorldReadable'
@@ -200,7 +266,7 @@ Describe 'Category 3 - config, memory, skills and secrets' {
     }
 
     It 'flags a machine-wide AI key environment variable without reading its value' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'EnvVarSecret' -TitleLike '*machine*'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'EnvVarSecret' -TitleLike '*machine*')
         $f.Count | Should -Be 1
         $f[0].Classification | Should -Be 'Suspicious'
         $f[0].Evidence['Value'] | Should -Be 'not read'
@@ -208,9 +274,9 @@ Describe 'Category 3 - config, memory, skills and secrets' {
     }
 
     It 'finds agent packages installed via npm, pipx and site-packages' {
-        (Get-RacTestFinding $scan -Breadcrumb 'AgentPackage' -AgentId 'openclaw').Evidence['Installed via'] | Should -Be 'npm global'
-        (Get-RacTestFinding $scan -Breadcrumb 'AgentPackage' -AgentId 'aider').Evidence['Installed via'] | Should -Be 'pipx'
-        (Get-RacTestFinding $scan -Breadcrumb 'AgentPackage' -AgentId 'agent-framework').Evidence['Version'] | Should -Be '0.86.0'
+        @(Get-RacTestFinding $scan -Breadcrumb 'AgentPackage' -AgentId 'openclaw').Evidence['Installed via'] | Should -Be 'npm global'
+        @(Get-RacTestFinding $scan -Breadcrumb 'AgentPackage' -AgentId 'aider').Evidence['Installed via'] | Should -Be 'pipx'
+        @(Get-RacTestFinding $scan -Breadcrumb 'AgentPackage' -AgentId 'agent-framework').Evidence['Version'] | Should -Be '0.86.0'
     }
 
     It 'finds AI IDE extensions, newest version only, and skips unrelated ones' {
@@ -220,25 +286,26 @@ Describe 'Category 3 - config, memory, skills and secrets' {
     }
 
     It 'survives a JSON5 config (comments, unquoted keys) without failing the category' {
-        # Windows PowerShell 5.1 cannot parse JSON5 and records the file as Partial
-        # coverage; PowerShell 7's parser is lenient and reads it. Neither may error.
+        # Once comments are stripped, BOTH Windows PowerShell 5.1 and PowerShell 7
+        # accept this file's unquoted keys, so it parses on both. (v0.1.1's first
+        # version of this test assumed 5.1 would reject it; the real Windows run
+        # showed otherwise.) Whatever the parser does, the category must not fail
+        # and no MCP config row may be an Error.
         @($scan.Result.Coverage | Where-Object { $_.Source -eq 'Category: ConfigAndSecrets' -and $_.Status -eq 'Error' }).Count | Should -Be 0
-        (Get-RacTestFinding $scan -Breadcrumb 'AgentConfigDir' -AgentId 'openclaw').Count | Should -Be 1
-        if ($PSVersionTable.PSEdition -eq 'Desktop') {
-            @($scan.Result.Coverage | Where-Object { $_.Source -like 'MCP config:*openclaw.json' -and $_.Status -eq 'Partial' }).Count | Should -Be 1
-        }
+        @($scan.Result.Coverage | Where-Object { $_.Source -like 'MCP config:*openclaw.json' -and $_.Status -eq 'Error' }).Count | Should -Be 0
+        @(Get-RacTestFinding $scan -Breadcrumb 'AgentConfigDir' -AgentId 'openclaw').Count | Should -Be 1
     }
 }
 
 Describe 'Category 4 - persistence' {
     It 'finds the OpenClaw logon task' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'ScheduledTask' -AgentId 'openclaw'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'ScheduledTask' -AgentId 'openclaw')
         $f.Count | Should -Be 1
         $f[0].Indicators | Should -Contain 'PersistenceAutostart'
     }
 
     It 'flags a hidden SYSTEM task that launches an MCP server' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'ScheduledTask' -TitleLike '*SystemHealthUpdater*'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'ScheduledTask' -TitleLike '*SystemHealthUpdater*')
         $f[0].Classification | Should -Be 'Suspicious'
         $f[0].Indicators | Should -Contain 'HiddenTask'
         $f[0].Indicators | Should -Contain 'SystemContext'
@@ -246,14 +313,14 @@ Describe 'Category 4 - persistence' {
     }
 
     It 'flags an agent platform running as a LocalSystem service' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'Service' -AgentId 'n8n'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'Service' -AgentId 'n8n')
         $f[0].Classification | Should -Be 'Suspicious'
         $f[0].Indicators | Should -Contain 'SystemContext'
     }
 
     It 'trusts approved autostarts the allow-list explicitly accepts' {
-        (Get-RacTestFinding $scan -Breadcrumb 'RunKey' -AgentId 'claude-desktop')[0].Classification | Should -Be 'Trusted'
-        (Get-RacTestFinding $scan -Breadcrumb 'StartupItem' -AgentId 'ollama')[0].Classification | Should -Be 'Trusted'
+        @(Get-RacTestFinding $scan -Breadcrumb 'RunKey' -AgentId 'claude-desktop')[0].Classification | Should -Be 'Trusted'
+        @(Get-RacTestFinding $scan -Breadcrumb 'StartupItem' -AgentId 'ollama')[0].Classification | Should -Be 'Trusted'
     }
 
     It 'flags a WMI subscription that starts OpenClaw, and ignores the Windows default consumer' {
@@ -262,6 +329,15 @@ Describe 'Category 4 - persistence' {
         $wmi[0].Agent | Should -Be 'OpenClaw'
         $wmi[0].Classification | Should -Be 'Suspicious'
         $wmi[0].Indicators | Should -Contain 'PersistenceWmi'
+    }
+
+    It 'keeps HiddenTask as its own indicator when it is the only extra risk' {
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'ScheduledTask' -TitleLike '*Codex Sync*')
+        $f.Count | Should -Be 1
+        $f[0].Indicators | Should -Contain 'HiddenTask'
+        $f[0].Indicators | Should -Contain 'PersistenceAutostart'
+        $f[0].Indicators | Should -Not -Contain 'PersistenceAutostartHiddenTask'
+        $f[0].Score | Should -Be 30
     }
 
     It 'leaves ordinary Windows autostarts alone' {
@@ -273,27 +349,46 @@ Describe 'Category 4 - persistence' {
 
 Describe 'Category 5 - tokens and OAuth' {
     It 'finds AI credentials in Credential Manager by name only' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'CredentialStore'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'CredentialStore')
         $f.Count | Should -Be 1
         $f[0].AgentId | Should -Be 'claude-code'
     }
 
     It 'reports the Codex token file without opening it' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'TokenFile' -AgentId 'openai-codex'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'TokenFile' -AgentId 'openai-codex')
         $f.Count | Should -Be 1
         $f[0].Evidence['Contents'] | Should -Match 'not opened'
         @(Get-RacTestFinding $scan -Breadcrumb 'SecretFile' | Where-Object { $_.Location -like '*auth.json' }).Count | Should -Be 0
     }
 
     It 'resolves a localized extension name and flags browser-control permissions' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'BrowserExtension'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'BrowserExtension' -AgentId 'claude-in-chrome')
         $f.Count | Should -Be 1
+        $f[0].Agent | Should -Be 'Claude in Chrome'
         $f[0].Evidence['Extension'] | Should -Be 'Claude'
         $f[0].Indicators | Should -Contain 'BrowserControlPermission'
     }
 
+    It 'does not let an approval for the Claude Desktop app cover the Claude browser extension' {
+        # v0.1.1's first build filed Claude in Chrome under Claude Desktop, so the
+        # real Windows report named an app that was not installed, and approving the
+        # app would also have approved an extension that can drive the browser.
+        @(Get-RacTestFinding $scan -Breadcrumb 'BrowserExtension' -AgentId 'claude-desktop').Count | Should -Be 0
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'BrowserExtension' -AgentId 'claude-in-chrome')
+        $f[0].Classification | Should -Not -Be 'Trusted' -Because 'the fixture allow-list approves Claude Desktop, not Claude in Chrome'
+    }
+
+    It 'names other AI extensions after themselves, not after a catalog app with a similar name' {
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'BrowserExtension' | Where-Object { $_.Evidence['Extension'] -eq 'ChatGPT Sidebar Helper' })
+        $f.Count | Should -Be 1
+        $f[0].Agent | Should -Be 'ChatGPT Sidebar Helper (browser extension)'
+        $f[0].AgentId | Should -Be 'ext:kfakechatgptsidebarhelper000000a'
+        @(Get-RacTestFinding $scan -AgentId 'chatgpt-desktop').Count | Should -Be 0
+        ($f | ConvertTo-RacAllowListEntry -ApprovedBy 'Test Admin').Agent | Should -Be 'ext:kfakechatgptsidebarhelper000000a' -Because 'the extension ID survives updates, the version folder does not'
+    }
+
     It 'finds the native messaging bridge and attributes it' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'NativeMessagingHost'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'NativeMessagingHost')
         $f.Count | Should -Be 1
         $f[0].Agent | Should -Be 'Claude Desktop'
     }
@@ -305,7 +400,7 @@ Describe 'Category 5 - tokens and OAuth' {
 
 Describe 'Category 6 - logs, transcripts and event patterns' {
     It 'summarizes transcripts with a tool-call count, never their content' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'AgentTranscript' -AgentId 'claude-code'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'AgentTranscript' -AgentId 'claude-code')
         $f.Count | Should -Be 1
         $f[0].Evidence['Files'] | Should -Be '2'
         $f[0].Evidence['Tool-call records'] | Should -Match '^3 record'
@@ -313,20 +408,40 @@ Describe 'Category 6 - logs, transcripts and event patterns' {
     }
 
     It 'lists MCP servers seen in Claude Desktop logs' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'AgentLog' -AgentId 'claude-desktop'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'AgentLog' -AgentId 'claude-desktop')
         $f[0].Evidence['MCP servers in logs'] | Should -Match 'filesystem'
         $f[0].Evidence['MCP servers in logs'] | Should -Match 'gmail'
     }
 
     It 'finds project-level Aider chat history' {
-        (Get-RacTestFinding $scan -Breadcrumb 'AgentTranscript' -AgentId 'aider').Count | Should -Be 1
+        @(Get-RacTestFinding $scan -Breadcrumb 'AgentTranscript' -AgentId 'aider').Count | Should -Be 1
     }
 
     It 'flags a PowerShell script block that calls an LLM API, with a redacted sample' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'PowerShellScriptBlock'
-        $f.Count | Should -Be 1 -Because 'the ordinary block and RAC''s own code must be ignored'
+        @(Get-RacTestFinding $scan -Breadcrumb 'PowerShellScriptBlock').Count | Should -Be 2 -Because 'carol''s script and the one disguised as RAC are reported; the ordinary block and RAC''s own code are not'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'PowerShellScriptBlock' | Where-Object { $_.Evidence['LLM host referenced'] -eq 'api.openai.com' })
+        $f.Count | Should -Be 1
         $f[0].Indicators | Should -Contain 'LlmCallFromScript'
         $f[0].Evidence['Samples (redacted)'] | Should -Match '\[REDACTED\]'
+    }
+
+    It 'never reports script blocks from its own repository, even chunks without marker text' {
+        $own = @(Get-RacTestFinding $scan -Breadcrumb 'PowerShellScriptBlock' | Where-Object { $_.Evidence['Script path'] -like ($scan.RepoRoot + '*') })
+        $own.Count | Should -Be 0
+    }
+
+    It 'recognizes its own code logged by another copy of RAC, or with no path' {
+        # The first v0.1.1 build, run from a second folder on the test VM, reported
+        # the tests that the first copy had run.
+        @(Get-RacTestFinding $scan -Breadcrumb 'PowerShellScriptBlock' | Where-Object { $_.Evidence['Script path'] -like 'D:\Tools\RAC-old\*' }).Count | Should -Be 0
+        @(Get-RacTestFinding $scan -Breadcrumb 'PowerShellScriptBlock' | Where-Object { $_.Evidence['Samples (redacted)'] -match 'resolves hostnames through CNAME' }).Count | Should -Be 0
+    }
+
+    It 'still reports a script that hides behind RAC''s names and folder' {
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'PowerShellScriptBlock' | Where-Object { $_.Evidence['LLM host referenced'] -eq 'api.groq.com' })
+        $f.Count | Should -Be 1
+        $f[0].Indicators | Should -Contain 'LlmCallFromScript'
+        $f[0].Evidence['Note'] | Should -Match 'not part of the RAC copy that ran this scan'
     }
 
     It 'groups Sysmon DNS and network events per process and hides ordinary browsers' {
@@ -337,22 +452,22 @@ Describe 'Category 6 - logs, transcripts and event patterns' {
     }
 
     It 'attributes Sysmon process launches to the agent that started them' {
-        $oc = Get-RacTestFinding $scan -Breadcrumb 'SysmonAgentProcess' -AgentId 'openclaw'
+        $oc = @(Get-RacTestFinding $scan -Breadcrumb 'SysmonAgentProcess' -AgentId 'openclaw')
         $oc[0].Indicators | Should -Contain 'AgentSpawnedShell'
-        (Get-RacTestFinding $scan -Breadcrumb 'SysmonAgentProcess' -AgentId 'claude-desktop').Count | Should -Be 1
+        @(Get-RacTestFinding $scan -Breadcrumb 'SysmonAgentProcess' -AgentId 'claude-desktop').Count | Should -Be 1
     }
 }
 
 Describe 'Category 7 - behavior' {
     It 'flags OpenClaw for off-hours activity' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'OffHoursActivity' -AgentId 'openclaw'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'OffHoursActivity' -AgentId 'openclaw')
         $f.Count | Should -Be 1
         $f[0].Indicators | Should -Contain 'OffHoursActivity'
     }
 
     It 'does not flag business-hours agents' {
-        (Get-RacTestFinding $scan -Breadcrumb 'OffHoursActivity' -AgentId 'claude-code').Count | Should -Be 0
-        (Get-RacTestFinding $scan -Breadcrumb 'OffHoursActivity' -AgentId 'claude-desktop').Count | Should -Be 0
+        @(Get-RacTestFinding $scan -Breadcrumb 'OffHoursActivity' -AgentId 'claude-code').Count | Should -Be 0
+        @(Get-RacTestFinding $scan -Breadcrumb 'OffHoursActivity' -AgentId 'claude-desktop').Count | Should -Be 0
     }
 
     It 'never merges unrelated unidentified processes into one timeline' {
@@ -360,7 +475,7 @@ Describe 'Category 7 - behavior' {
     }
 
     It 'flags cross-app reach and the lethal trifecta even for an approved agent' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'CrossAppReach' -AgentId 'claude-desktop'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'CrossAppReach' -AgentId 'claude-desktop')
         $f.Count | Should -Be 1
         $f[0].Indicators | Should -Contain 'CrossAppReach'
         $f[0].Indicators | Should -Contain 'LethalTrifecta'
@@ -372,13 +487,13 @@ Describe 'Category 7 - behavior' {
     }
 
     It 'flags an agent that installs packages on its own' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'PackageInstallActivity' -AgentId 'openclaw'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'PackageInstallActivity' -AgentId 'openclaw')
         $f[0].Indicators | Should -Contain 'AgentInstallsPackages'
         $f[0].Evidence['Most recent'] | Should -Match 'left-padz'
     }
 
     It 'flags an agent rewriting its own skills, confirmed by Sysmon' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'SelfModification' -AgentId 'openclaw'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'SelfModification' -AgentId 'openclaw')
         $f.Count | Should -Be 1
         $f[0].Indicators | Should -Contain 'SelfModificationByAgent'
         $f[0].Evidence['Examples'] | Should -Match 'skill\.md'
@@ -392,7 +507,7 @@ Describe 'Classification and the allow-list' {
     }
 
     It 'ignores an expired approval and says so' {
-        $cursor = Get-RacTestFinding $scan -Breadcrumb 'AgentConfigDir' -AgentId 'cursor'
+        $cursor = @(Get-RacTestFinding $scan -Breadcrumb 'AgentConfigDir' -AgentId 'cursor')
         $cursor[0].Classification | Should -Be 'Unknown'
         ($cursor[0].Reasons -join ' ') | Should -Match "Cursor pilot \(ended\).*expired on 2026-06-30"
     }
@@ -479,6 +594,10 @@ Describe 'Report output' {
 }
 
 Describe 'Shipped examples and robustness' {
+    It 'writes nothing to the error stream (no red text on the console)' {
+        $scan.Errors | ForEach-Object { $_.ToString() } | Should -BeNullOrEmpty
+    }
+
     It 'completes every category on the fake machine without an error' {
         @($scan.Result.Coverage | Where-Object { $_.Source -like 'Category:*' -and $_.Status -eq 'Error' }) | Should -BeNullOrEmpty
     }
@@ -499,13 +618,13 @@ Describe 'Shipped examples and robustness' {
 
     It 'lists the agents it can recognize' {
         $ids = @(Get-RacSignature | ForEach-Object { $_.Id })
-        foreach ($id in 'claude-code', 'claude-desktop', 'openai-codex', 'github-copilot', 'openclaw', 'ollama', 'agent-framework') { $ids | Should -Contain $id }
+        foreach ($id in 'claude-code', 'claude-desktop', 'claude-in-chrome', 'openai-codex', 'github-copilot', 'openclaw', 'ollama', 'agent-framework') { $ids | Should -Contain $id }
     }
 }
 
 Describe 'ConvertTo-RacAllowListEntry' {
     It 'drafts a user-scoped entry with an approver and expiry' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'AgentConfigDir' -AgentId 'openai-codex'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'AgentConfigDir' -AgentId 'openai-codex')
         $entry = $f | ConvertTo-RacAllowListEntry -ApprovedBy 'Test Admin' -ExpiresInDays 30
         $entry.Agent | Should -Be 'openai-codex'
         $entry.Users | Should -Contain 'carol'
@@ -514,14 +633,14 @@ Describe 'ConvertTo-RacAllowListEntry' {
     }
 
     It 'scopes a draft for an unattributed finding narrowly' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'DnsCacheLlm' -TitleLike '*generativelanguage*'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'DnsCacheLlm' -TitleLike '*generativelanguage*')
         $entry = $f | ConvertTo-RacAllowListEntry -ApprovedBy 'Test Admin'
         $entry.Agent | Should -Be '*'
         $entry.Breadcrumbs | Should -Contain 'DnsCacheLlm'
     }
 
     It 'turns an Unknown agent into Trusted once the drafted entry is added' {
-        $f = Get-RacTestFinding $scan -Breadcrumb 'AgentConfigDir' -AgentId 'openai-codex'
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'AgentConfigDir' -AgentId 'openai-codex')
         $draft = $f | ConvertTo-RacAllowListEntry -ApprovedBy 'Test Admin'
         $fixture = Get-Content -LiteralPath (Join-Path -Path $PSScriptRoot -ChildPath 'Fixtures/allowlist.fixture.json') -Raw | ConvertFrom-Json
         $combined = @($fixture.entries) + @($draft)
@@ -529,14 +648,43 @@ Describe 'ConvertTo-RacAllowListEntry' {
         Set-Content -LiteralPath $path -Value (ConvertTo-Json -InputObject @{ entries = $combined } -Depth 6) -Encoding UTF8
 
         $rescan = Invoke-RacFixtureScan -TestRoot (Join-Path -Path $TestDrive -ChildPath 'rescan') -AllowListPath $path
-        $codexDir = Get-RacTestFinding $rescan -Breadcrumb 'AgentConfigDir' -AgentId 'openai-codex'
+        $codexDir = @(Get-RacTestFinding $rescan -Breadcrumb 'AgentConfigDir' -AgentId 'openai-codex')
         $codexDir[0].Classification | Should -Be 'Trusted'
-        $codexShell = Get-RacTestFinding $rescan -Breadcrumb 'McpServerConfig' -AgentId 'openai-codex'
+        $codexShell = @(Get-RacTestFinding $rescan -Breadcrumb 'McpServerConfig' -AgentId 'openai-codex')
         $codexShell[0].Classification | Should -Be 'Suspicious' -Because 'approval does not cover a shell server with a key in its config'
     }
 }
 
 Describe 'Helpers' {
+    It 'marks an event log Partial when it no longer reaches back over the lookback window' {
+        InModuleScope RogueAgentChecker {
+            $start = (Get-Date).AddDays(-7)
+            # Full and overwriting, oldest event an hour old: what the test VM's PowerShell log looked like.
+            $wrapped = [pscustomobject]@{ LogName = 'Microsoft-Windows-PowerShell/Operational'; LogMode = 'Circular'; MaxBytes = 15MB; FileBytes = 15MB; OldestEvent = (Get-Date).AddHours(-1) }
+            $r = Get-RacEventLogReach -Info $wrapped -LookbackStart $start
+            $r.Partial | Should -BeTrue
+            $r.Note | Should -Match 'only reaches back to'
+            $r.Note | Should -Match 'overwrites the oldest events'
+
+            $roomy = [pscustomobject]@{ LogName = 'x'; LogMode = 'Circular'; MaxBytes = 1GB; FileBytes = 15MB; OldestEvent = (Get-Date).AddDays(-30) }
+            (Get-RacEventLogReach -Info $roomy -LookbackStart $start).Partial | Should -BeFalse
+            (Get-RacEventLogReach -Info $roomy -LookbackStart $start).Note | Should -Match '^Log reaches back to'
+
+            $fullButLongEnough = [pscustomobject]@{ LogName = 'x'; LogMode = 'Circular'; MaxBytes = 15MB; FileBytes = 15MB; OldestEvent = (Get-Date).AddDays(-9) }
+            (Get-RacEventLogReach -Info $fullButLongEnough -LookbackStart $start).Partial | Should -BeFalse
+
+            $notFull = [pscustomobject]@{ LogName = 'x'; LogMode = 'Circular'; MaxBytes = 1GB; FileBytes = 1MB; OldestEvent = (Get-Date).AddHours(-2) }
+            (Get-RacEventLogReach -Info $notFull -LookbackStart $start).Partial | Should -BeFalse -Because 'a log that is not full has not overwritten anything'
+
+            $retain = [pscustomobject]@{ LogName = 'x'; LogMode = 'Retain'; MaxBytes = 15MB; FileBytes = 15MB; OldestEvent = (Get-Date).AddDays(-30) }
+            $r = Get-RacEventLogReach -Info $retain -LookbackStart $start
+            $r.Partial | Should -BeTrue
+            $r.Note | Should -Match 'stopped recording new ones'
+
+            (Get-RacEventLogReach -Info $null -LookbackStart $start).Partial | Should -BeFalse
+        }
+    }
+
     It 'redacts every supported key format and keeps the label' {
         InModuleScope RogueAgentChecker {
             $s = Protect-RacText 'a sk-ant-api03-FAKEFAKEFAKE0000RACTESTKEY0000 b'
@@ -560,6 +708,48 @@ Describe 'Helpers' {
         InModuleScope RogueAgentChecker {
             $s = Protect-RacText ('x' * 10 + ' sk-ant-api03-FAKEFAKEFAKE0000RACTESTKEY0000') -MaxLength 20
             $s | Should -Not -Match 'sk-ant'
+        }
+    }
+
+    It 'opens only local script files: network paths are never read' {
+        InModuleScope RogueAgentChecker {
+            Mock Get-RacDriveType { 'Network' } -ParameterFilter { $Letter -eq 'Z' }
+            Mock Get-RacDriveType { 'Fixed' } -ParameterFilter { $Letter -eq 'C' }
+            Mock Read-RacTextFile { 'irm https://api.openai.com/v1/models' }
+            Test-RacLocalFilePath '\\fileserver\scripts\sync.ps1' | Should -BeFalse
+            Test-RacLocalFilePath '//fileserver/scripts/sync.ps1' | Should -BeFalse
+            Test-RacLocalFilePath 'Z:\scripts\sync.ps1' | Should -BeFalse -Because 'Z: is a mapped network drive'
+            Test-RacLocalFilePath 'C:\scripts\sync.ps1' | Should -BeTrue
+            $ctx = [pscustomobject]@{ Signatures = $null; ScriptTexts = @{} }
+            Get-RacScriptFileText -Context $ctx -Path '\\fileserver\scripts\sync.ps1' | Should -BeNullOrEmpty
+            Get-RacScriptFileText -Context $ctx -Path 'Z:\scripts\sync.ps1' | Should -BeNullOrEmpty
+            Should -Invoke Read-RacTextFile -Times 0 -Exactly
+        }
+    }
+
+    It 'finds script paths in a command line, but not relative or %VARIABLE% paths' {
+        InModuleScope RogueAgentChecker {
+            $p = @(Get-RacScriptPathFromCommand 'tool.exe --script=C:\x\y.py "D:\a b\c.ps1" rel\z.ps1 %LOCALAPPDATA%\q.ps1 run.cmd')
+            $p | Should -Be @('C:\x\y.py', 'D:\a b\c.ps1')
+        }
+    }
+
+    It 'decodes -EncodedCommand and its short forms, and nothing else' {
+        InModuleScope RogueAgentChecker {
+            $b64 = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes('Get-Date'))
+            ConvertFrom-RacEncodedCommand "powershell.exe -EncodedCommand $b64" | Should -Be 'Get-Date'
+            ConvertFrom-RacEncodedCommand "powershell -enc $b64" | Should -Be 'Get-Date'
+            ConvertFrom-RacEncodedCommand "powershell -e $b64" | Should -Be 'Get-Date'
+            ConvertFrom-RacEncodedCommand 'powershell.exe -ExecutionPolicy AAAAAAAAAAAAAAAA' | Should -BeNullOrEmpty
+            ConvertFrom-RacEncodedCommand 'powershell.exe -File C:\x.ps1' | Should -BeNullOrEmpty
+        }
+    }
+
+    It 'lists AI key variable names a script uses, never values, and ignores ordinary names' {
+        InModuleScope RogueAgentChecker {
+            $sig = Import-RacSignatureFile -Path (Join-Path -Path $script:RacModuleRoot -ChildPath 'Data/signatures.json')
+            $names = @(Get-RacAiKeyName -Signatures $sig -Text '$key = $env:OPENAI_API_KEY; $t = $env:GITHUB_TOKEN; os.environ["ANTHROPIC_API_KEY"]; $monkey = 1')
+            $names | Should -Be @('OPENAI_API_KEY', 'ANTHROPIC_API_KEY')
         }
     }
 

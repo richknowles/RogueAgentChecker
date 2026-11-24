@@ -9,7 +9,7 @@
 #>
 
 function Get-RacFakeSystem {
-    param([Parameter(Mandatory = $true)]$Environment)
+    param([Parameter(Mandatory = $true)]$Environment, [string]$RepoRoot = '')
 
     $e = $Environment
     $s = $e.Secrets
@@ -33,6 +33,19 @@ function Get-RacFakeSystem {
         [pscustomobject]@{ LogName = $LogName; Id = $Id; TimeCreated = $Time; RecordId = Get-Random; Data = $Data }
     }
 
+    # A real chunk of RAC's own test file, word for word, as Windows would log it
+    # when ANOTHER copy of RAC runs its tests. It mentions api.openai.com, so it
+    # would be reported if RAC did not recognize its own code.
+    $ownChunk = ''
+    if ($RepoRoot) {
+        $ownText = [System.IO.File]::ReadAllText([System.IO.Path]::Combine($RepoRoot, 'Tests', 'RogueAgentChecker.Tests.ps1')).Replace("`r`n", "`n")
+        $at = $ownText.IndexOf("Should -Be 'api.openai.com'")
+        $ownChunk = $ownText.Substring([Math]::Max(0, $at - 400), 800).Replace("`n", "`r`n")
+    }
+
+    # 'powershell -EncodedCommand' takes Base64 of UTF-16LE text. Single quotes: $env stays literal.
+    $encodedGroq = [Convert]::ToBase64String([System.Text.Encoding]::Unicode.GetBytes('irm https://api.groq.com/openai/v1/models -Headers @{ Authorization = "Bearer $env:GROQ_API_KEY" }'))
+
     $node = 'C:\Program Files\nodejs\node.exe'
     $openclawCmd = '"C:\Program Files\nodejs\node.exe" C:\Users\bob\AppData\Roaming\npm\node_modules\openclaw\dist\index.js gateway --port 18789'
 
@@ -55,6 +68,9 @@ function Get-RacFakeSystem {
             New-FakeProcess 5201 5200 'chrome.exe' 'C:\Users\bob\AppData\Local\ms-playwright\chromium-1187\chrome-win\chrome.exe' 'chrome.exe --type=renderer --headless=new --remote-debugging-port=9222' $now.AddDays(-3).AddMinutes(5) 'CORP\bob'   # its renderer: ignored
             New-FakeProcess 6100 801 'python.exe' 'C:\Users\carol\Downloads\bot\.venv\Scripts\python.exe' ('python.exe -m crewai run --api-key=' + $s.Groq) $biz 'CORP\carol'   # CrewAI agent from Downloads
             New-FakeProcess 802 600 'powershell.exe' 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe' 'powershell.exe -NoProfile -WindowStyle Hidden -EncodedCommand SQBuAHYAbwBrAGUALQBSAGUAcwB0AE0AZQB0AGgAbwBkAA==' $now.AddMinutes(-40) 'NT AUTHORITY\SYSTEM'   # hidden SYSTEM PowerShell (see network)
+            New-FakeProcess 6600 800 'powershell.exe' 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe' ('"powershell.exe" -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "' + $e.RogueScript + '"') $now.AddMinutes(-70) 'CORP\bob'   # the live test's rogue: no open connection RAC can name, but its script calls OpenAI
+            New-FakeProcess 6700 700 'python.exe' 'C:\Python312\python.exe' ('python.exe "' + $e.SdkScript + '" --once') $biz 'CORP\carol'   # visible script using the OpenAI SDK
+            New-FakeProcess 6800 801 'powershell.exe' 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe' ('powershell.exe -NoProfile -File "' + $e.PlainScript + '"') $biz 'CORP\alice'   # ordinary script: ignored
         )
 
         # ---------------------------------------------------------------- network
@@ -88,9 +104,33 @@ function Get-RacFakeSystem {
                 Actions = @([pscustomobject]@{ Execute = $node; Arguments = 'C:\Users\bob\AppData\Roaming\npm\node_modules\openclaw\dist\index.js gateway --port 18789'; WorkingDirectory = '' })
             }
             [pscustomobject]@{
+                # Hidden, but otherwise low risk: HiddenTask must stay its own indicator (v0.1.0 glued it onto PersistenceAutostart)
+                TaskPath = '\'; TaskName = 'Codex Sync'; State = 'Ready'; Author = 'CORP\carol'; Description = ''
+                UserId = 'CORP\carol'; RunLevel = 'Limited'; Hidden = $true; Triggers = @('Daily'); RegistrationDate = $now.AddDays(-2).ToString('s')
+                Actions = @([pscustomobject]@{ Execute = 'C:\Users\carol\.codex\bin\codex.exe'; Arguments = 'exec "sync notes"'; WorkingDirectory = '' })
+            }
+            [pscustomobject]@{
                 TaskPath = '\'; TaskName = 'SystemHealthUpdater'; State = 'Ready'; Author = ''; Description = 'Keeps the system healthy'
                 UserId = 'SYSTEM'; RunLevel = 'Highest'; Hidden = $true; Triggers = @('Boot'); RegistrationDate = $now.AddDays(-1).ToString('s')
                 Actions = @([pscustomobject]@{ Execute = 'powershell.exe'; Arguments = '-NoProfile -WindowStyle Hidden -Command "npx -y @modelcontextprotocol/server-everything"'; WorkingDirectory = '' })
+            }
+            [pscustomobject]@{
+                # The live test's rogue task: nothing in the command names AI; the script it runs does
+                TaskPath = '\'; TaskName = 'OneDrive Sync Helper'; State = 'Running'; Author = 'CORP\bob'; Description = ''
+                UserId = 'CORP\bob'; RunLevel = 'Limited'; Hidden = $true; Triggers = @('Logon'); RegistrationDate = $now.AddDays(-1).ToString('s')
+                Actions = @([pscustomobject]@{ Execute = 'powershell.exe'; Arguments = ('-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "' + $e.RogueScript + '"'); WorkingDirectory = '' })
+            }
+            [pscustomobject]@{
+                # An encoded command that calls Groq: RAC decodes it and reads it; nothing is run
+                TaskPath = '\'; TaskName = 'Telemetry Refresh'; State = 'Ready'; Author = ''; Description = ''
+                UserId = 'CORP\carol'; RunLevel = 'Limited'; Hidden = $false; Triggers = @('Daily'); RegistrationDate = $now.AddDays(-1).ToString('s')
+                Actions = @([pscustomobject]@{ Execute = 'powershell.exe'; Arguments = ('-NoProfile -EncodedCommand ' + $encodedGroq); WorkingDirectory = '' })
+            }
+            [pscustomobject]@{
+                # An ordinary script task: RAC reads the script, finds nothing about AI, reports nothing
+                TaskPath = '\'; TaskName = 'Nightly Backup'; State = 'Ready'; Author = 'CORP\alice'; Description = ''
+                UserId = 'CORP\alice'; RunLevel = 'Limited'; Hidden = $false; Triggers = @('Daily'); RegistrationDate = $now.AddDays(-30).ToString('s')
+                Actions = @([pscustomobject]@{ Execute = 'powershell.exe'; Arguments = ('-NoProfile -File "' + $e.PlainScript + '"'); WorkingDirectory = '' })
             }
             [pscustomobject]@{
                 TaskPath = '\Microsoft\Windows\Defrag\'; TaskName = 'ScheduledDefrag'; State = 'Ready'; Author = 'Microsoft Corporation'; Description = ''
@@ -140,7 +180,16 @@ function Get-RacFakeSystem {
                     Path            = 'C:\Users\carol\Downloads\bot\ask-gpt.ps1'
                 }
                 New-FakeEvent 'Microsoft-Windows-PowerShell/Operational' 4104 $biz @{ ScriptBlockText = 'Get-ChildItem C:\temp'; Path = '' }   # ordinary: ignored
-                New-FakeEvent 'Microsoft-Windows-PowerShell/Operational' 4104 $biz @{ ScriptBlockText = 'function New-RacFinding { <# Rogue Agent Checker itself, mentions openclaw #> }'; Path = '' }   # RAC itself: ignored
+                New-FakeEvent 'Microsoft-Windows-PowerShell/Operational' 4104 $biz @{ ScriptBlockText = $ownChunk; Path = 'D:\Tools\RAC-old\RogueAgentChecker\Tests\RogueAgentChecker.Tests.ps1' }   # RAC's own code from ANOTHER copy: ignored by content
+                New-FakeEvent 'Microsoft-Windows-PowerShell/Operational' 4104 $biz @{ ScriptBlockText = $ownChunk; Path = '' }   # RAC's own code, no path: ignored by content
+                New-FakeEvent 'Microsoft-Windows-PowerShell/Operational' 4104 $off1.AddMinutes(12) @{
+                    ScriptBlockText = ("function New-RacFinding { } # RacModuleRoot Invoke-RogueAgentScan`r`n" + 'Invoke-RestMethod -Uri "https://api.groq.com/openai/v1/chat/completions" -Method Post -Headers @{ Authorization = "Bearer $env:GROQ_API_KEY" } -Body $prompt')
+                    Path            = 'C:\Users\bob\AppData\Local\Temp\RogueAgentChecker\Private\Core.ps1'
+                }   # NOT RAC: a script hiding behind RAC's names and folder must still be reported
+                New-FakeEvent 'Microsoft-Windows-PowerShell/Operational' 4104 $biz @{
+                    ScriptBlockText = ("It 'flags OpenClaw' { `$f.Evidence['Remote host'] | Should -Be 'api.openai.com'; `$env:OPENAI_API_KEY }")
+                    Path            = $(if ($RepoRoot) { [System.IO.Path]::Combine($RepoRoot, 'Tests', 'RogueAgentChecker.Tests.ps1') } else { '' })
+                }   # a CHUNK of RAC's own test file (no marker text): must be ignored by path
             )
             'PowerShellCore/Operational' = @()
             'Microsoft-Windows-Sysmon/Operational' = @(

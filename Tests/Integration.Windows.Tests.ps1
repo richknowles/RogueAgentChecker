@@ -50,7 +50,10 @@ Describe 'Real Windows sources (opt-in: set RAC_INTEGRATION=1)' -Skip:(-not $run
         }
 
         $script:outDir = Join-Path -Path $TestDrive -ChildPath 'out'
-        $script:result = Invoke-RogueAgentScan -OutputPath $script:outDir -PassThru -WarningAction SilentlyContinue 6>$null
+        # 2>&1 keeps anything written to the error stream (red console text) so a test can assert there is none.
+        $all = @(Invoke-RogueAgentScan -OutputPath $script:outDir -PassThru -WarningAction SilentlyContinue 2>&1 6>$null)
+        $script:scanErrors = @($all | Where-Object { $_ -is [System.Management.Automation.ErrorRecord] })
+        $script:result = $all | Where-Object { $_ -isnot [System.Management.Automation.ErrorRecord] } | Select-Object -Last 1
     }
 
     AfterAll {
@@ -97,11 +100,41 @@ Describe 'Real Windows sources (opt-in: set RAC_INTEGRATION=1)' -Skip:(-not $run
         ($output | Select-Object -Last 1) | Should -Match '^RAC: \d+ suspicious, \d+ unknown, \d+ trusted'
     }
 
+    It 'reads the current user''s own registry hive, elevated or not' {
+        # v0.1.0: one unreadable service-account hive (S-1-5-19) made a standard-user scan skip ALL user hives.
+        $me = [System.Security.Principal.WindowsIdentity]::GetCurrent().User.Value
+        $hives = @(InModuleScope RogueAgentChecker { Get-RacLoadedUserHive })
+        $mine = @($hives | Where-Object { $_.Sid -eq $me })
+        $mine.Count | Should -Be 1
+        $mine[0].Readable | Should -BeTrue
+        $run = @($result.Coverage | Where-Object { $_.Source -eq 'Run / RunOnce registry keys' })
+        $run[0].Detail | Should -Match '\b[1-9]\d* user hive\(s\) read'
+    }
+
+    It 'writes nothing to the error stream (no red text on the console)' {
+        $scanErrors | ForEach-Object { $_.ToString() } | Should -BeNullOrEmpty
+    }
+
+    It 'says how far back the PowerShell log reaches, and flags a log that no longer covers the lookback' {
+        # On the test VM this log held about an hour of a busy day while the report claimed 7 days.
+        $row = @($result.Coverage | Where-Object { $_.Source -eq 'Event log: Microsoft-Windows-PowerShell/Operational' })
+        $row.Count | Should -Be 1
+        $row[0].Detail | Should -Match 'reaches back to'
+        if ($row[0].Detail -match 'only reaches back to') { $row[0].Status | Should -Be 'Partial' }
+    }
+
     It 'records why sources were limited when not elevated' {
         if ($result.Elevated) {
             Set-ItResult -Skipped -Because 'running elevated'
             return
         }
         @($result.Coverage | Where-Object { $_.Status -in 'Partial', 'Skipped' }).Count | Should -BeGreaterThan 0
+        # v0.1.0 reported "Checked, 0 items" here when Windows silently returned nothing to a standard user.
+        foreach ($source in 'DNS client cache', 'Event log: Security') {
+            $row = @($result.Coverage | Where-Object { $_.Source -eq $source })
+            if ($row.Count -gt 0) {
+                ($row[0].Status -eq 'Checked' -and $row[0].ItemCount -eq 0) | Should -BeFalse -Because "$source must not claim a clean read it did not get"
+            }
+        }
     }
 }

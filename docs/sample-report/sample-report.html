@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Rogue Agent Report - FAKE-WS01 - 2026-10-26 19:32</title>
+<title>Rogue Agent Report - FAKE-WS01 - 2026-11-24 00:14</title>
 <style>:root{--bg:#f7f7f5;--paper:#ffffff;--ink:#1d1d1f;--muted:#5f6368;--line:#e3e3df;--soft:#f1f1ee;
 --sus:#b42318;--sus-bg:#fdecea;--unk:#a15c07;--unk-bg:#fff4e0;--tru:#05603a;--tru-bg:#e7f6ee;--accent:#1f3a5f;}
 @media (prefers-color-scheme: dark){:root{--bg:#121314;--paper:#1b1c1e;--ink:#ececec;--muted:#a1a4a8;--line:#2e3033;--soft:#232528;
@@ -54,57 +54,61 @@ footer{margin-top:40px;font-size:12px;color:var(--muted)}
 code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em}
 @media (max-width:760px){.fbody{grid-template-columns:1fr}details.finding>summary{grid-template-columns:auto 1fr}.ftitle,.fmeta{grid-column:1 / -1}}
 @media print{body{background:#fff;color:#000}.filters{display:none}details.finding{break-inside:avoid}main{max-width:none;padding:0}}</style></head><body><main>
-<header class="mast"><div class="brand">Rogue Agent Checker &middot; v0.1.0 &middot; read-only scan</div>
+<header class="mast"><div class="brand">Rogue Agent Checker &middot; v0.1.1 &middot; read-only scan</div>
 <h1>AI agent audit: FAKE-WS01</h1><dl class="meta">
-<div><dt>Scanned</dt><dd>2026-10-26 19:32:40 (6.2 s)</dd></div>
+<div><dt>Scanned</dt><dd>2026-11-24 00:14:20 (5.4 s)</dd></div>
 <div><dt>Run as</dt><dd>CORP\itadmin (elevated)</dd></div>
 <div><dt>Host</dt><dd>Microsoft Windows 11 Enterprise (fake) &middot; PowerShell 7.4.6</dd></div>
-<div><dt>Scan ID</dt><dd>e373489f-8ca8-43b2-a7c4-e87e46765176</dd></div>
-<div><dt>Allow-list</dt><dd>allowlist.fixture.json &middot; 6 entries &middot; SHA-256 184B5DA6BA356A49</dd></div>
-<div><dt>Signatures</dt><dd>2026.10.26 &middot; SHA-256 710C820406221181</dd></div>
+<div><dt>Scan ID</dt><dd>6333d8bb-a5a7-4fee-b49b-6202c2d3ba69</dd></div>
+<div><dt>Allow-list</dt><dd>allowlist.fixture.json &middot; 6 entries &middot; SHA-256 EF2450904467C981</dd></div>
+<div><dt>Signatures</dt><dd>2026.11.23 &middot; SHA-256 458BD3FA6F15C7DD</dd></div>
 <div><dt>Lookback</dt><dd>7 days</dd></div>
 </dl></header>
 <section><div class="tiles">
-<div class="tile sus"><div class="n">11</div><div class="l">Suspicious</div></div>
-<div class="tile unk"><div class="n">40</div><div class="l">Unknown (not approved)</div></div>
-<div class="tile tru"><div class="n">28</div><div class="l">Trusted (on allow-list)</div></div>
-<div class="tile"><div class="n">19</div><div class="l">Distinct agents</div></div>
+<div class="tile sus"><div class="n">14</div><div class="l">Suspicious</div></div>
+<div class="tile unk"><div class="n">45</div><div class="l">Unknown (not approved)</div></div>
+<div class="tile tru"><div class="n">27</div><div class="l">Trusted (on allow-list)</div></div>
+<div class="tile"><div class="n">23</div><div class="l">Distinct agents</div></div>
 </div>
-<p class="verdict">11 suspicious finding(s) need attention now. 40 unknown item(s) need an owner decision.</p></section>
+<p class="verdict">14 suspicious finding(s) need attention now. 45 unknown item(s) need an owner decision.</p></section>
 <section><h2>What to do next</h2><ol class="steps">
-<li>Investigate the 11 suspicious finding(s) first: RAC-0001 powershell.exe (PID 802) connected to api.openai.com (OpenAI); RAC-0002 Scheduled task &#39;\SystemHealthUpdater&#39; starts Unidentified MCP server; RAC-0003 WMI event subscription &#39;AgentKeepAlive&#39; runs OpenClaw; RAC-0004 Ollama listening on port 11434 (Ollama API) on ALL network interfaces; RAC-0005 Plaintext key or token in .env (GROQ_API_KEY, Groq API key); RAC-0006 Claude Desktop for alice can act across 4 app categories (private d...; RAC-0007 MCP server &#39;shell&#39; configured for OpenAI Codex CLI; RAC-0008 OpenAI key set as a machine environment variable (OPENAI_API_KEY) and 3 more. Preserve evidence before removing anything.</li>
-<li>Rotate exposed AI keys at the provider and move them into a secret store: RAC-0005, RAC-0008.</li>
-<li>Close network-exposed agent or model ports (bind to 127.0.0.1 or firewall them): RAC-0004.</li>
-<li>Assign an owner to each of the 40 unknown item(s) across 14 agent(s) and decide: approve (add to the allow-list with an approver and expiry) or remove through change control.</li>
+<li>Investigate the 14 suspicious finding(s) first: RAC-0001 powershell.exe (PID 802) connected to api.openai.com (OpenAI); RAC-0002 Scheduled task &#39;\SystemHealthUpdater&#39; starts Unidentified MCP server; RAC-0003 Scheduled task &#39;\OneDrive Sync Helper&#39; starts Unidentified agent; RAC-0004 WMI event subscription &#39;AgentKeepAlive&#39; runs OpenClaw; RAC-0005 Scheduled task &#39;\Telemetry Refresh&#39; starts Unidentified agent; RAC-0006 Ollama listening on port 11434 (Ollama API) on ALL network interfaces; RAC-0007 powershell.exe (PID 6600) runs a script that calls api.openai.com; RAC-0008 Plaintext key or token in .env (GROQ_API_KEY, Groq API key) and 6 more. Preserve evidence before removing anything.</li>
+<li>Rotate exposed AI keys at the provider and move them into a secret store: RAC-0008, RAC-0011.</li>
+<li>Close network-exposed agent or model ports (bind to 127.0.0.1 or firewall them): RAC-0006.</li>
+<li>Assign an owner to each of the 45 unknown item(s) across 17 agent(s) and decide: approve (add to the allow-list with an approver and expiry) or remove through change control.</li>
 <li>Review the 1 partial or skipped source(s) in the Coverage section before treating this machine as clean.</li>
 <li>File this report with the ticket, then rescan after changes to confirm the result.</li>
 </ol></section>
 <section><h2>Agents on this machine</h2><div class="wrap"><table><thead><tr><th>Agent</th><th>Status</th><th>Findings</th><th>Categories</th><th>Users</th></tr></thead><tbody>
 <tr><td><strong>OpenClaw</strong></td><td><span class="badge b-Suspicious">Suspicious</span></td><td>16</td><td>1. Processes, 2. Network, 3. Config, memory &amp; secrets, 4. Persistence, 6. Logs &amp; events, 7. Behavior</td><td>CORP\bob</td></tr>
-<tr><td><strong>Claude Desktop</strong></td><td><span class="badge b-Suspicious">Suspicious</span></td><td>14</td><td>1. Processes, 3. Config, memory &amp; secrets, 4. Persistence, 5. Tokens &amp; OAuth, 6. Logs &amp; events, 7. Behavior</td><td>CORP\alice</td></tr>
+<tr><td><strong>Claude Desktop</strong></td><td><span class="badge b-Suspicious">Suspicious</span></td><td>13</td><td>1. Processes, 3. Config, memory &amp; secrets, 4. Persistence, 5. Tokens &amp; OAuth, 6. Logs &amp; events, 7. Behavior</td><td>CORP\alice</td></tr>
+<tr><td><strong>OpenAI Codex CLI</strong></td><td><span class="badge b-Suspicious">Suspicious</span></td><td>6</td><td>3. Config, memory &amp; secrets, 4. Persistence, 5. Tokens &amp; OAuth, 6. Logs &amp; events</td><td>CORP\carol</td></tr>
 <tr><td><strong>Ollama</strong></td><td><span class="badge b-Suspicious">Suspicious</span></td><td>6</td><td>1. Processes, 2. Network, 3. Config, memory &amp; secrets, 4. Persistence, 6. Logs &amp; events</td><td>CORP\alice</td></tr>
-<tr><td><strong>OpenAI Codex CLI</strong></td><td><span class="badge b-Suspicious">Suspicious</span></td><td>5</td><td>3. Config, memory &amp; secrets, 5. Tokens &amp; OAuth, 6. Logs &amp; events</td><td>carol</td></tr>
 <tr><td><strong>Agent framework / SDK (custom-built agent)</strong></td><td><span class="badge b-Suspicious">Suspicious</span></td><td>3</td><td>1. Processes, 3. Config, memory &amp; secrets, 7. Behavior</td><td>CORP\carol</td></tr>
+<tr><td><strong>Unidentified script</strong></td><td><span class="badge b-Suspicious">Suspicious</span></td><td>2</td><td>1. Processes</td><td>CORP\bob, CORP\carol</td></tr>
+<tr><td><strong>Unidentified agent</strong></td><td><span class="badge b-Suspicious">Suspicious</span></td><td>2</td><td>4. Persistence</td><td>CORP\bob, CORP\carol</td></tr>
 <tr><td><strong>Unattributed (.env file)</strong></td><td><span class="badge b-Suspicious">Suspicious</span></td><td>2</td><td>3. Config, memory &amp; secrets</td><td>carol, alice</td></tr>
 <tr><td><strong>Unattributed (environment)</strong></td><td><span class="badge b-Suspicious">Suspicious</span></td><td>2</td><td>3. Config, memory &amp; secrets</td><td>CORP\alice</td></tr>
-<tr><td><strong>n8n</strong></td><td><span class="badge b-Suspicious">Suspicious</span></td><td>1</td><td>4. Persistence</td><td>LocalSystem</td></tr>
 <tr><td><strong>Unidentified MCP server</strong></td><td><span class="badge b-Suspicious">Suspicious</span></td><td>1</td><td>4. Persistence</td><td>SYSTEM</td></tr>
+<tr><td><strong>n8n</strong></td><td><span class="badge b-Suspicious">Suspicious</span></td><td>1</td><td>4. Persistence</td><td>LocalSystem</td></tr>
 <tr><td><strong>Unidentified process</strong></td><td><span class="badge b-Suspicious">Suspicious</span></td><td>1</td><td>2. Network</td><td>NT AUTHORITY\SYSTEM</td></tr>
 <tr><td><strong>Claude Code</strong></td><td><span class="badge b-Unknown">Unknown</span></td><td>10</td><td>1. Processes, 2. Network, 3. Config, memory &amp; secrets, 5. Tokens &amp; OAuth, 6. Logs &amp; events, 7. Behavior</td><td>CORP\alice, CORP\itadmin</td></tr>
-<tr><td><strong>Aider</strong></td><td><span class="badge b-Unknown">Unknown</span></td><td>3</td><td>3. Config, memory &amp; secrets, 6. Logs &amp; events, 7. Behavior</td><td>carol</td></tr>
 <tr><td><strong>Unattributed (proxy log)</strong></td><td><span class="badge b-Unknown">Unknown</span></td><td>3</td><td>2. Network</td><td></td></tr>
-<tr><td><strong>Cursor</strong></td><td><span class="badge b-Unknown">Unknown</span></td><td>2</td><td>3. Config, memory &amp; secrets</td><td>carol</td></tr>
+<tr><td><strong>Aider</strong></td><td><span class="badge b-Unknown">Unknown</span></td><td>3</td><td>3. Config, memory &amp; secrets, 6. Logs &amp; events, 7. Behavior</td><td>carol</td></tr>
+<tr><td><strong>Unattributed (PowerShell)</strong></td><td><span class="badge b-Unknown">Unknown</span></td><td>2</td><td>6. Logs &amp; events</td><td></td></tr>
 <tr><td><strong>Script host (possible custom agent)</strong></td><td><span class="badge b-Unknown">Unknown</span></td><td>2</td><td>6. Logs &amp; events, 7. Behavior</td><td>CORP\bob</td></tr>
-<tr><td><strong>Unattributed (DNS cache)</strong></td><td><span class="badge b-Unknown">Unknown</span></td><td>2</td><td>2. Network</td><td></td></tr>
+<tr><td><strong>Cursor</strong></td><td><span class="badge b-Unknown">Unknown</span></td><td>2</td><td>3. Config, memory &amp; secrets</td><td>carol</td></tr>
 <tr><td><strong>Continue</strong></td><td><span class="badge b-Unknown">Unknown</span></td><td>2</td><td>3. Config, memory &amp; secrets</td><td>carol</td></tr>
-<tr><td><strong>Unattributed (PowerShell)</strong></td><td><span class="badge b-Unknown">Unknown</span></td><td>1</td><td>6. Logs &amp; events</td><td></td></tr>
+<tr><td><strong>Unattributed (DNS cache)</strong></td><td><span class="badge b-Unknown">Unknown</span></td><td>2</td><td>2. Network</td><td></td></tr>
+<tr><td><strong>ChatGPT Sidebar Helper (browser extension)</strong></td><td><span class="badge b-Unknown">Unknown</span></td><td>1</td><td>5. Tokens &amp; OAuth</td><td>alice</td></tr>
+<tr><td><strong>Claude in Chrome</strong></td><td><span class="badge b-Unknown">Unknown</span></td><td>1</td><td>5. Tokens &amp; OAuth</td><td>alice</td></tr>
 <tr><td><strong>GitHub Copilot (VS Code agent mode / Copilot CLI)</strong></td><td><span class="badge b-Trusted">Trusted</span></td><td>3</td><td>3. Config, memory &amp; secrets</td><td>alice</td></tr>
 </tbody></table></div></section>
 <section><h2>Findings</h2>
-<div class="filters"><button class="on" data-filter="All">All (79)</button><button data-filter="Suspicious">Suspicious (11)</button><button data-filter="Unknown">Unknown (40)</button><button data-filter="Trusted">Trusted (28)</button></div>
+<div class="filters"><button class="on" data-filter="All">All (86)</button><button data-filter="Suspicious">Suspicious (14)</button><button data-filter="Unknown">Unknown (45)</button><button data-filter="Trusted">Trusted (27)</button></div>
 <details class="finding" data-class="Suspicious" open><summary>
 <span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0001</span><span class="ftitle">powershell.exe (PID 802) connected to api.openai.com (OpenAI)</span>
-<span class="fmeta">2. Network &middot; LlmConnection &middot; Unidentified process &middot; NT AUTHORITY\SYSTEM &middot; 2026-10-26 18:57 &middot; score 120</span></summary>
+<span class="fmeta">2. Network &middot; LlmConnection &middot; Unidentified process &middot; NT AUTHORITY\SYSTEM &middot; 2026-11-23 23:39 &middot; score 120</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>powershell.exe (PID 802) -&gt; api.openai.com</td></tr>
 <tr><th>Process</th><td>powershell.exe (PID 802)</td></tr>
@@ -115,7 +119,7 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <tr><th>Executable</th><td>C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</td></tr>
 <tr><th>Command line</th><td>powershell.exe -NoProfile -WindowStyle Hidden -EncodedCommand SQBuAHYAbwBrAGUALQBSAGUAcwB0AE0AZQB0AGgAbwBkAA==</td></tr>
 <tr><th>Owner</th><td>NT AUTHORITY\SYSTEM</td></tr>
-<tr><th>Connected since</th><td>2026-10-26 18:57:39</td></tr>
+<tr><th>Connected since</th><td>2026-11-23 23:39:19</td></tr>
 <tr><th>Open for (minutes)</th><td>35</td></tr>
 <tr><th>Hostname source</th><td>local DNS client cache (no lookups performed)</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
@@ -128,7 +132,7 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 </ul><h3>Recommended next step</h3><p class="rec">Investigate now. Confirm with the administrator who set this up (it runs as NT AUTHORITY\SYSTEM) whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. Confirm the process is meant to call this AI provider and that the data it sends is allowed to leave.</p></div></div></details>
 <details class="finding" data-class="Suspicious" open><summary>
 <span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0002</span><span class="ftitle">Scheduled task &#39;\SystemHealthUpdater&#39; starts Unidentified MCP server</span>
-<span class="fmeta">4. Persistence &middot; ScheduledTask &middot; Unidentified MCP server &middot; SYSTEM &middot; 2026-10-25 02:14 &middot; score 100</span></summary>
+<span class="fmeta">4. Persistence &middot; ScheduledTask &middot; Unidentified MCP server &middot; SYSTEM &middot; 2026-11-23 02:14 &middot; score 100</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>Task Scheduler: \SystemHealthUpdater</td></tr>
 <tr><th>Task</th><td>\SystemHealthUpdater</td></tr>
@@ -138,10 +142,10 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <tr><th>Action</th><td>powershell.exe -NoProfile -WindowStyle Hidden -Command &quot;npx -y @modelcontextprotocol/server-everything&quot;</td></tr>
 <tr><th>Triggers</th><td>Boot</td></tr>
 <tr><th>Hidden</th><td>True</td></tr>
-<tr><th>Registered</th><td>2026-10-25T19:32:39</td></tr>
+<tr><th>Registered</th><td>2026-11-23T00:14:19</td></tr>
 <tr><th>Matched because</th><td>launches an MCP server (/@modelcontextprotocol//)</td></tr>
-<tr><th>Last run</th><td>2026-10-25 02:14:00</td></tr>
-<tr><th>Next run</th><td>2026-10-27 19:32:39</td></tr>
+<tr><th>Last run</th><td>2026-11-23 02:14:00</td></tr>
+<tr><th>Next run</th><td>2026-11-25 00:14:19</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Not on the allow-list.</li>
 <li>+10 PersistenceAutostart: Starts automatically without a person launching it</li>
@@ -151,7 +155,36 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 100 is at or above the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Investigate now. Confirm with the administrator who set this up (it runs as SYSTEM) whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. Confirm who created the task. Disable it through change control if the agent is not approved.</p></div></div></details>
 <details class="finding" data-class="Suspicious" open><summary>
-<span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0003</span><span class="ftitle">WMI event subscription &#39;AgentKeepAlive&#39; runs OpenClaw</span>
+<span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0003</span><span class="ftitle">Scheduled task &#39;\OneDrive Sync Helper&#39; starts Unidentified agent</span>
+<span class="fmeta">4. Persistence &middot; ScheduledTask &middot; Unidentified agent &middot; CORP\bob &middot; 2026-11-23 02:14 &middot; score 95</span></summary>
+<div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
+<tr><th>Location</th><td>Task Scheduler: \OneDrive Sync Helper</td></tr>
+<tr><th>Task</th><td>\OneDrive Sync Helper</td></tr>
+<tr><th>State</th><td>Running</td></tr>
+<tr><th>Runs as</th><td>CORP\bob</td></tr>
+<tr><th>Run level</th><td>Limited</td></tr>
+<tr><th>Action</th><td>powershell.exe -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File &quot;C:\Users\bob\AppData\Local\OneDriveSyncHelper\sync.ps1&quot;</td></tr>
+<tr><th>Triggers</th><td>Logon</td></tr>
+<tr><th>Hidden</th><td>True</td></tr>
+<tr><th>Author</th><td>CORP\bob</td></tr>
+<tr><th>Registered</th><td>2026-11-23T00:14:19</td></tr>
+<tr><th>Matched because</th><td>runs the script C:\Users\bob\AppData\Local\OneDriveSyncHelper\sync.ps1, which calls api.openai.com (key variables: OPENAI_API_KEY)</td></tr>
+<tr><th>Script</th><td>C:\Users\bob\AppData\Local\OneDriveSyncHelper\sync.ps1</td></tr>
+<tr><th>LLM host referenced</th><td>api.openai.com</td></tr>
+<tr><th>Key variables used</th><td>OPENAI_API_KEY</td></tr>
+<tr><th>Sample (redacted)</th><td>while ($true) { Invoke-RestMethod -Uri &#39;https://api.openai.com/v1/models&#39; -Headers @{ Authorization = &quot;Bearer $key&quot; } | Out-Null Start-Sleep -Seconds 3</td></tr>
+<tr><th>Last run</th><td>2026-11-23 02:14:00</td></tr>
+<tr><th>Next run</th><td>2026-11-25 00:14:19</td></tr>
+</tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
+<li>Not on the allow-list.</li>
+<li>+10 PersistenceAutostart: Starts automatically without a person launching it</li>
+<li>+40 StealthLaunch: Launched hidden or with an encoded command line</li>
+<li>+20 HiddenTask: Scheduled task is marked hidden</li>
+<li>+25 LlmCallFromScript: A script calls an LLM API directly (a logged PowerShell script block, or the script or encoded command a process or autostart entry runs)</li>
+<li>Risk score 95 is at or above the threshold of 40.</li>
+</ul><h3>Recommended next step</h3><p class="rec">Investigate now. Confirm with CORP\bob whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. Confirm who created the task. Disable it through change control if the agent is not approved.</p></div></div></details>
+<details class="finding" data-class="Suspicious" open><summary>
+<span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0004</span><span class="ftitle">WMI event subscription &#39;AgentKeepAlive&#39; runs OpenClaw</span>
 <span class="fmeta">4. Persistence &middot; WmiSubscription &middot; OpenClaw &middot; bob &middot; score 90</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>root\subscription: AgentKeepAlive</td></tr>
@@ -168,8 +201,34 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 90 is at or above the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Investigate now. Confirm with bob whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. WMI subscriptions are a stealth persistence technique. Capture the consumer and filter details, then remove them through change control (v1 never removes anything).</p></div></div></details>
 <details class="finding" data-class="Suspicious" open><summary>
-<span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0004</span><span class="ftitle">Ollama listening on port 11434 (Ollama API) on ALL network interfaces</span>
-<span class="fmeta">2. Network &middot; AgentListener &middot; Ollama &middot; CORP\alice &middot; 2026-10-26 19:32 &middot; score 65</span></summary>
+<span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0005</span><span class="ftitle">Scheduled task &#39;\Telemetry Refresh&#39; starts Unidentified agent</span>
+<span class="fmeta">4. Persistence &middot; ScheduledTask &middot; Unidentified agent &middot; CORP\carol &middot; 2026-11-23 02:14 &middot; score 75</span></summary>
+<div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
+<tr><th>Location</th><td>Task Scheduler: \Telemetry Refresh</td></tr>
+<tr><th>Task</th><td>\Telemetry Refresh</td></tr>
+<tr><th>State</th><td>Ready</td></tr>
+<tr><th>Runs as</th><td>CORP\carol</td></tr>
+<tr><th>Run level</th><td>Limited</td></tr>
+<tr><th>Action</th><td>powershell.exe -NoProfile -EncodedCommand aQByAG0AIABoAHQAdABwAHMAOgAvAC8AYQBwAGkALgBnAHIAbwBxAC4AYwBvAG0ALwBvAHAAZQBuAGEAaQAvAHYAMQAvAG0AbwBkAGUAbABzACAALQBIAGUAYQBkAGUAcgBzACAAQAB7ACAAQQB1AHQAaABvAHIAaQB6AGEAdABpAG8AbgAgAD0AIAAiAEIAZQBhAHIAZQByACAAJABlAG4AdgA6AEcAUgBPAFEAXwBBAFAASQBfAEsARQBZACIAIAB9AA==</td></tr>
+<tr><th>Triggers</th><td>Daily</td></tr>
+<tr><th>Hidden</th><td>False</td></tr>
+<tr><th>Registered</th><td>2026-11-23T00:14:19</td></tr>
+<tr><th>Matched because</th><td>runs an encoded PowerShell command that calls api.groq.com (key variables: GROQ_API_KEY)</td></tr>
+<tr><th>LLM host referenced</th><td>api.groq.com</td></tr>
+<tr><th>Key variables used</th><td>GROQ_API_KEY</td></tr>
+<tr><th>Sample (redacted)</th><td>irm https://api.groq.com/openai/v1/models -Headers @{ Authorization = &quot;Bearer $env:GROQ_API_KEY&quot; }</td></tr>
+<tr><th>Last run</th><td>2026-11-23 02:14:00</td></tr>
+<tr><th>Next run</th><td>2026-11-25 00:14:19</td></tr>
+</tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
+<li>Not on the allow-list.</li>
+<li>+10 PersistenceAutostart: Starts automatically without a person launching it</li>
+<li>+40 StealthLaunch: Launched hidden or with an encoded command line</li>
+<li>+25 LlmCallFromScript: A script calls an LLM API directly (a logged PowerShell script block, or the script or encoded command a process or autostart entry runs)</li>
+<li>Risk score 75 is at or above the threshold of 40.</li>
+</ul><h3>Recommended next step</h3><p class="rec">Investigate now. Confirm with CORP\carol whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. Confirm who created the task. Disable it through change control if the agent is not approved.</p></div></div></details>
+<details class="finding" data-class="Suspicious" open><summary>
+<span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0006</span><span class="ftitle">Ollama listening on port 11434 (Ollama API) on ALL network interfaces</span>
+<span class="fmeta">2. Network &middot; AgentListener &middot; Ollama &middot; CORP\alice &middot; 2026-11-24 00:14 &middot; score 65</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>TCP 11434 (ollama.exe (PID 7100))</td></tr>
 <tr><th>Port</th><td>11434</td></tr>
@@ -186,15 +245,39 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Approved agent, but remaining risk score 65 is at or above the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Investigate now. Confirm with CORP\alice whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. Bind the service to 127.0.0.1 or block the port at the host firewall. An exposed agent or model port lets anyone on the network drive it.</p></div></div></details>
 <details class="finding" data-class="Suspicious" open><summary>
-<span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0005</span><span class="ftitle">Plaintext key or token in .env (GROQ_API_KEY, Groq API key)</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; SecretFile &middot; Unattributed (.env file) &middot; carol &middot; 2026-10-23 10:00 &middot; score 55</span></summary>
+<span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0007</span><span class="ftitle">powershell.exe (PID 6600) runs a script that calls api.openai.com</span>
+<span class="fmeta">1. Processes &middot; LlmScriptProcess &middot; Unidentified script &middot; CORP\bob &middot; 2026-11-23 23:04 &middot; score 65</span></summary>
+<div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
+<tr><th>Location</th><td>C:\Users\bob\AppData\Local\OneDriveSyncHelper\sync.ps1</td></tr>
+<tr><th>Process</th><td>powershell.exe (PID 6600)</td></tr>
+<tr><th>Executable</th><td>C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe</td></tr>
+<tr><th>Command line</th><td>&quot;powershell.exe&quot; -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File &quot;C:\Users\bob\AppData\Local\OneDriveSyncHelper\sync.ps1&quot;</td></tr>
+<tr><th>Parent</th><td>svchost.exe (PID 800)</td></tr>
+<tr><th>Owner</th><td>CORP\bob</td></tr>
+<tr><th>Started</th><td>2026-11-23 23:04:19</td></tr>
+<tr><th>Uptime (hours)</th><td>1.2</td></tr>
+<tr><th>Stealth pattern</th><td>(^| )-w(in|indowstyle)? +h(idden)?\b</td></tr>
+<tr><th>Found in</th><td>the script file it runs</td></tr>
+<tr><th>Script</th><td>C:\Users\bob\AppData\Local\OneDriveSyncHelper\sync.ps1</td></tr>
+<tr><th>LLM host referenced</th><td>api.openai.com</td></tr>
+<tr><th>Key variables used</th><td>OPENAI_API_KEY</td></tr>
+<tr><th>Sample (redacted)</th><td>while ($true) { Invoke-RestMethod -Uri &#39;https://api.openai.com/v1/models&#39; -Headers @{ Authorization = &quot;Bearer $key&quot; } | Out-Null Start-Sleep -Seconds 3</td></tr>
+</tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
+<li>Not on the allow-list.</li>
+<li>+25 LlmCallFromScript: A script calls an LLM API directly (a logged PowerShell script block, or the script or encoded command a process or autostart entry runs)</li>
+<li>+40 StealthLaunch: Launched hidden or with an encoded command line</li>
+<li>Risk score 65 is at or above the threshold of 40.</li>
+</ul><h3>Recommended next step</h3><p class="rec">Investigate now. Confirm with CORP\bob whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. Open the script (see Script) and find its owner. A script that calls an AI API on its own is an unmanaged agent; check the Persistence findings for what starts it.</p></div></div></details>
+<details class="finding" data-class="Suspicious" open><summary>
+<span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0008</span><span class="ftitle">Plaintext key or token in .env (GROQ_API_KEY, Groq API key)</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; SecretFile &middot; Unattributed (.env file) &middot; carol &middot; 2026-11-23 10:00 &middot; score 55</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\carol\Downloads\bot\.env</td></tr>
 <tr><th>File</th><td>C:\Users\carol\Downloads\bot\.env</td></tr>
 <tr><th>Key names</th><td>GROQ_API_KEY</td></tr>
 <tr><th>Key formats</th><td>Groq API key</td></tr>
 <tr><th>Line numbers</th><td>1</td></tr>
-<tr><th>Last modified</th><td>2026-10-23 10:00:00</td></tr>
+<tr><th>Last modified</th><td>2026-11-23 10:00:00</td></tr>
 <tr><th>Values</th><td>not recorded (RAC never stores or prints key values)</td></tr>
 <tr><th>Readable by</th><td>BUILTIN\Users</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
@@ -204,7 +287,7 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 55 is at or above the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Investigate now. Confirm with carol whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. Move the key into a secret store or Windows Credential Manager. If the file is readable by other users or has been synced or committed anywhere, rotate the key at the provider.</p></div></div></details>
 <details class="finding" data-class="Suspicious" open><summary>
-<span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0006</span><span class="ftitle">Claude Desktop for alice can act across 4 app categories (private data + untrusted input + outbound channel)</span>
+<span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0009</span><span class="ftitle">Claude Desktop for alice can act across 4 app categories (private data + untrusted input + outbound channel)</span>
 <span class="fmeta">7. Behavior &middot; CrossAppReach &middot; Claude Desktop &middot; alice &middot; score 50</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>MCP configuration of Claude Desktop</td></tr>
@@ -213,7 +296,7 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <tr><th>Private data</th><td>yes</td></tr>
 <tr><th>Untrusted input</th><td>yes</td></tr>
 <tr><th>Outbound channel</th><td>yes</td></tr>
-<tr><th>Related findings</th><td>RAC-0015, RAC-0016, RAC-0030, RAC-0052</td></tr>
+<tr><th>Related findings</th><td>RAC-0020, RAC-0021, RAC-0037, RAC-0060</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Matches allow-list entry &#39;Claude Desktop - company standard&#39; (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1043).</li>
 <li>+20 CrossAppReach: One agent identity can act across three or more application categories</li>
@@ -221,8 +304,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Approved agent, but remaining risk score 50 is at or above the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Investigate now. Confirm with alice whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. One agent identity can act across several apps. Narrow its tokens and scopes, split duties between agents, and require human approval for send, delete and execute actions.</p></div></div></details>
 <details class="finding" data-class="Suspicious" open><summary>
-<span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0007</span><span class="ftitle">MCP server &#39;shell&#39; configured for OpenAI Codex CLI</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; McpServerConfig &middot; OpenAI Codex CLI &middot; carol &middot; 2026-10-23 10:00 &middot; score 40</span></summary>
+<span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0010</span><span class="ftitle">MCP server &#39;shell&#39; configured for OpenAI Codex CLI</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; McpServerConfig &middot; OpenAI Codex CLI &middot; carol &middot; 2026-11-23 10:00 &middot; score 40</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\carol\.codex\config.toml :: shell</td></tr>
 <tr><th>Config file</th><td>C:\Users\carol\.codex\config.toml</td></tr>
@@ -243,7 +326,7 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 40 is at or above the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Investigate now. Confirm with carol whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. Review what this MCP server can reach, remove servers that are not needed, and pin package versions instead of npx -y / uvx latest.</p></div></div></details>
 <details class="finding" data-class="Suspicious" open><summary>
-<span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0008</span><span class="ftitle">OpenAI key set as a machine environment variable (OPENAI_API_KEY)</span>
+<span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0011</span><span class="ftitle">OpenAI key set as a machine environment variable (OPENAI_API_KEY)</span>
 <span class="fmeta">3. Config, memory &amp; secrets &middot; EnvVarSecret &middot; Unattributed (environment) &middot; score 40</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Environment</td></tr>
@@ -258,7 +341,7 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 40 is at or above the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Investigate now. Confirm with the owner whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. Machine-wide AI keys are inherited by every user and service. Scope the key to the one account or service that needs it, and rotate it if it was shared.</p></div></div></details>
 <details class="finding" data-class="Suspicious" open><summary>
-<span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0009</span><span class="ftitle">Service &#39;n8n&#39; runs n8n</span>
+<span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0012</span><span class="ftitle">Service &#39;n8n&#39; runs n8n</span>
 <span class="fmeta">4. Persistence &middot; Service &middot; n8n &middot; LocalSystem &middot; score 40</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>Service: n8n</td></tr>
@@ -276,8 +359,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 40 is at or above the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Investigate now. Confirm with the administrator who set this up (it runs as LocalSystem) whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. Agents running as services act without a person present. Confirm ownership and the account it runs as.</p></div></div></details>
 <details class="finding" data-class="Suspicious" open><summary>
-<span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0010</span><span class="ftitle">Agent framework / SDK (custom-built agent) running (python.exe, PID 6100)</span>
-<span class="fmeta">1. Processes &middot; AgentProcess &middot; Agent framework / SDK (custom-built agent) &middot; CORP\carol &middot; 2026-10-23 10:00 &middot; score 40</span></summary>
+<span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0013</span><span class="ftitle">Agent framework / SDK (custom-built agent) running (python.exe, PID 6100)</span>
+<span class="fmeta">1. Processes &middot; AgentProcess &middot; Agent framework / SDK (custom-built agent) &middot; CORP\carol &middot; 2026-11-23 10:00 &middot; score 40</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\carol\Downloads\bot\.venv\Scripts\python.exe</td></tr>
 <tr><th>Process</th><td>python.exe (PID 6100)</td></tr>
@@ -285,8 +368,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <tr><th>Command line</th><td>python.exe -m crewai run --api-key=[REDACTED:groq-key]</td></tr>
 <tr><th>Parent</th><td>explorer.exe (PID 801)</td></tr>
 <tr><th>Owner</th><td>CORP\carol</td></tr>
-<tr><th>Started</th><td>2026-10-23 10:00:00</td></tr>
-<tr><th>Uptime (hours)</th><td>81.5</td></tr>
+<tr><th>Started</th><td>2026-11-23 10:00:00</td></tr>
+<tr><th>Uptime (hours)</th><td>14.2</td></tr>
 <tr><th>Matched because</th><td>command line matches /\bcrewai\b/</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Not on the allow-list.</li>
@@ -295,8 +378,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 40 is at or above the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Investigate now. Confirm with CORP\carol whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine.</p></div></div></details>
 <details class="finding" data-class="Suspicious" open><summary>
-<span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0011</span><span class="ftitle">Automated / headless browser chrome.exe (PID 5200) launched by OpenClaw</span>
-<span class="fmeta">1. Processes &middot; HeadlessBrowser &middot; OpenClaw &middot; CORP\bob &middot; 2026-10-23 19:37 &middot; score 40</span></summary>
+<span class="badge b-Suspicious">Suspicious</span><span class="fid">RAC-0014</span><span class="ftitle">Automated / headless browser chrome.exe (PID 5200) launched by OpenClaw</span>
+<span class="fmeta">1. Processes &middot; HeadlessBrowser &middot; OpenClaw &middot; CORP\bob &middot; 2026-11-21 00:19 &middot; score 40</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\bob\AppData\Local\ms-playwright\chromium-1187\chrome-win\chrome.exe</td></tr>
 <tr><th>Process</th><td>chrome.exe (PID 5200)</td></tr>
@@ -304,7 +387,7 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <tr><th>Command line</th><td>chrome.exe --headless=new --remote-debugging-port=9222 --user-data-dir=C:\Users\bob\AppData\Local\Temp\playwright_profile</td></tr>
 <tr><th>Parent</th><td>node.exe (PID 5100)</td></tr>
 <tr><th>Owner</th><td>CORP\bob</td></tr>
-<tr><th>Started</th><td>2026-10-23 19:37:39</td></tr>
+<tr><th>Started</th><td>2026-11-21 00:19:19</td></tr>
 <tr><th>Uptime (hours)</th><td>71.9</td></tr>
 <tr><th>Launched by</th><td>OpenClaw (PID 5100)</td></tr>
 <tr><th>Automation flag</th><td>--headless</td></tr>
@@ -315,12 +398,12 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 40 is at or above the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Investigate now. Confirm with CORP\bob whether this is sanctioned. Preserve evidence first (keep this report; capture the process or files before anything is removed), then contain it through your incident process. Rotate any AI keys or tokens found on this machine. A browser with remote debugging can be fully controlled by any local process, including the user&#39;s signed-in sessions. Identify the automation that owns it.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0012</span><span class="ftitle">OpenClaw skills / memory changed for bob (3 file(s) in the last 7 days)</span>
-<span class="fmeta">7. Behavior &middot; SelfModification &middot; OpenClaw &middot; bob &middot; 2026-10-25 02:14 &middot; score 35</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0015</span><span class="ftitle">OpenClaw skills / memory changed for bob (3 file(s) in the last 7 days)</span>
+<span class="fmeta">7. Behavior &middot; SelfModification &middot; OpenClaw &middot; bob &middot; 2026-11-23 02:14 &middot; score 35</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>Skills and memory of OpenClaw</td></tr>
 <tr><th>Files changed</th><td>3</td></tr>
-<tr><th>Newest change</th><td>2026-10-25 02:14:00</td></tr>
+<tr><th>Newest change</th><td>2026-11-23 02:14:00</td></tr>
 <tr><th>Examples</th><td>.openclaw/workspace/memory.md, skills/autoupdate/skill.md, skills/autoupdate/skill.md</td></tr>
 <tr><th>Written by agent process</th><td>yes (Sysmon 11 (written by node.exe))</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
@@ -330,13 +413,35 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 35 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Compare the changed skill and memory files with a known-good copy. An agent that rewrites its own instructions can carry a prompt injection forward.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0013</span><span class="ftitle">OpenClaw: 2 package install(s) in the last 7 days</span>
-<span class="fmeta">7. Behavior &middot; PackageInstallActivity &middot; OpenClaw &middot; bob &middot; 2026-10-25 02:14 &middot; score 30</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0016</span><span class="ftitle">python.exe (PID 6700) runs a script that uses an AI SDK (from openai)</span>
+<span class="fmeta">1. Processes &middot; LlmScriptProcess &middot; Unidentified script &middot; CORP\carol &middot; 2026-11-23 10:00 &middot; score 35</span></summary>
+<div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
+<tr><th>Location</th><td>C:\Users\carol\Documents\scripts\summarize.py</td></tr>
+<tr><th>Process</th><td>python.exe (PID 6700)</td></tr>
+<tr><th>Executable</th><td>C:\Python312\python.exe</td></tr>
+<tr><th>Command line</th><td>python.exe &quot;C:\Users\carol\Documents\scripts\summarize.py&quot; --once</td></tr>
+<tr><th>Parent</th><td>PID 700 (not running)</td></tr>
+<tr><th>Owner</th><td>CORP\carol</td></tr>
+<tr><th>Started</th><td>2026-11-23 10:00:00</td></tr>
+<tr><th>Uptime (hours)</th><td>14.2</td></tr>
+<tr><th>Found in</th><td>the script file it runs</td></tr>
+<tr><th>Script</th><td>C:\Users\carol\Documents\scripts\summarize.py</td></tr>
+<tr><th>AI SDK</th><td>from openai</td></tr>
+<tr><th>Sample (redacted)</th><td>from openai import OpenAI client = OpenAI() print(client.models.list())</td></tr>
+</tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
+<li>Not on the allow-list.</li>
+<li>+10 LongRunning: Agent process has been running longer than the long-running threshold</li>
+<li>+25 LlmCallFromScript: A script calls an LLM API directly (a logged PowerShell script block, or the script or encoded command a process or autostart entry runs)</li>
+<li>Risk score 35 is below the threshold of 40; flagged because it is not approved.</li>
+</ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask CORP\carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Open the script (see Script) and find its owner. A script that calls an AI API on its own is an unmanaged agent; check the Persistence findings for what starts it.</p></div></div></details>
+<details class="finding" data-class="Unknown"><summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0017</span><span class="ftitle">OpenClaw: 2 package install(s) in the last 7 days</span>
+<span class="fmeta">7. Behavior &middot; PackageInstallActivity &middot; OpenClaw &middot; bob &middot; 2026-11-23 02:14 &middot; score 30</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>Install activity: OpenClaw</td></tr>
 <tr><th>Installs</th><td>2</td></tr>
 <tr><th>Launched by the agent itself</th><td>1</td></tr>
-<tr><th>Most recent</th><td>2026-10-25 02:14 openclaw 2026.10.2 (npm global) [install folder date] | 2026-10-24 03:07 cmd.exe /d /s /c &quot;npm install -g left-padz&quot; [Sysmon 1]</td></tr>
+<tr><th>Most recent</th><td>2026-11-23 02:14 openclaw 2026.10.2 (npm global) [install folder date] | 2026-11-22 03:07 cmd.exe /d /s /c &quot;npm install -g left-padz&quot; [Sysmon 1]</td></tr>
 <tr><th>Users</th><td>bob</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Not on the allow-list.</li>
@@ -345,8 +450,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 30 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Review what was installed (watch for typosquats) and remove the agent&#39;s ability to install software if it is not required.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0014</span><span class="ftitle">OpenClaw listening on port 9222 (Chrome DevTools Protocol (full browser remote control))</span>
-<span class="fmeta">2. Network &middot; AgentListener &middot; OpenClaw &middot; CORP\bob &middot; 2026-10-26 19:32 &middot; score 30</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0018</span><span class="ftitle">OpenClaw listening on port 9222 (Chrome DevTools Protocol (full browser remote control))</span>
+<span class="fmeta">2. Network &middot; AgentListener &middot; OpenClaw &middot; CORP\bob &middot; 2026-11-24 00:14 &middot; score 30</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>TCP 9222 (chrome.exe (PID 5200))</td></tr>
 <tr><th>Port</th><td>9222</td></tr>
@@ -361,8 +466,31 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 30 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask CORP\bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Bind the service to 127.0.0.1 or block the port at the host firewall. An exposed agent or model port lets anyone on the network drive it.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0015</span><span class="ftitle">MCP server &#39;desktop-commander&#39; configured for Claude Desktop</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; McpServerConfig &middot; Claude Desktop &middot; alice &middot; 2026-10-23 10:00 &middot; score 25</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0019</span><span class="ftitle">Scheduled task &#39;\Codex Sync&#39; starts OpenAI Codex CLI</span>
+<span class="fmeta">4. Persistence &middot; ScheduledTask &middot; OpenAI Codex CLI &middot; CORP\carol &middot; 2026-11-23 02:14 &middot; score 30</span></summary>
+<div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
+<tr><th>Location</th><td>Task Scheduler: \Codex Sync</td></tr>
+<tr><th>Task</th><td>\Codex Sync</td></tr>
+<tr><th>State</th><td>Ready</td></tr>
+<tr><th>Runs as</th><td>CORP\carol</td></tr>
+<tr><th>Run level</th><td>Limited</td></tr>
+<tr><th>Action</th><td>C:\Users\carol\.codex\bin\codex.exe exec &quot;sync notes&quot;</td></tr>
+<tr><th>Triggers</th><td>Daily</td></tr>
+<tr><th>Hidden</th><td>True</td></tr>
+<tr><th>Author</th><td>CORP\carol</td></tr>
+<tr><th>Registered</th><td>2026-11-22T00:14:19</td></tr>
+<tr><th>Matched because</th><td>references the executable of OpenAI Codex CLI</td></tr>
+<tr><th>Last run</th><td>2026-11-23 02:14:00</td></tr>
+<tr><th>Next run</th><td>2026-11-25 00:14:19</td></tr>
+</tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
+<li>Not on the allow-list.</li>
+<li>+10 PersistenceAutostart: Starts automatically without a person launching it</li>
+<li>+20 HiddenTask: Scheduled task is marked hidden</li>
+<li>Risk score 30 is below the threshold of 40; flagged because it is not approved.</li>
+</ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask CORP\carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Confirm who created the task. Disable it through change control if the agent is not approved.</p></div></div></details>
+<details class="finding" data-class="Unknown"><summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0020</span><span class="ftitle">MCP server &#39;desktop-commander&#39; configured for Claude Desktop</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; McpServerConfig &middot; Claude Desktop &middot; alice &middot; 2026-11-23 10:00 &middot; score 25</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\alice\AppData\Roaming\Claude\claude_desktop_config.json :: desktop-commander</td></tr>
 <tr><th>Config file</th><td>C:\Users\alice\AppData\Roaming\Claude\claude_desktop_config.json</td></tr>
@@ -380,8 +508,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 25 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask alice what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Review what this MCP server can reach, remove servers that are not needed, and pin package versions instead of npx -y / uvx latest.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0016</span><span class="ftitle">MCP server &#39;slack&#39; configured for Claude Desktop</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; McpServerConfig &middot; Claude Desktop &middot; alice &middot; 2026-10-23 10:00 &middot; score 25</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0021</span><span class="ftitle">MCP server &#39;slack&#39; configured for Claude Desktop</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; McpServerConfig &middot; Claude Desktop &middot; alice &middot; 2026-11-23 10:00 &middot; score 25</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\alice\AppData\Roaming\Claude\claude_desktop_config.json :: slack</td></tr>
 <tr><th>Config file</th><td>C:\Users\alice\AppData\Roaming\Claude\claude_desktop_config.json</td></tr>
@@ -390,7 +518,7 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <tr><th>Transport</th><td>stdio (local process)</td></tr>
 <tr><th>Command</th><td>npx</td></tr>
 <tr><th>Arguments</th><td>-y @modelcontextprotocol/server-slack</td></tr>
-<tr><th>Env var names</th><td>SLACK_TEAM_ID, SLACK_BOT_TOKEN</td></tr>
+<tr><th>Env var names</th><td>SLACK_BOT_TOKEN, SLACK_TEAM_ID</td></tr>
 <tr><th>Plaintext secrets</th><td>SLACK_BOT_TOKEN (Slack token)</td></tr>
 <tr><th>Unpinned package</th><td>@modelcontextprotocol/server-slack</td></tr>
 <tr><th>Reaches</th><td>chat</td></tr>
@@ -401,30 +529,65 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 25 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask alice what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Review what this MCP server can reach, remove servers that are not needed, and pin package versions instead of npx -y / uvx latest.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0017</span><span class="ftitle">PowerShell script calls api.openai.com (1 block(s))</span>
-<span class="fmeta">6. Logs &amp; events &middot; PowerShellScriptBlock &middot; Unattributed (PowerShell) &middot; 2026-10-25 02:24 &middot; score 25</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0022</span><span class="ftitle">PowerShell script calls api.groq.com (1 block(s))</span>
+<span class="fmeta">6. Logs &amp; events &middot; PowerShellScriptBlock &middot; Unattributed (PowerShell) &middot; 2026-11-23 02:26 &middot; score 25</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>Event log: PowerShell Operational (4104)</td></tr>
 <tr><th>Event</th><td>PowerShell Script Block Logging (4104)</td></tr>
 <tr><th>Script blocks</th><td>1</td></tr>
-<tr><th>First seen</th><td>2026-10-25 02:24:00</td></tr>
-<tr><th>Last seen</th><td>2026-10-25 02:24:00</td></tr>
+<tr><th>First seen</th><td>2026-11-23 02:26:00</td></tr>
+<tr><th>Last seen</th><td>2026-11-23 02:26:00</td></tr>
+<tr><th>LLM host referenced</th><td>api.groq.com</td></tr>
+<tr><th>Key variables used</th><td>GROQ_API_KEY</td></tr>
+<tr><th>Script path</th><td>C:\Users\bob\AppData\Local\Temp\RogueAgentChecker\Private\Core.ps1</td></tr>
+<tr><th>Samples (redacted)</th><td>voke-RogueAgentScan Invoke-RestMethod -Uri &quot;https://api.groq.com/openai/v1/chat/completions&quot; -Method Post -Headers @{ Authorization = &quot;Bearer $env:GROQ_API_KEY</td></tr>
+<tr><th>Note</th><td>The path names Rogue Agent Checker, but this text is not part of the RAC copy that ran this scan. If it is another RAC version, confirm by comparing the file with that release; otherwise treat it as any other script.</td></tr>
+</tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
+<li>Not on the allow-list.</li>
+<li>+25 LlmCallFromScript: A script calls an LLM API directly (a logged PowerShell script block, or the script or encoded command a process or autostart entry runs)</li>
+<li>Risk score 25 is below the threshold of 40; flagged because it is not approved.</li>
+</ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask the owner what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Find the script (see Script path) and its owner. Scripts calling LLM APIs directly are unmanaged agents.</p></div></div></details>
+<details class="finding" data-class="Unknown"><summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0023</span><span class="ftitle">PowerShell script calls api.openai.com (1 block(s))</span>
+<span class="fmeta">6. Logs &amp; events &middot; PowerShellScriptBlock &middot; Unattributed (PowerShell) &middot; 2026-11-23 02:24 &middot; score 25</span></summary>
+<div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
+<tr><th>Location</th><td>Event log: PowerShell Operational (4104)</td></tr>
+<tr><th>Event</th><td>PowerShell Script Block Logging (4104)</td></tr>
+<tr><th>Script blocks</th><td>1</td></tr>
+<tr><th>First seen</th><td>2026-11-23 02:24:00</td></tr>
+<tr><th>Last seen</th><td>2026-11-23 02:24:00</td></tr>
 <tr><th>LLM host referenced</th><td>api.openai.com</td></tr>
 <tr><th>Script path</th><td>C:\Users\carol\Downloads\bot\ask-gpt.ps1</td></tr>
 <tr><th>Samples (redacted)</th><td>earer [REDACTED]&quot; }; Invoke-RestMethod -Uri &quot;https://api.openai.com/v1/chat/completions&quot; -Method Post -Headers $h -Body $body</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Not on the allow-list.</li>
-<li>+25 LlmCallFromScript: A PowerShell script block called an LLM API directly</li>
+<li>+25 LlmCallFromScript: A script calls an LLM API directly (a logged PowerShell script block, or the script or encoded command a process or autostart entry runs)</li>
 <li>Risk score 25 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask the owner what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Find the script (see Script path) and its owner. Scripts calling LLM APIs directly are unmanaged agents.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0018</span><span class="ftitle">OpenClaw active outside business hours (7 times)</span>
-<span class="fmeta">7. Behavior &middot; OffHoursActivity &middot; OpenClaw &middot; bob &middot; 2026-10-25 17:32 &middot; score 15</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0024</span><span class="ftitle">AI browser extension &#39;Claude&#39; in Chrome</span>
+<span class="fmeta">5. Tokens &amp; OAuth &middot; BrowserExtension &middot; Claude in Chrome &middot; alice &middot; 2026-11-23 10:00 &middot; score 20</span></summary>
+<div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
+<tr><th>Location</th><td>C:\Users\alice\AppData\Local\Google\Chrome\User Data\Default\Extensions\fcoeoabgfenejglbffodgkkbkcdhcgfn\1.0.36_0</td></tr>
+<tr><th>Browser</th><td>Chrome (Default)</td></tr>
+<tr><th>Extension</th><td>Claude</td></tr>
+<tr><th>Extension ID</th><td>fcoeoabgfenejglbffodgkkbkcdhcgfn</td></tr>
+<tr><th>Version</th><td>1.0.36_0</td></tr>
+<tr><th>Notable permissions</th><td>debugger, nativeMessaging, tabs, sidePanel</td></tr>
+<tr><th>Folder</th><td>C:\Users\alice\AppData\Local\Google\Chrome\User Data\Default\Extensions\fcoeoabgfenejglbffodgkkbkcdhcgfn\1.0.36_0</td></tr>
+</tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
+<li>Not on the allow-list.</li>
+<li>+20 BrowserControlPermission: Browser extension holds debugger or native-messaging permission (can drive the browser)</li>
+<li>Risk score 20 is below the threshold of 40; flagged because it is not approved.</li>
+</ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask alice what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Extensions with debugger or native messaging permission can drive the browser with the user&#39;s sessions. Manage them with browser policy (ExtensionInstallAllowlist).</p></div></div></details>
+<details class="finding" data-class="Unknown"><summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0025</span><span class="ftitle">OpenClaw active outside business hours (7 times)</span>
+<span class="fmeta">7. Behavior &middot; OffHoursActivity &middot; OpenClaw &middot; bob &middot; 2026-11-23 02:41 &middot; score 15</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>Activity timeline: C:\Program Files\nodejs\node.exe</td></tr>
 <tr><th>Off-hours timestamps</th><td>7 of 7 in the last 7 days</td></tr>
 <tr><th>Business hours</th><td>07:00-19:00, Monday, Tuesday, Wednesday, Thursday, Friday</td></tr>
-<tr><th>Most recent</th><td>Sun 2026-10-25 17:32; Sun 2026-10-25 02:41; Sun 2026-10-25 02:14; Sat 2026-10-24 03:07; Sat 2026-10-24 03:05</td></tr>
+<tr><th>Most recent</th><td>Mon 2026-11-23 02:41; Mon 2026-11-23 02:14; Sun 2026-11-22 22:14; Sun 2026-11-22 03:07; Sun 2026-11-22 03:05</td></tr>
 <tr><th>Evidence from</th><td>AgentProcess, HeadlessBrowser, LlmConnection, AgentConfigDir, SecretFile, AgentPackage, ScheduledTask, AgentTranscript, AgentLog, SysmonAgentProcess</td></tr>
 <tr><th>Users</th><td>bob</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
@@ -433,13 +596,13 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 15 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Confirm whether this was scheduled automation or an unattended agent. Check the Persistence findings for the same agent.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0019</span><span class="ftitle">Script host (possible custom agent) active outside business hours (3 times)</span>
-<span class="fmeta">7. Behavior &middot; OffHoursActivity &middot; Script host (possible custom agent) &middot; bob &middot; 2026-10-25 02:41 &middot; score 15</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0026</span><span class="ftitle">Script host (possible custom agent) active outside business hours (3 times)</span>
+<span class="fmeta">7. Behavior &middot; OffHoursActivity &middot; Script host (possible custom agent) &middot; bob &middot; 2026-11-23 02:41 &middot; score 15</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>Activity timeline: Sysmon: C:\Program Files\nodejs\node.exe</td></tr>
 <tr><th>Off-hours timestamps</th><td>3 of 3 in the last 7 days</td></tr>
 <tr><th>Business hours</th><td>07:00-19:00, Monday, Tuesday, Wednesday, Thursday, Friday</td></tr>
-<tr><th>Most recent</th><td>Sun 2026-10-25 02:41; Sun 2026-10-25 02:14; Sat 2026-10-24 03:05</td></tr>
+<tr><th>Most recent</th><td>Mon 2026-11-23 02:41; Mon 2026-11-23 02:14; Sun 2026-11-22 03:05</td></tr>
 <tr><th>Evidence from</th><td>SysmonLlmTraffic</td></tr>
 <tr><th>Users</th><td>bob</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
@@ -448,8 +611,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 15 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Confirm whether this was scheduled automation or an unattended agent. Check the Persistence findings for the same agent.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0020</span><span class="ftitle">MCP server &#39;sentry&#39; configured for Claude Code</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; McpServerConfig &middot; Claude Code &middot; alice &middot; 2026-10-23 10:00 &middot; score 15</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0027</span><span class="ftitle">MCP server &#39;sentry&#39; configured for Claude Code</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; McpServerConfig &middot; Claude Code &middot; alice &middot; 2026-11-23 10:00 &middot; score 15</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\alice\Documents\src\webapp\.mcp.json :: sentry</td></tr>
 <tr><th>Config file</th><td>C:\Users\alice\Documents\src\webapp\.mcp.json</td></tr>
@@ -463,8 +626,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 15 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask alice what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Review what this MCP server can reach, remove servers that are not needed, and pin package versions instead of npx -y / uvx latest.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0021</span><span class="ftitle">MCP server &#39;linear&#39; configured for Cursor</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; McpServerConfig &middot; Cursor &middot; carol &middot; 2026-10-23 10:00 &middot; score 15</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0028</span><span class="ftitle">MCP server &#39;linear&#39; configured for Cursor</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; McpServerConfig &middot; Cursor &middot; carol &middot; 2026-11-23 10:00 &middot; score 15</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\carol\.cursor\mcp.json :: linear</td></tr>
 <tr><th>Config file</th><td>C:\Users\carol\.cursor\mcp.json</td></tr>
@@ -480,14 +643,14 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 15 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Review what this MCP server can reach, remove servers that are not needed, and pin package versions instead of npx -y / uvx latest.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0022</span><span class="ftitle">Plaintext key or token in config.toml (OpenAI API key)</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; SecretFile &middot; OpenAI Codex CLI &middot; carol &middot; 2026-10-23 10:00 &middot; score 15</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0029</span><span class="ftitle">Plaintext key or token in config.toml (OpenAI API key)</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; SecretFile &middot; OpenAI Codex CLI &middot; carol &middot; 2026-11-23 10:00 &middot; score 15</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\carol\.codex\config.toml</td></tr>
 <tr><th>File</th><td>C:\Users\carol\.codex\config.toml</td></tr>
 <tr><th>Key formats</th><td>OpenAI API key</td></tr>
 <tr><th>Line numbers</th><td>11</td></tr>
-<tr><th>Last modified</th><td>2026-10-23 10:00:00</td></tr>
+<tr><th>Last modified</th><td>2026-11-23 10:00:00</td></tr>
 <tr><th>Values</th><td>not recorded (RAC never stores or prints key values)</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Not on the allow-list.</li>
@@ -495,15 +658,15 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 15 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Move the key into a secret store or Windows Credential Manager. If the file is readable by other users or has been synced or committed anywhere, rotate the key at the provider.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0023</span><span class="ftitle">Plaintext key or token in .env (ANTHROPIC_API_KEY, Anthropic API key)</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; SecretFile &middot; OpenClaw &middot; bob &middot; 2026-10-25 02:14 &middot; score 15</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0030</span><span class="ftitle">Plaintext key or token in .env (ANTHROPIC_API_KEY, Anthropic API key)</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; SecretFile &middot; OpenClaw &middot; bob &middot; 2026-11-23 02:14 &middot; score 15</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\bob\.openclaw\.env</td></tr>
 <tr><th>File</th><td>C:\Users\bob\.openclaw\.env</td></tr>
 <tr><th>Key names</th><td>ANTHROPIC_API_KEY</td></tr>
 <tr><th>Key formats</th><td>Anthropic API key</td></tr>
 <tr><th>Line numbers</th><td>1</td></tr>
-<tr><th>Last modified</th><td>2026-10-25 02:14:00</td></tr>
+<tr><th>Last modified</th><td>2026-11-23 02:14:00</td></tr>
 <tr><th>Values</th><td>not recorded (RAC never stores or prints key values)</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Not on the allow-list.</li>
@@ -511,15 +674,15 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 15 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Move the key into a secret store or Windows Credential Manager. If the file is readable by other users or has been synced or committed anywhere, rotate the key at the provider.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0024</span><span class="ftitle">Plaintext key or token in .env (OPENAI_API_KEY, OpenAI API key)</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; SecretFile &middot; Unattributed (.env file) &middot; alice &middot; 2026-10-23 10:00 &middot; score 15</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0031</span><span class="ftitle">Plaintext key or token in .env (OPENAI_API_KEY, OpenAI API key)</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; SecretFile &middot; Unattributed (.env file) &middot; alice &middot; 2026-11-23 10:00 &middot; score 15</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\alice\Documents\src\webapp\.env</td></tr>
 <tr><th>File</th><td>C:\Users\alice\Documents\src\webapp\.env</td></tr>
 <tr><th>Key names</th><td>OPENAI_API_KEY</td></tr>
 <tr><th>Key formats</th><td>OpenAI API key</td></tr>
 <tr><th>Line numbers</th><td>2</td></tr>
-<tr><th>Last modified</th><td>2026-10-23 10:00:00</td></tr>
+<tr><th>Last modified</th><td>2026-11-23 10:00:00</td></tr>
 <tr><th>Values</th><td>not recorded (RAC never stores or prints key values)</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Not on the allow-list.</li>
@@ -527,7 +690,7 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 15 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask alice what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Move the key into a secret store or Windows Credential Manager. If the file is readable by other users or has been synced or committed anywhere, rotate the key at the provider.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0025</span><span class="ftitle">Anthropic key set as a user environment variable (ANTHROPIC_API_KEY)</span>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0032</span><span class="ftitle">Anthropic key set as a user environment variable (ANTHROPIC_API_KEY)</span>
 <span class="fmeta">3. Config, memory &amp; secrets &middot; EnvVarSecret &middot; Unattributed (environment) &middot; CORP\alice &middot; score 15</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>HKU\CORP\alice\Environment</td></tr>
@@ -542,13 +705,13 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 15 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask CORP\alice what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Machine-wide AI keys are inherited by every user and service. Scope the key to the one account or service that needs it, and rotate it if it was shared.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0026</span><span class="ftitle">Agent framework / SDK (custom-built agent): 1 package install(s) in the last 7 days</span>
-<span class="fmeta">7. Behavior &middot; PackageInstallActivity &middot; Agent framework / SDK (custom-built agent) &middot; carol &middot; 2026-10-23 10:00 &middot; score 10</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0033</span><span class="ftitle">Agent framework / SDK (custom-built agent): 1 package install(s) in the last 7 days</span>
+<span class="fmeta">7. Behavior &middot; PackageInstallActivity &middot; Agent framework / SDK (custom-built agent) &middot; carol &middot; 2026-11-23 10:00 &middot; score 10</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>Install activity: Agent framework / SDK (custom-built agent)</td></tr>
 <tr><th>Installs</th><td>1</td></tr>
 <tr><th>Launched by the agent itself</th><td>0</td></tr>
-<tr><th>Most recent</th><td>2026-10-23 10:00 crewai 0.86.0 (site-packages) [install folder date]</td></tr>
+<tr><th>Most recent</th><td>2026-11-23 10:00 crewai 0.86.0 (site-packages) [install folder date]</td></tr>
 <tr><th>Users</th><td>carol</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Not on the allow-list.</li>
@@ -556,13 +719,13 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 10 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Review what was installed (watch for typosquats) and remove the agent&#39;s ability to install software if it is not required.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0027</span><span class="ftitle">Aider: 1 package install(s) in the last 7 days</span>
-<span class="fmeta">7. Behavior &middot; PackageInstallActivity &middot; Aider &middot; carol &middot; 2026-10-23 10:00 &middot; score 10</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0034</span><span class="ftitle">Aider: 1 package install(s) in the last 7 days</span>
+<span class="fmeta">7. Behavior &middot; PackageInstallActivity &middot; Aider &middot; carol &middot; 2026-11-23 10:00 &middot; score 10</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>Install activity: Aider</td></tr>
 <tr><th>Installs</th><td>1</td></tr>
 <tr><th>Launched by the agent itself</th><td>0</td></tr>
-<tr><th>Most recent</th><td>2026-10-23 10:00 aider-chat  (pipx) [install folder date]</td></tr>
+<tr><th>Most recent</th><td>2026-11-23 10:00 aider-chat  (pipx) [install folder date]</td></tr>
 <tr><th>Users</th><td>carol</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Not on the allow-list.</li>
@@ -570,8 +733,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 10 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Review what was installed (watch for typosquats) and remove the agent&#39;s ability to install software if it is not required.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0028</span><span class="ftitle">Agent framework / SDK (custom-built agent) package installed: crewai 0.86.0</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentPackage &middot; Agent framework / SDK (custom-built agent) &middot; carol &middot; 2026-10-23 10:00 &middot; score 10</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0035</span><span class="ftitle">Agent framework / SDK (custom-built agent) package installed: crewai 0.86.0</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentPackage &middot; Agent framework / SDK (custom-built agent) &middot; carol &middot; 2026-11-23 10:00 &middot; score 10</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\carol\AppData\Roaming\Python\Python312\site-packages\crewai-0.86.0.dist-info</td></tr>
 <tr><th>Package</th><td>crewai</td></tr>
@@ -579,30 +742,30 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <tr><th>Installed via</th><td>site-packages</td></tr>
 <tr><th>Version</th><td>0.86.0</td></tr>
 <tr><th>Install path</th><td>C:\Users\carol\AppData\Roaming\Python\Python312\site-packages\crewai-0.86.0.dist-info</td></tr>
-<tr><th>Installed on</th><td>2026-10-23 10:00:00</td></tr>
+<tr><th>Installed on</th><td>2026-11-23 10:00:00</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Not on the allow-list.</li>
 <li>+10 RecentPackageInstall: Agent software was installed within the lookback window</li>
 <li>Risk score 10 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0029</span><span class="ftitle">Aider package installed: aider-chat </span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentPackage &middot; Aider &middot; carol &middot; 2026-10-23 10:00 &middot; score 10</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0036</span><span class="ftitle">Aider package installed: aider-chat </span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentPackage &middot; Aider &middot; carol &middot; 2026-11-23 10:00 &middot; score 10</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\carol\.local\pipx\venvs\aider-chat</td></tr>
 <tr><th>Package</th><td>aider-chat</td></tr>
 <tr><th>Ecosystem</th><td>pypi</td></tr>
 <tr><th>Installed via</th><td>pipx</td></tr>
 <tr><th>Install path</th><td>C:\Users\carol\.local\pipx\venvs\aider-chat</td></tr>
-<tr><th>Installed on</th><td>2026-10-23 10:00:00</td></tr>
+<tr><th>Installed on</th><td>2026-11-23 10:00:00</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Not on the allow-list.</li>
 <li>+10 RecentPackageInstall: Agent software was installed within the lookback window</li>
 <li>Risk score 10 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0030</span><span class="ftitle">MCP server &#39;gmail&#39; configured for Claude Desktop</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; McpServerConfig &middot; Claude Desktop &middot; alice &middot; 2026-10-23 10:00 &middot; score 10</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0037</span><span class="ftitle">MCP server &#39;gmail&#39; configured for Claude Desktop</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; McpServerConfig &middot; Claude Desktop &middot; alice &middot; 2026-11-23 10:00 &middot; score 10</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\alice\AppData\Roaming\Claude\claude_desktop_config.json :: gmail</td></tr>
 <tr><th>Config file</th><td>C:\Users\alice\AppData\Roaming\Claude\claude_desktop_config.json</td></tr>
@@ -619,8 +782,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 10 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask alice what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Review what this MCP server can reach, remove servers that are not needed, and pin package versions instead of npx -y / uvx latest.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0031</span><span class="ftitle">MCP server &#39;sqlite&#39; configured for Continue</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; McpServerConfig &middot; Continue &middot; carol &middot; 2026-10-23 10:00 &middot; score 10</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0038</span><span class="ftitle">MCP server &#39;sqlite&#39; configured for Continue</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; McpServerConfig &middot; Continue &middot; carol &middot; 2026-11-23 10:00 &middot; score 10</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\carol\.continue\config.yaml :: sqlite</td></tr>
 <tr><th>Config file</th><td>C:\Users\carol\.continue\config.yaml</td></tr>
@@ -637,8 +800,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 10 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Review what this MCP server can reach, remove servers that are not needed, and pin package versions instead of npx -y / uvx latest.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0032</span><span class="ftitle">OpenClaw package installed: openclaw 2026.10.2</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentPackage &middot; OpenClaw &middot; bob &middot; 2026-10-25 02:14 &middot; score 10</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0039</span><span class="ftitle">OpenClaw package installed: openclaw 2026.10.2</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentPackage &middot; OpenClaw &middot; bob &middot; 2026-11-23 02:14 &middot; score 10</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\bob\AppData\Roaming\npm\node_modules\openclaw</td></tr>
 <tr><th>Package</th><td>openclaw</td></tr>
@@ -646,21 +809,21 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <tr><th>Installed via</th><td>npm global</td></tr>
 <tr><th>Version</th><td>2026.10.2</td></tr>
 <tr><th>Install path</th><td>C:\Users\bob\AppData\Roaming\npm\node_modules\openclaw</td></tr>
-<tr><th>Installed on</th><td>2026-10-25 02:14:00</td></tr>
+<tr><th>Installed on</th><td>2026-11-23 02:14:00</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Not on the allow-list.</li>
 <li>+10 RecentPackageInstall: Agent software was installed within the lookback window</li>
 <li>Risk score 10 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0033</span><span class="ftitle">OpenClaw: 1 process launch(es) in the last 7 days</span>
-<span class="fmeta">6. Logs &amp; events &middot; SysmonAgentProcess &middot; OpenClaw &middot; CORP\bob &middot; 2026-10-24 03:07 &middot; score 10</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0040</span><span class="ftitle">OpenClaw: 1 process launch(es) in the last 7 days</span>
+<span class="fmeta">6. Logs &amp; events &middot; SysmonAgentProcess &middot; OpenClaw &middot; CORP\bob &middot; 2026-11-22 03:07 &middot; score 10</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>Event log: Sysmon Operational (1)</td></tr>
 <tr><th>Event</th><td>Sysmon process creation (1)</td></tr>
 <tr><th>Launches</th><td>1</td></tr>
-<tr><th>First seen</th><td>2026-10-24 03:07:00</td></tr>
-<tr><th>Last seen</th><td>2026-10-24 03:07:00</td></tr>
+<tr><th>First seen</th><td>2026-11-22 03:07:00</td></tr>
+<tr><th>Last seen</th><td>2026-11-22 03:07:00</td></tr>
 <tr><th>Shells launched by agent</th><td>1</td></tr>
 <tr><th>Images</th><td>cmd.exe</td></tr>
 <tr><th>Sample command lines</th><td>cmd.exe /d /s /c &quot;npm install -g left-padz&quot;</td></tr>
@@ -671,8 +834,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 10 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask CORP\bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0034</span><span class="ftitle">node.exe (PID 5100) connected to api.anthropic.com (Anthropic)</span>
-<span class="fmeta">2. Network &middot; LlmConnection &middot; OpenClaw &middot; CORP\bob &middot; 2026-10-25 17:32 &middot; score 10</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0041</span><span class="ftitle">node.exe (PID 5100) connected to api.anthropic.com (Anthropic)</span>
+<span class="fmeta">2. Network &middot; LlmConnection &middot; OpenClaw &middot; CORP\bob &middot; 2026-11-22 22:14 &middot; score 10</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>node.exe (PID 5100) -&gt; api.anthropic.com</td></tr>
 <tr><th>Process</th><td>node.exe (PID 5100)</td></tr>
@@ -683,7 +846,7 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <tr><th>Executable</th><td>C:\Program Files\nodejs\node.exe</td></tr>
 <tr><th>Command line</th><td>&quot;C:\Program Files\nodejs\node.exe&quot; C:\Users\bob\AppData\Roaming\npm\node_modules\openclaw\dist\index.js gateway --port 18789 --token [REDACTED:anthropic-key]</td></tr>
 <tr><th>Owner</th><td>CORP\bob</td></tr>
-<tr><th>Connected since</th><td>2026-10-25 17:32:39</td></tr>
+<tr><th>Connected since</th><td>2026-11-22 22:14:19</td></tr>
 <tr><th>Open for (minutes)</th><td>1560</td></tr>
 <tr><th>Hostname source</th><td>local DNS client cache (no lookups performed)</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
@@ -692,8 +855,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 10 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask CORP\bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Confirm the process is meant to call this AI provider and that the data it sends is allowed to leave.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0035</span><span class="ftitle">Scheduled task &#39;\OpenClaw Gateway&#39; starts OpenClaw</span>
-<span class="fmeta">4. Persistence &middot; ScheduledTask &middot; OpenClaw &middot; CORP\bob &middot; 2026-10-25 02:14 &middot; score 10</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0042</span><span class="ftitle">Scheduled task &#39;\OpenClaw Gateway&#39; starts OpenClaw</span>
+<span class="fmeta">4. Persistence &middot; ScheduledTask &middot; OpenClaw &middot; CORP\bob &middot; 2026-11-23 02:14 &middot; score 10</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>Task Scheduler: \OpenClaw Gateway</td></tr>
 <tr><th>Task</th><td>\OpenClaw Gateway</td></tr>
@@ -704,18 +867,18 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <tr><th>Triggers</th><td>Logon</td></tr>
 <tr><th>Hidden</th><td>False</td></tr>
 <tr><th>Author</th><td>CORP\bob</td></tr>
-<tr><th>Registered</th><td>2026-10-23T19:32:39</td></tr>
+<tr><th>Registered</th><td>2026-11-21T00:14:19</td></tr>
 <tr><th>Matched because</th><td>text matches /openclaw/</td></tr>
-<tr><th>Last run</th><td>2026-10-25 02:14:00</td></tr>
-<tr><th>Next run</th><td>2026-10-27 19:32:39</td></tr>
+<tr><th>Last run</th><td>2026-11-23 02:14:00</td></tr>
+<tr><th>Next run</th><td>2026-11-25 00:14:19</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Not on the allow-list.</li>
 <li>+10 PersistenceAutostart: Starts automatically without a person launching it</li>
 <li>Risk score 10 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask CORP\bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Confirm who created the task. Disable it through change control if the agent is not approved.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0036</span><span class="ftitle">OpenClaw running (node.exe, PID 5100)</span>
-<span class="fmeta">1. Processes &middot; AgentProcess &middot; OpenClaw &middot; CORP\bob &middot; 2026-10-23 19:32 &middot; score 10</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0043</span><span class="ftitle">OpenClaw running (node.exe, PID 5100)</span>
+<span class="fmeta">1. Processes &middot; AgentProcess &middot; OpenClaw &middot; CORP\bob &middot; 2026-11-21 00:14 &middot; score 10</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Program Files\nodejs\node.exe</td></tr>
 <tr><th>Process</th><td>node.exe (PID 5100)</td></tr>
@@ -723,7 +886,7 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <tr><th>Command line</th><td>&quot;C:\Program Files\nodejs\node.exe&quot; C:\Users\bob\AppData\Roaming\npm\node_modules\openclaw\dist\index.js gateway --port 18789 --token [REDACTED:anthropic-key]</td></tr>
 <tr><th>Parent</th><td>explorer.exe (PID 5000)</td></tr>
 <tr><th>Owner</th><td>CORP\bob</td></tr>
-<tr><th>Started</th><td>2026-10-23 19:32:39</td></tr>
+<tr><th>Started</th><td>2026-11-21 00:14:19</td></tr>
 <tr><th>Uptime (hours)</th><td>72</td></tr>
 <tr><th>Matched because</th><td>command line matches /openclaw/</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
@@ -732,7 +895,7 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 10 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask CORP\bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0037</span><span class="ftitle">Stored credential for Claude Code in Credential Manager</span>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0044</span><span class="ftitle">Stored credential for Claude Code in Credential Manager</span>
 <span class="fmeta">5. Tokens &amp; OAuth &middot; CredentialStore &middot; Claude Code &middot; CORP\itadmin &middot; score 10</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>Credential Manager: Claude Code-credentials</td></tr>
@@ -745,13 +908,13 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 10 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask CORP\itadmin what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. If the application is not approved, remove the stored credential and revoke the session at the provider.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0038</span><span class="ftitle">OpenAI Codex CLI sign-in token stored for user carol</span>
-<span class="fmeta">5. Tokens &amp; OAuth &middot; TokenFile &middot; OpenAI Codex CLI &middot; carol &middot; 2026-10-23 10:00 &middot; score 10</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0045</span><span class="ftitle">OpenAI Codex CLI sign-in token stored for user carol</span>
+<span class="fmeta">5. Tokens &amp; OAuth &middot; TokenFile &middot; OpenAI Codex CLI &middot; carol &middot; 2026-11-23 10:00 &middot; score 10</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\carol\.codex\auth.json</td></tr>
 <tr><th>Path</th><td>C:\Users\carol\.codex\auth.json</td></tr>
 <tr><th>Size</th><td>110 bytes</td></tr>
-<tr><th>Last modified</th><td>2026-10-23 10:00:00</td></tr>
+<tr><th>Last modified</th><td>2026-11-23 10:00:00</td></tr>
 <tr><th>Contents</th><td>not opened (RAC reports token files by presence only)</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Not on the allow-list.</li>
@@ -759,30 +922,30 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 10 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Sign-in tokens act as the user. If the agent is not approved, sign it out and revoke the session at the provider.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0039</span><span class="ftitle">Continue installed or configured for user carol</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentConfigDir &middot; Continue &middot; carol &middot; 2026-10-23 10:00 &middot; score 0</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0046</span><span class="ftitle">Continue installed or configured for user carol</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentConfigDir &middot; Continue &middot; carol &middot; 2026-11-23 10:00 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\carol\.continue</td></tr>
 <tr><th>Kind</th><td>IDE agent extension / CLI</td></tr>
 <tr><th>Vendor</th><td>Continue Dev (open source)</td></tr>
 <tr><th>Locations</th><td>C:\Users\carol\.continue</td></tr>
 <tr><th>Top-level items</th><td>1</td></tr>
-<tr><th>Last changed</th><td>2026-10-23 10:00:00</td></tr>
+<tr><th>Last changed</th><td>2026-11-23 10:00:00</td></tr>
 <tr><th>Changed in lookback</th><td>2</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Not on the allow-list.</li>
 <li>Risk score 0 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0040</span><span class="ftitle">Cursor installed or configured for user carol</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentConfigDir &middot; Cursor &middot; carol &middot; 2026-10-23 10:00 &middot; score 0</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0047</span><span class="ftitle">Cursor installed or configured for user carol</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentConfigDir &middot; Cursor &middot; carol &middot; 2026-11-23 10:00 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\carol\.cursor</td></tr>
 <tr><th>Kind</th><td>AI IDE</td></tr>
 <tr><th>Vendor</th><td>Anysphere</td></tr>
 <tr><th>Locations</th><td>C:\Users\carol\.cursor</td></tr>
 <tr><th>Top-level items</th><td>1</td></tr>
-<tr><th>Last changed</th><td>2026-10-23 10:00:00</td></tr>
+<tr><th>Last changed</th><td>2026-11-23 10:00:00</td></tr>
 <tr><th>Changed in lookback</th><td>2</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Allow-list entry &#39;Cursor pilot (ended)&#39; would match, but it expired on 2026-06-30.</li>
@@ -790,30 +953,30 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 0 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0041</span><span class="ftitle">OpenAI Codex CLI installed or configured for user carol</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentConfigDir &middot; OpenAI Codex CLI &middot; carol &middot; 2026-10-23 10:00 &middot; score 0</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0048</span><span class="ftitle">OpenAI Codex CLI installed or configured for user carol</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentConfigDir &middot; OpenAI Codex CLI &middot; carol &middot; 2026-11-23 10:00 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\carol\.codex</td></tr>
 <tr><th>Kind</th><td>CLI coding agent</td></tr>
 <tr><th>Vendor</th><td>OpenAI</td></tr>
 <tr><th>Locations</th><td>C:\Users\carol\.codex</td></tr>
 <tr><th>Top-level items</th><td>3</td></tr>
-<tr><th>Last changed</th><td>2026-10-23 10:00:00</td></tr>
+<tr><th>Last changed</th><td>2026-11-23 10:00:00</td></tr>
 <tr><th>Changed in lookback</th><td>4</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Not on the allow-list.</li>
 <li>Risk score 0 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0042</span><span class="ftitle">OpenClaw installed or configured for user bob</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentConfigDir &middot; OpenClaw &middot; bob &middot; 2026-10-25 02:14 &middot; score 0</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0049</span><span class="ftitle">OpenClaw installed or configured for user bob</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentConfigDir &middot; OpenClaw &middot; bob &middot; 2026-11-23 02:14 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\bob\.openclaw</td></tr>
 <tr><th>Kind</th><td>Autonomous personal agent with gateway</td></tr>
 <tr><th>Vendor</th><td>OpenClaw (open source; formerly Clawdbot / Moltbot)</td></tr>
 <tr><th>Locations</th><td>C:\Users\bob\.openclaw</td></tr>
 <tr><th>Top-level items</th><td>4</td></tr>
-<tr><th>Last changed</th><td>2026-10-25 02:14:00</td></tr>
+<tr><th>Last changed</th><td>2026-11-23 02:14:00</td></tr>
 <tr><th>Skills / memory</th><td>skills/autoupdate, MEMORY.md</td></tr>
 <tr><th>Changed in lookback</th><td>5</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
@@ -821,29 +984,29 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 0 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0043</span><span class="ftitle">Aider chat history in project bot</span>
-<span class="fmeta">6. Logs &amp; events &middot; AgentTranscript &middot; Aider &middot; carol &middot; 2026-10-23 10:00 &middot; score 0</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0050</span><span class="ftitle">Aider chat history in project bot</span>
+<span class="fmeta">6. Logs &amp; events &middot; AgentTranscript &middot; Aider &middot; carol &middot; 2026-11-23 10:00 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\carol\Downloads\bot\.aider.chat.history.md</td></tr>
 <tr><th>File</th><td>C:\Users\carol\Downloads\bot\.aider.chat.history.md</td></tr>
 <tr><th>Size (KB)</th><td>0</td></tr>
-<tr><th>Last modified</th><td>2026-10-23 10:00:00</td></tr>
+<tr><th>Last modified</th><td>2026-11-23 10:00:00</td></tr>
 <tr><th>Project</th><td>C:\Users\carol\Downloads\bot</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Not on the allow-list.</li>
 <li>Risk score 0 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0044</span><span class="ftitle">OpenAI Codex CLI transcripts: 1 file(s), newest 2026-10-23 10:00</span>
-<span class="fmeta">6. Logs &amp; events &middot; AgentTranscript &middot; OpenAI Codex CLI &middot; carol &middot; 2026-10-23 10:00 &middot; score 0</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0051</span><span class="ftitle">OpenAI Codex CLI transcripts: 1 file(s), newest 2026-11-23 10:00</span>
+<span class="fmeta">6. Logs &amp; events &middot; AgentTranscript &middot; OpenAI Codex CLI &middot; carol &middot; 2026-11-23 10:00 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\carol\.codex\sessions</td></tr>
 <tr><th>Location</th><td>C:\Users\carol\.codex\sessions</td></tr>
 <tr><th>Kind</th><td>Transcript</td></tr>
 <tr><th>Files</th><td>1</td></tr>
 <tr><th>Total size (MB)</th><td>0</td></tr>
-<tr><th>Oldest</th><td>2026-10-23 10:00:00</td></tr>
-<tr><th>Newest</th><td>2026-10-23 10:00:00</td></tr>
+<tr><th>Oldest</th><td>2026-11-23 10:00:00</td></tr>
+<tr><th>Newest</th><td>2026-11-23 10:00:00</td></tr>
 <tr><th>Changed in lookback</th><td>1</td></tr>
 <tr><th>Tool-call records</th><td>1 record(s) in 1 file(s)</td></tr>
 <tr><th>Content</th><td>not quoted (summary only)</td></tr>
@@ -852,16 +1015,33 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 0 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask carol what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0045</span><span class="ftitle">OpenClaw transcripts: 2 file(s), newest 2026-10-25 02:41</span>
-<span class="fmeta">6. Logs &amp; events &middot; AgentTranscript &middot; OpenClaw &middot; bob &middot; 2026-10-25 02:41 &middot; score 0</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0052</span><span class="ftitle">OpenClaw logs: 1 file(s), newest 2026-11-22 03:05</span>
+<span class="fmeta">6. Logs &amp; events &middot; AgentLog &middot; OpenClaw &middot; bob &middot; 2026-11-22 03:05 &middot; score 0</span></summary>
+<div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
+<tr><th>Location</th><td>C:\Users\bob\AppData\Local\Temp\openclaw</td></tr>
+<tr><th>Location</th><td>C:\Users\bob\AppData\Local\Temp\openclaw</td></tr>
+<tr><th>Kind</th><td>Log</td></tr>
+<tr><th>Files</th><td>1</td></tr>
+<tr><th>Total size (MB)</th><td>0</td></tr>
+<tr><th>Oldest</th><td>2026-11-22 03:05:00</td></tr>
+<tr><th>Newest</th><td>2026-11-22 03:05:00</td></tr>
+<tr><th>Changed in lookback</th><td>1</td></tr>
+<tr><th>Content</th><td>not quoted (summary only)</td></tr>
+</tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
+<li>Not on the allow-list.</li>
+<li>Risk score 0 is below the threshold of 40; flagged because it is not approved.</li>
+</ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control.</p></div></div></details>
+<details class="finding" data-class="Unknown"><summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0053</span><span class="ftitle">OpenClaw transcripts: 2 file(s), newest 2026-11-23 02:41</span>
+<span class="fmeta">6. Logs &amp; events &middot; AgentTranscript &middot; OpenClaw &middot; bob &middot; 2026-11-23 02:41 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\bob\.openclaw\agents</td></tr>
 <tr><th>Location</th><td>C:\Users\bob\.openclaw\agents</td></tr>
 <tr><th>Kind</th><td>Transcript</td></tr>
 <tr><th>Files</th><td>2</td></tr>
 <tr><th>Total size (MB)</th><td>0</td></tr>
-<tr><th>Oldest</th><td>2026-10-25 02:14:00</td></tr>
-<tr><th>Newest</th><td>2026-10-25 02:41:00</td></tr>
+<tr><th>Oldest</th><td>2026-11-23 02:14:00</td></tr>
+<tr><th>Newest</th><td>2026-11-23 02:41:00</td></tr>
 <tr><th>Changed in lookback</th><td>2</td></tr>
 <tr><th>Tool-call records</th><td>3 record(s) in 2 file(s)</td></tr>
 <tr><th>Content</th><td>not quoted (summary only)</td></tr>
@@ -870,41 +1050,24 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 0 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0046</span><span class="ftitle">OpenClaw logs: 1 file(s), newest 2026-10-24 03:05</span>
-<span class="fmeta">6. Logs &amp; events &middot; AgentLog &middot; OpenClaw &middot; bob &middot; 2026-10-24 03:05 &middot; score 0</span></summary>
-<div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
-<tr><th>Location</th><td>C:\Users\bob\AppData\Local\Temp\openclaw</td></tr>
-<tr><th>Location</th><td>C:\Users\bob\AppData\Local\Temp\openclaw</td></tr>
-<tr><th>Kind</th><td>Log</td></tr>
-<tr><th>Files</th><td>1</td></tr>
-<tr><th>Total size (MB)</th><td>0</td></tr>
-<tr><th>Oldest</th><td>2026-10-24 03:05:00</td></tr>
-<tr><th>Newest</th><td>2026-10-24 03:05:00</td></tr>
-<tr><th>Changed in lookback</th><td>1</td></tr>
-<tr><th>Content</th><td>not quoted (summary only)</td></tr>
-</tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
-<li>Not on the allow-list.</li>
-<li>Risk score 0 is below the threshold of 40; flagged because it is not approved.</li>
-</ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control.</p></div></div></details>
-<details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0047</span><span class="ftitle">node.exe contacted api.anthropic.com (3 event(s))</span>
-<span class="fmeta">6. Logs &amp; events &middot; SysmonLlmTraffic &middot; Script host (possible custom agent) &middot; CORP\bob &middot; 2026-10-25 02:41 &middot; score 0</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0054</span><span class="ftitle">node.exe contacted api.anthropic.com (3 event(s))</span>
+<span class="fmeta">6. Logs &amp; events &middot; SysmonLlmTraffic &middot; Script host (possible custom agent) &middot; CORP\bob &middot; 2026-11-23 02:41 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>Sysmon: C:\Program Files\nodejs\node.exe</td></tr>
 <tr><th>Process image</th><td>C:\Program Files\nodejs\node.exe</td></tr>
 <tr><th>Remote host</th><td>api.anthropic.com</td></tr>
 <tr><th>Provider</th><td>Anthropic</td></tr>
 <tr><th>Events</th><td>3 (Sysmon event ID 22, 3)</td></tr>
-<tr><th>First seen</th><td>2026-10-24 03:05:00</td></tr>
-<tr><th>Last seen</th><td>2026-10-25 02:41:00</td></tr>
+<tr><th>First seen</th><td>2026-11-22 03:05:00</td></tr>
+<tr><th>Last seen</th><td>2026-11-23 02:41:00</td></tr>
 <tr><th>User</th><td>CORP\bob</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Not on the allow-list.</li>
 <li>Risk score 0 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask CORP\bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Identify the program in Process image and confirm it is allowed to call this AI provider.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0048</span><span class="ftitle">OpenClaw listening on port 18789 (OpenClaw gateway)</span>
-<span class="fmeta">2. Network &middot; AgentListener &middot; OpenClaw &middot; CORP\bob &middot; 2026-10-26 19:32 &middot; score 0</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0055</span><span class="ftitle">OpenClaw listening on port 18789 (OpenClaw gateway)</span>
+<span class="fmeta">2. Network &middot; AgentListener &middot; OpenClaw &middot; CORP\bob &middot; 2026-11-24 00:14 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>TCP 18789 (node.exe (PID 5100))</td></tr>
 <tr><th>Port</th><td>18789</td></tr>
@@ -918,8 +1081,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 0 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask CORP\bob what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Bind the service to 127.0.0.1 or block the port at the host firewall. An exposed agent or model port lets anyone on the network drive it.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0049</span><span class="ftitle">Recent DNS lookup of generativelanguage.googleapis.com (Google Gemini API)</span>
-<span class="fmeta">2. Network &middot; DnsCacheLlm &middot; Unattributed (DNS cache) &middot; 2026-10-26 19:32 &middot; score 0</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0056</span><span class="ftitle">Recent DNS lookup of generativelanguage.googleapis.com (Google Gemini API)</span>
+<span class="fmeta">2. Network &middot; DnsCacheLlm &middot; Unattributed (DNS cache) &middot; 2026-11-24 00:14 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>DNS cache: generativelanguage.googleapis.com</td></tr>
 <tr><th>Hostname</th><td>generativelanguage.googleapis.com</td></tr>
@@ -931,8 +1094,22 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 0 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask the owner what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Attribute the lookup: check the network and Sysmon findings, or rerun with -NetworkSamples to catch the connection. Approve the provider in the allow-list if it is sanctioned.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0050</span><span class="ftitle">1 requests to api.groq.com in proxy logs</span>
-<span class="fmeta">2. Network &middot; ProxyLogLlm &middot; Unattributed (proxy log) &middot; 2026-10-26 19:32 &middot; score 0</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0057</span><span class="ftitle">2 requests to api.openai.com in proxy logs</span>
+<span class="fmeta">2. Network &middot; ProxyLogLlm &middot; Unattributed (proxy log) &middot; 2026-11-24 00:14 &middot; score 0</span></summary>
+<div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
+<tr><th>Location</th><td>Proxy logs: api.openai.com</td></tr>
+<tr><th>Hostname</th><td>api.openai.com</td></tr>
+<tr><th>Provider</th><td>OpenAI</td></tr>
+<tr><th>Matching log lines</th><td>2</td></tr>
+<tr><th>Log files</th><td>access.log</td></tr>
+<tr><th>Lines scanned</th><td>6</td></tr>
+</tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
+<li>Not on the allow-list.</li>
+<li>Risk score 0 is below the threshold of 40; flagged because it is not approved.</li>
+</ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask the owner what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Use the proxy&#39;s client IP and user fields to find the machine and person behind this traffic.</p></div></div></details>
+<details class="finding" data-class="Unknown"><summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0058</span><span class="ftitle">1 requests to api.groq.com in proxy logs</span>
+<span class="fmeta">2. Network &middot; ProxyLogLlm &middot; Unattributed (proxy log) &middot; 2026-11-24 00:14 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>Proxy logs: api.groq.com</td></tr>
 <tr><th>Hostname</th><td>api.groq.com</td></tr>
@@ -945,22 +1122,23 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Risk score 0 is below the threshold of 40; flagged because it is not approved.</li>
 </ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask the owner what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Use the proxy&#39;s client IP and user fields to find the machine and person behind this traffic.</p></div></div></details>
 <details class="finding" data-class="Unknown"><summary>
-<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0051</span><span class="ftitle">2 requests to api.openai.com in proxy logs</span>
-<span class="fmeta">2. Network &middot; ProxyLogLlm &middot; Unattributed (proxy log) &middot; 2026-10-26 19:32 &middot; score 0</span></summary>
+<span class="badge b-Unknown">Unknown</span><span class="fid">RAC-0059</span><span class="ftitle">AI browser extension &#39;ChatGPT Sidebar Helper&#39; in Chrome</span>
+<span class="fmeta">5. Tokens &amp; OAuth &middot; BrowserExtension &middot; ChatGPT Sidebar Helper (browser extension) &middot; alice &middot; 2026-11-23 10:00 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
-<tr><th>Location</th><td>Proxy logs: api.openai.com</td></tr>
-<tr><th>Hostname</th><td>api.openai.com</td></tr>
-<tr><th>Provider</th><td>OpenAI</td></tr>
-<tr><th>Matching log lines</th><td>2</td></tr>
-<tr><th>Log files</th><td>access.log</td></tr>
-<tr><th>Lines scanned</th><td>6</td></tr>
+<tr><th>Location</th><td>C:\Users\alice\AppData\Local\Google\Chrome\User Data\Default\Extensions\kfakechatgptsidebarhelper000000a\3.1.0_0</td></tr>
+<tr><th>Browser</th><td>Chrome (Default)</td></tr>
+<tr><th>Extension</th><td>ChatGPT Sidebar Helper</td></tr>
+<tr><th>Extension ID</th><td>kfakechatgptsidebarhelper000000a</td></tr>
+<tr><th>Version</th><td>3.1.0_0</td></tr>
+<tr><th>Notable permissions</th><td>tabs, scripting</td></tr>
+<tr><th>Folder</th><td>C:\Users\alice\AppData\Local\Google\Chrome\User Data\Default\Extensions\kfakechatgptsidebarhelper000000a\3.1.0_0</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Not on the allow-list.</li>
 <li>Risk score 0 is below the threshold of 40; flagged because it is not approved.</li>
-</ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask the owner what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Use the proxy&#39;s client IP and user fields to find the machine and person behind this traffic.</p></div></div></details>
+</ul><h3>Recommended next step</h3><p class="rec">Assign an owner and decide. Ask alice what this agent is for. If approved, add an allow-list entry (ConvertTo-RacAllowListEntry drafts one) with an approver and expiry. If not approved, schedule removal through change control. Extensions with debugger or native messaging permission can drive the browser with the user&#39;s sessions. Manage them with browser policy (ExtensionInstallAllowlist).</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0052</span><span class="ftitle">MCP server &#39;filesystem&#39; configured for Claude Desktop</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; McpServerConfig &middot; Claude Desktop &middot; alice &middot; 2026-10-23 10:00 &middot; score 25</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0060</span><span class="ftitle">MCP server &#39;filesystem&#39; configured for Claude Desktop</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; McpServerConfig &middot; Claude Desktop &middot; alice &middot; 2026-11-23 10:00 &middot; score 25</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\alice\AppData\Roaming\Claude\claude_desktop_config.json :: filesystem</td></tr>
 <tr><th>Config file</th><td>C:\Users\alice\AppData\Roaming\Claude\claude_desktop_config.json</td></tr>
@@ -978,8 +1156,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Remaining risk score 25 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Claude Desktop - company standard&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0053</span><span class="ftitle">MCP server process node.exe (PID 4200) launched by Claude Desktop</span>
-<span class="fmeta">1. Processes &middot; McpServerProcess &middot; Claude Desktop &middot; CORP\alice &middot; 2026-10-23 10:01 &middot; score 25</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0061</span><span class="ftitle">MCP server process node.exe (PID 4200) launched by Claude Desktop</span>
+<span class="fmeta">1. Processes &middot; McpServerProcess &middot; Claude Desktop &middot; CORP\alice &middot; 2026-11-23 10:01 &middot; score 25</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Program Files\nodejs\node.exe</td></tr>
 <tr><th>Process</th><td>node.exe (PID 4200)</td></tr>
@@ -987,8 +1165,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <tr><th>Command line</th><td>node C:\Users\alice\AppData\Roaming\npm\node_modules\@modelcontextprotocol\server-filesystem\dist\index.js C:\Users\alice\Documents</td></tr>
 <tr><th>Parent</th><td>claude.exe (PID 4100)</td></tr>
 <tr><th>Owner</th><td>CORP\alice</td></tr>
-<tr><th>Started</th><td>2026-10-23 10:01:00</td></tr>
-<tr><th>Uptime (hours)</th><td>81.5</td></tr>
+<tr><th>Started</th><td>2026-11-23 10:01:00</td></tr>
+<tr><th>Uptime (hours)</th><td>14.2</td></tr>
 <tr><th>Launched by</th><td>Claude Desktop (PID 4100)</td></tr>
 <tr><th>MCP pattern</th><td>@modelcontextprotocol/</td></tr>
 <tr><th>Reaches</th><td>files</td></tr>
@@ -999,8 +1177,23 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Remaining risk score 25 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Claude Desktop - company standard&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0054</span><span class="ftitle">MCP server &#39;github&#39; configured for Claude Code</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; McpServerConfig &middot; Claude Code &middot; alice &middot; 2026-10-23 10:00 &middot; score 15</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0062</span><span class="ftitle">Plaintext key or token in .claude.json (GitHub token)</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; SecretFile &middot; Claude Code &middot; alice &middot; 2026-11-23 10:00 &middot; score 15</span></summary>
+<div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
+<tr><th>Location</th><td>C:\Users\alice\.claude.json</td></tr>
+<tr><th>File</th><td>C:\Users\alice\.claude.json</td></tr>
+<tr><th>Key formats</th><td>GitHub token</td></tr>
+<tr><th>Line numbers</th><td>16</td></tr>
+<tr><th>Last modified</th><td>2026-11-23 10:00:00</td></tr>
+<tr><th>Values</th><td>not recorded (RAC never stores or prints key values)</td></tr>
+</tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
+<li>Matches allow-list entry &#39;Claude Code - Engineering&#39; (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1042).</li>
+<li>+15 SecretInPlaintext: An AI provider key or token is stored in a plaintext file</li>
+<li>Remaining risk score 15 is below the threshold of 40.</li>
+</ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Claude Code - Engineering&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
+<details class="finding" data-class="Trusted"><summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0063</span><span class="ftitle">MCP server &#39;github&#39; configured for Claude Code</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; McpServerConfig &middot; Claude Code &middot; alice &middot; 2026-11-23 10:00 &middot; score 15</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\alice\.claude.json :: github</td></tr>
 <tr><th>Config file</th><td>C:\Users\alice\.claude.json</td></tr>
@@ -1018,29 +1211,14 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Remaining risk score 15 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Claude Code - Engineering&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0055</span><span class="ftitle">Plaintext key or token in .claude.json (GitHub token)</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; SecretFile &middot; Claude Code &middot; alice &middot; 2026-10-23 10:00 &middot; score 15</span></summary>
-<div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
-<tr><th>Location</th><td>C:\Users\alice\.claude.json</td></tr>
-<tr><th>File</th><td>C:\Users\alice\.claude.json</td></tr>
-<tr><th>Key formats</th><td>GitHub token</td></tr>
-<tr><th>Line numbers</th><td>9</td></tr>
-<tr><th>Last modified</th><td>2026-10-23 10:00:00</td></tr>
-<tr><th>Values</th><td>not recorded (RAC never stores or prints key values)</td></tr>
-</tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
-<li>Matches allow-list entry &#39;Claude Code - Engineering&#39; (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1042).</li>
-<li>+15 SecretInPlaintext: An AI provider key or token is stored in a plaintext file</li>
-<li>Remaining risk score 15 is below the threshold of 40.</li>
-</ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Claude Code - Engineering&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
-<details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0056</span><span class="ftitle">Plaintext key or token in claude_desktop_config.json (Slack token)</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; SecretFile &middot; Claude Desktop &middot; alice &middot; 2026-10-23 10:00 &middot; score 15</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0064</span><span class="ftitle">Plaintext key or token in claude_desktop_config.json (Slack token)</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; SecretFile &middot; Claude Desktop &middot; alice &middot; 2026-11-23 10:00 &middot; score 15</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\alice\AppData\Roaming\Claude\claude_desktop_config.json</td></tr>
 <tr><th>File</th><td>C:\Users\alice\AppData\Roaming\Claude\claude_desktop_config.json</td></tr>
 <tr><th>Key formats</th><td>Slack token</td></tr>
-<tr><th>Line numbers</th><td>25</td></tr>
-<tr><th>Last modified</th><td>2026-10-23 10:00:00</td></tr>
+<tr><th>Line numbers</th><td>24</td></tr>
+<tr><th>Last modified</th><td>2026-11-23 10:00:00</td></tr>
 <tr><th>Values</th><td>not recorded (RAC never stores or prints key values)</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Matches allow-list entry &#39;Claude Desktop - company standard&#39; (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1043).</li>
@@ -1048,38 +1226,38 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Remaining risk score 15 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Claude Desktop - company standard&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0057</span><span class="ftitle">GitHub Copilot (VS Code agent mode / Copilot CLI) extension in .vscode (github.copilot)</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; IdeExtension &middot; GitHub Copilot (VS Code agent mode / Copilot CLI) &middot; alice &middot; 2026-10-23 10:00 &middot; score 10</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0065</span><span class="ftitle">GitHub Copilot (VS Code agent mode / Copilot CLI) extension in .vscode (github.copilot)</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; IdeExtension &middot; GitHub Copilot (VS Code agent mode / Copilot CLI) &middot; alice &middot; 2026-11-23 10:00 &middot; score 10</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\alice\.vscode\extensions\github.copilot-1.350.0</td></tr>
 <tr><th>IDE</th><td>.vscode</td></tr>
 <tr><th>Extension</th><td>github.copilot</td></tr>
 <tr><th>Version</th><td>1.350.0</td></tr>
 <tr><th>Folder</th><td>C:\Users\alice\.vscode\extensions\github.copilot-1.350.0</td></tr>
-<tr><th>Installed on</th><td>2026-10-23 10:00:00</td></tr>
+<tr><th>Installed on</th><td>2026-11-23 10:00:00</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Matches allow-list entry &#39;GitHub Copilot Business&#39; (approved by IT Security (J. Admin), on 2026-08-01, expires 2099-12-31).</li>
 <li>+10 RecentPackageInstall: Agent software was installed within the lookback window</li>
 <li>Remaining risk score 10 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;GitHub Copilot Business&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0058</span><span class="ftitle">GitHub Copilot (VS Code agent mode / Copilot CLI) extension in .vscode (github.copilot-chat)</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; IdeExtension &middot; GitHub Copilot (VS Code agent mode / Copilot CLI) &middot; alice &middot; 2026-10-23 10:00 &middot; score 10</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0066</span><span class="ftitle">GitHub Copilot (VS Code agent mode / Copilot CLI) extension in .vscode (github.copilot-chat)</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; IdeExtension &middot; GitHub Copilot (VS Code agent mode / Copilot CLI) &middot; alice &middot; 2026-11-23 10:00 &middot; score 10</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\alice\.vscode\extensions\github.copilot-chat-0.31.0</td></tr>
 <tr><th>IDE</th><td>.vscode</td></tr>
 <tr><th>Extension</th><td>github.copilot-chat</td></tr>
 <tr><th>Version</th><td>0.31.0</td></tr>
 <tr><th>Folder</th><td>C:\Users\alice\.vscode\extensions\github.copilot-chat-0.31.0</td></tr>
-<tr><th>Installed on</th><td>2026-10-23 10:00:00</td></tr>
+<tr><th>Installed on</th><td>2026-11-23 10:00:00</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Matches allow-list entry &#39;GitHub Copilot Business&#39; (approved by IT Security (J. Admin), on 2026-08-01, expires 2099-12-31).</li>
 <li>+10 RecentPackageInstall: Agent software was installed within the lookback window</li>
 <li>Remaining risk score 10 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;GitHub Copilot Business&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0059</span><span class="ftitle">Claude Desktop running (claude.exe, PID 4100)</span>
-<span class="fmeta">1. Processes &middot; AgentProcess &middot; Claude Desktop &middot; CORP\alice &middot; 2026-10-23 10:00 &middot; score 10</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0067</span><span class="ftitle">Claude Desktop running (claude.exe, PID 4100)</span>
+<span class="fmeta">1. Processes &middot; AgentProcess &middot; Claude Desktop &middot; CORP\alice &middot; 2026-11-23 10:00 &middot; score 10</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\alice\AppData\Local\AnthropicClaude\app-1.0.1307\claude.exe</td></tr>
 <tr><th>Process</th><td>claude.exe (PID 4100)</td></tr>
@@ -1087,8 +1265,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <tr><th>Command line</th><td>&quot;C:\Users\alice\AppData\Local\AnthropicClaude\app-1.0.1307\claude.exe&quot;</td></tr>
 <tr><th>Parent</th><td>explorer.exe (PID 801)</td></tr>
 <tr><th>Owner</th><td>CORP\alice</td></tr>
-<tr><th>Started</th><td>2026-10-23 10:00:00</td></tr>
-<tr><th>Uptime (hours)</th><td>81.5</td></tr>
+<tr><th>Started</th><td>2026-11-23 10:00:00</td></tr>
+<tr><th>Uptime (hours)</th><td>14.2</td></tr>
 <tr><th>Matched because</th><td>process name &#39;claude.exe&#39;</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Matches allow-list entry &#39;Claude Desktop - company standard&#39; (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1043).</li>
@@ -1096,13 +1274,13 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Remaining risk score 10 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Claude Desktop - company standard&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0060</span><span class="ftitle">Claude Code: 1 package install(s) in the last 7 days</span>
-<span class="fmeta">7. Behavior &middot; PackageInstallActivity &middot; Claude Code &middot; alice &middot; 2026-10-23 10:00 &middot; score 0</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0068</span><span class="ftitle">Claude Code: 1 package install(s) in the last 7 days</span>
+<span class="fmeta">7. Behavior &middot; PackageInstallActivity &middot; Claude Code &middot; alice &middot; 2026-11-23 10:00 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>Install activity: Claude Code</td></tr>
 <tr><th>Installs</th><td>1</td></tr>
 <tr><th>Launched by the agent itself</th><td>0</td></tr>
-<tr><th>Most recent</th><td>2026-10-23 10:00 @anthropic-ai/claude-code 2.1.3 (npm global) [install folder date]</td></tr>
+<tr><th>Most recent</th><td>2026-11-23 10:00 @anthropic-ai/claude-code 2.1.3 (npm global) [install folder date]</td></tr>
 <tr><th>Users</th><td>alice</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Matches allow-list entry &#39;Claude Code - Engineering&#39; (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1042).</li>
@@ -1110,24 +1288,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Remaining risk score 0 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Claude Code - Engineering&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0061</span><span class="ftitle">Claude Code installed or configured for user alice</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentConfigDir &middot; Claude Code &middot; alice &middot; 2026-10-23 10:00 &middot; score 0</span></summary>
-<div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
-<tr><th>Location</th><td>C:\Users\alice\.claude</td></tr>
-<tr><th>Kind</th><td>CLI coding agent</td></tr>
-<tr><th>Vendor</th><td>Anthropic</td></tr>
-<tr><th>Locations</th><td>C:\Users\alice\.claude; C:\Users\alice\.claude.json</td></tr>
-<tr><th>Top-level items</th><td>5</td></tr>
-<tr><th>Last changed</th><td>2026-10-23 10:00:00</td></tr>
-<tr><th>Skills / memory</th><td>skills/code-review, CLAUDE.md</td></tr>
-<tr><th>Changed in lookback</th><td>6</td></tr>
-</tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
-<li>Matches allow-list entry &#39;Claude Code - Engineering&#39; (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1042).</li>
-<li>Remaining risk score 0 is below the threshold of 40.</li>
-</ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Claude Code - Engineering&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
-<details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0062</span><span class="ftitle">Claude Code package installed: @anthropic-ai/claude-code 2.1.3</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentPackage &middot; Claude Code &middot; alice &middot; 2026-10-23 10:00 &middot; score 0</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0069</span><span class="ftitle">Claude Code package installed: @anthropic-ai/claude-code 2.1.3</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentPackage &middot; Claude Code &middot; alice &middot; 2026-11-23 10:00 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\alice\AppData\Roaming\npm\node_modules\@anthropic-ai\claude-code</td></tr>
 <tr><th>Package</th><td>@anthropic-ai/claude-code</td></tr>
@@ -1135,30 +1297,46 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <tr><th>Installed via</th><td>npm global</td></tr>
 <tr><th>Version</th><td>2.1.3</td></tr>
 <tr><th>Install path</th><td>C:\Users\alice\AppData\Roaming\npm\node_modules\@anthropic-ai\claude-code</td></tr>
-<tr><th>Installed on</th><td>2026-10-23 10:00:00</td></tr>
+<tr><th>Installed on</th><td>2026-11-23 10:00:00</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Matches allow-list entry &#39;Claude Code - Engineering&#39; (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1042).</li>
 <li>Accepted by the approval: RecentPackageInstall (Agent software was installed within the lookback window).</li>
 <li>Remaining risk score 0 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Claude Code - Engineering&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0063</span><span class="ftitle">Claude Desktop installed or configured for user alice</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentConfigDir &middot; Claude Desktop &middot; alice &middot; 2026-10-23 10:00 &middot; score 0</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0070</span><span class="ftitle">Claude Code installed or configured for user alice</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentConfigDir &middot; Claude Code &middot; alice &middot; 2026-11-23 10:00 &middot; score 0</span></summary>
+<div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
+<tr><th>Location</th><td>C:\Users\alice\.claude</td></tr>
+<tr><th>Kind</th><td>CLI coding agent</td></tr>
+<tr><th>Vendor</th><td>Anthropic</td></tr>
+<tr><th>Locations</th><td>C:\Users\alice\.claude; C:\Users\alice\.claude.json</td></tr>
+<tr><th>Top-level items</th><td>5</td></tr>
+<tr><th>Last changed</th><td>2026-11-23 10:00:00</td></tr>
+<tr><th>Skills / memory</th><td>skills/code-review, CLAUDE.md</td></tr>
+<tr><th>Changed in lookback</th><td>6</td></tr>
+</tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
+<li>Matches allow-list entry &#39;Claude Code - Engineering&#39; (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1042).</li>
+<li>Remaining risk score 0 is below the threshold of 40.</li>
+</ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Claude Code - Engineering&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
+<details class="finding" data-class="Trusted"><summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0071</span><span class="ftitle">Claude Desktop installed or configured for user alice</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentConfigDir &middot; Claude Desktop &middot; alice &middot; 2026-11-23 10:00 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\alice\AppData\Roaming\Claude</td></tr>
 <tr><th>Kind</th><td>Desktop agent app</td></tr>
 <tr><th>Vendor</th><td>Anthropic</td></tr>
 <tr><th>Locations</th><td>C:\Users\alice\AppData\Roaming\Claude</td></tr>
 <tr><th>Top-level items</th><td>2</td></tr>
-<tr><th>Last changed</th><td>2026-10-23 10:00:00</td></tr>
+<tr><th>Last changed</th><td>2026-11-23 10:00:00</td></tr>
 <tr><th>Changed in lookback</th><td>3</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Matches allow-list entry &#39;Claude Desktop - company standard&#39; (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1043).</li>
 <li>Remaining risk score 0 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Claude Desktop - company standard&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0064</span><span class="ftitle">MCP server &#39;playwright&#39; configured for GitHub Copilot (VS Code agent mode / Copilot CLI)</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; McpServerConfig &middot; GitHub Copilot (VS Code agent mode / Copilot CLI) &middot; alice &middot; 2026-10-23 10:00 &middot; score 0</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0072</span><span class="ftitle">MCP server &#39;playwright&#39; configured for GitHub Copilot (VS Code agent mode / Copilot CLI)</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; McpServerConfig &middot; GitHub Copilot (VS Code agent mode / Copilot CLI) &middot; alice &middot; 2026-11-23 10:00 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\alice\AppData\Roaming\Code\User\mcp.json :: playwright</td></tr>
 <tr><th>Config file</th><td>C:\Users\alice\AppData\Roaming\Code\User\mcp.json</td></tr>
@@ -1173,31 +1351,31 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Remaining risk score 0 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;GitHub Copilot Business&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0065</span><span class="ftitle">Ollama installed or configured for user alice</span>
-<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentConfigDir &middot; Ollama &middot; alice &middot; 2026-10-23 10:00 &middot; score 0</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0073</span><span class="ftitle">Ollama installed or configured for user alice</span>
+<span class="fmeta">3. Config, memory &amp; secrets &middot; AgentConfigDir &middot; Ollama &middot; alice &middot; 2026-11-23 10:00 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\alice\.ollama</td></tr>
 <tr><th>Kind</th><td>Local LLM runtime</td></tr>
 <tr><th>Vendor</th><td>Ollama</td></tr>
 <tr><th>Locations</th><td>C:\Users\alice\.ollama; C:\Users\alice\AppData\Local\Ollama</td></tr>
 <tr><th>Top-level items</th><td>2</td></tr>
-<tr><th>Last changed</th><td>2026-10-23 10:00:00</td></tr>
+<tr><th>Last changed</th><td>2026-11-23 10:00:00</td></tr>
 <tr><th>Changed in lookback</th><td>4</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Matches allow-list entry &#39;Ollama - local models (alice only)&#39; (approved by IT Security (J. Admin), on 2026-09-15, expires 2099-12-31).</li>
 <li>Remaining risk score 0 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Ollama - local models (alice only)&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0066</span><span class="ftitle">Claude Code transcripts: 2 file(s), newest 2026-10-23 10:00</span>
-<span class="fmeta">6. Logs &amp; events &middot; AgentTranscript &middot; Claude Code &middot; alice &middot; 2026-10-23 10:00 &middot; score 0</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0074</span><span class="ftitle">Claude Code transcripts: 2 file(s), newest 2026-11-23 10:00</span>
+<span class="fmeta">6. Logs &amp; events &middot; AgentTranscript &middot; Claude Code &middot; alice &middot; 2026-11-23 10:00 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\alice\.claude\projects</td></tr>
 <tr><th>Location</th><td>C:\Users\alice\.claude\projects</td></tr>
 <tr><th>Kind</th><td>Transcript</td></tr>
 <tr><th>Files</th><td>2</td></tr>
 <tr><th>Total size (MB)</th><td>0</td></tr>
-<tr><th>Oldest</th><td>2026-10-23 10:00:00</td></tr>
-<tr><th>Newest</th><td>2026-10-23 10:00:00</td></tr>
+<tr><th>Oldest</th><td>2026-11-23 10:00:00</td></tr>
+<tr><th>Newest</th><td>2026-11-23 10:00:00</td></tr>
 <tr><th>Changed in lookback</th><td>2</td></tr>
 <tr><th>Tool-call records</th><td>3 record(s) in 2 file(s)</td></tr>
 <tr><th>Content</th><td>not quoted (summary only)</td></tr>
@@ -1206,32 +1384,14 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Remaining risk score 0 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Claude Code - Engineering&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0067</span><span class="ftitle">Claude Desktop logs: 3 file(s), newest 2026-10-23 10:00</span>
-<span class="fmeta">6. Logs &amp; events &middot; AgentLog &middot; Claude Desktop &middot; alice &middot; 2026-10-23 10:00 &middot; score 0</span></summary>
-<div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
-<tr><th>Location</th><td>C:\Users\alice\AppData\Roaming\Claude\logs</td></tr>
-<tr><th>Location</th><td>C:\Users\alice\AppData\Roaming\Claude\logs</td></tr>
-<tr><th>Kind</th><td>Log</td></tr>
-<tr><th>Files</th><td>3</td></tr>
-<tr><th>Total size (MB)</th><td>0</td></tr>
-<tr><th>Oldest</th><td>2026-10-23 10:00:00</td></tr>
-<tr><th>Newest</th><td>2026-10-23 10:00:00</td></tr>
-<tr><th>Changed in lookback</th><td>3</td></tr>
-<tr><th>MCP servers in logs</th><td>filesystem, gmail</td></tr>
-<tr><th>Content</th><td>not quoted (summary only)</td></tr>
-</tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
-<li>Matches allow-list entry &#39;Claude Desktop - company standard&#39; (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1043).</li>
-<li>Remaining risk score 0 is below the threshold of 40.</li>
-</ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Claude Desktop - company standard&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
-<details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0068</span><span class="ftitle">Claude Desktop: 1 process launch(es) in the last 7 days</span>
-<span class="fmeta">6. Logs &amp; events &middot; SysmonAgentProcess &middot; Claude Desktop &middot; CORP\alice &middot; 2026-10-23 10:01 &middot; score 0</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0075</span><span class="ftitle">Claude Desktop: 1 process launch(es) in the last 7 days</span>
+<span class="fmeta">6. Logs &amp; events &middot; SysmonAgentProcess &middot; Claude Desktop &middot; CORP\alice &middot; 2026-11-23 10:01 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>Event log: Sysmon Operational (1)</td></tr>
 <tr><th>Event</th><td>Sysmon process creation (1)</td></tr>
 <tr><th>Launches</th><td>1</td></tr>
-<tr><th>First seen</th><td>2026-10-23 10:01:00</td></tr>
-<tr><th>Last seen</th><td>2026-10-23 10:01:00</td></tr>
+<tr><th>First seen</th><td>2026-11-23 10:01:00</td></tr>
+<tr><th>Last seen</th><td>2026-11-23 10:01:00</td></tr>
 <tr><th>Shells launched by agent</th><td>0</td></tr>
 <tr><th>Images</th><td>node.exe</td></tr>
 <tr><th>Sample command lines</th><td>node C:\Users\alice\AppData\Roaming\npm\node_modules\@modelcontextprotocol\server-filesystem\dist\index.js C:\Users\alice\Documents</td></tr>
@@ -1241,33 +1401,34 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Remaining risk score 0 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Claude Desktop - company standard&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0069</span><span class="ftitle">Ollama logs: 1 file(s), newest 2026-10-23 10:00</span>
-<span class="fmeta">6. Logs &amp; events &middot; AgentLog &middot; Ollama &middot; alice &middot; 2026-10-23 10:00 &middot; score 0</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0076</span><span class="ftitle">Claude Desktop logs: 3 file(s), newest 2026-11-23 10:00</span>
+<span class="fmeta">6. Logs &amp; events &middot; AgentLog &middot; Claude Desktop &middot; alice &middot; 2026-11-23 10:00 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
-<tr><th>Location</th><td>C:\Users\alice\AppData\Local\Ollama</td></tr>
-<tr><th>Location</th><td>C:\Users\alice\AppData\Local\Ollama</td></tr>
+<tr><th>Location</th><td>C:\Users\alice\AppData\Roaming\Claude\logs</td></tr>
+<tr><th>Location</th><td>C:\Users\alice\AppData\Roaming\Claude\logs</td></tr>
 <tr><th>Kind</th><td>Log</td></tr>
-<tr><th>Files</th><td>1</td></tr>
+<tr><th>Files</th><td>3</td></tr>
 <tr><th>Total size (MB)</th><td>0</td></tr>
-<tr><th>Oldest</th><td>2026-10-23 10:00:00</td></tr>
-<tr><th>Newest</th><td>2026-10-23 10:00:00</td></tr>
-<tr><th>Changed in lookback</th><td>1</td></tr>
+<tr><th>Oldest</th><td>2026-11-23 10:00:00</td></tr>
+<tr><th>Newest</th><td>2026-11-23 10:00:00</td></tr>
+<tr><th>Changed in lookback</th><td>3</td></tr>
+<tr><th>MCP servers in logs</th><td>filesystem, gmail</td></tr>
 <tr><th>Content</th><td>not quoted (summary only)</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
-<li>Matches allow-list entry &#39;Ollama - local models (alice only)&#39; (approved by IT Security (J. Admin), on 2026-09-15, expires 2099-12-31).</li>
+<li>Matches allow-list entry &#39;Claude Desktop - company standard&#39; (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1043).</li>
 <li>Remaining risk score 0 is below the threshold of 40.</li>
-</ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Ollama - local models (alice only)&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
+</ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Claude Desktop - company standard&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0070</span><span class="ftitle">Ollama history: 1 file(s), newest 2026-10-23 10:00</span>
-<span class="fmeta">6. Logs &amp; events &middot; AgentHistory &middot; Ollama &middot; alice &middot; 2026-10-23 10:00 &middot; score 0</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0077</span><span class="ftitle">Ollama history: 1 file(s), newest 2026-11-23 10:00</span>
+<span class="fmeta">6. Logs &amp; events &middot; AgentHistory &middot; Ollama &middot; alice &middot; 2026-11-23 10:00 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\alice\.ollama\history</td></tr>
 <tr><th>Location</th><td>C:\Users\alice\.ollama\history</td></tr>
 <tr><th>Kind</th><td>History</td></tr>
 <tr><th>Files</th><td>1</td></tr>
 <tr><th>Total size (MB)</th><td>0</td></tr>
-<tr><th>Oldest</th><td>2026-10-23 10:00:00</td></tr>
-<tr><th>Newest</th><td>2026-10-23 10:00:00</td></tr>
+<tr><th>Oldest</th><td>2026-11-23 10:00:00</td></tr>
+<tr><th>Newest</th><td>2026-11-23 10:00:00</td></tr>
 <tr><th>Changed in lookback</th><td>1</td></tr>
 <tr><th>Tool-call records</th><td>0 record(s) in 1 file(s)</td></tr>
 <tr><th>Content</th><td>not quoted (summary only)</td></tr>
@@ -1276,8 +1437,25 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Remaining risk score 0 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Ollama - local models (alice only)&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0071</span><span class="ftitle">claude.exe (PID 4300) connected to api.anthropic.com (Anthropic)</span>
-<span class="fmeta">2. Network &middot; LlmConnection &middot; Claude Code &middot; CORP\alice &middot; 2026-10-23 11:00 &middot; score 0</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0078</span><span class="ftitle">Ollama logs: 1 file(s), newest 2026-11-23 10:00</span>
+<span class="fmeta">6. Logs &amp; events &middot; AgentLog &middot; Ollama &middot; alice &middot; 2026-11-23 10:00 &middot; score 0</span></summary>
+<div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
+<tr><th>Location</th><td>C:\Users\alice\AppData\Local\Ollama</td></tr>
+<tr><th>Location</th><td>C:\Users\alice\AppData\Local\Ollama</td></tr>
+<tr><th>Kind</th><td>Log</td></tr>
+<tr><th>Files</th><td>1</td></tr>
+<tr><th>Total size (MB)</th><td>0</td></tr>
+<tr><th>Oldest</th><td>2026-11-23 10:00:00</td></tr>
+<tr><th>Newest</th><td>2026-11-23 10:00:00</td></tr>
+<tr><th>Changed in lookback</th><td>1</td></tr>
+<tr><th>Content</th><td>not quoted (summary only)</td></tr>
+</tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
+<li>Matches allow-list entry &#39;Ollama - local models (alice only)&#39; (approved by IT Security (J. Admin), on 2026-09-15, expires 2099-12-31).</li>
+<li>Remaining risk score 0 is below the threshold of 40.</li>
+</ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Ollama - local models (alice only)&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
+<details class="finding" data-class="Trusted"><summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0079</span><span class="ftitle">claude.exe (PID 4300) connected to api.anthropic.com (Anthropic)</span>
+<span class="fmeta">2. Network &middot; LlmConnection &middot; Claude Code &middot; CORP\alice &middot; 2026-11-23 11:00 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>claude.exe (PID 4300) -&gt; api.anthropic.com</td></tr>
 <tr><th>Process</th><td>claude.exe (PID 4300)</td></tr>
@@ -1288,8 +1466,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <tr><th>Executable</th><td>C:\Users\alice\.local\bin\claude.exe</td></tr>
 <tr><th>Command line</th><td>claude.exe</td></tr>
 <tr><th>Owner</th><td>CORP\alice</td></tr>
-<tr><th>Connected since</th><td>2026-10-23 11:00:00</td></tr>
-<tr><th>Open for (minutes)</th><td>4833</td></tr>
+<tr><th>Connected since</th><td>2026-11-23 11:00:00</td></tr>
+<tr><th>Open for (minutes)</th><td>794</td></tr>
 <tr><th>Hostname source</th><td>local DNS client cache (no lookups performed)</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Matches allow-list entry &#39;Claude Code - Engineering&#39; (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1042).</li>
@@ -1297,8 +1475,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Remaining risk score 0 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Claude Code - Engineering&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0072</span><span class="ftitle">Recent DNS lookup of claude.ai (Anthropic)</span>
-<span class="fmeta">2. Network &middot; DnsCacheLlm &middot; Unattributed (DNS cache) &middot; 2026-10-26 19:32 &middot; score 0</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0080</span><span class="ftitle">Recent DNS lookup of claude.ai (Anthropic)</span>
+<span class="fmeta">2. Network &middot; DnsCacheLlm &middot; Unattributed (DNS cache) &middot; 2026-11-24 00:14 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>DNS cache: claude.ai</td></tr>
 <tr><th>Hostname</th><td>claude.ai</td></tr>
@@ -1310,8 +1488,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Remaining risk score 0 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Sanctioned AI providers (network)&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0073</span><span class="ftitle">1 requests to api.anthropic.com in proxy logs</span>
-<span class="fmeta">2. Network &middot; ProxyLogLlm &middot; Unattributed (proxy log) &middot; 2026-10-26 19:32 &middot; score 0</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0081</span><span class="ftitle">1 requests to api.anthropic.com in proxy logs</span>
+<span class="fmeta">2. Network &middot; ProxyLogLlm &middot; Unattributed (proxy log) &middot; 2026-11-24 00:14 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>Proxy logs: api.anthropic.com</td></tr>
 <tr><th>Hostname</th><td>api.anthropic.com</td></tr>
@@ -1324,7 +1502,7 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Remaining risk score 0 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Sanctioned AI providers (network)&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0074</span><span class="ftitle">Run key &#39;Claude&#39; starts Claude Desktop at logon</span>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0082</span><span class="ftitle">Run key &#39;Claude&#39; starts Claude Desktop at logon</span>
 <span class="fmeta">4. Persistence &middot; RunKey &middot; Claude Desktop &middot; CORP\alice &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>HKEY_USERS\S-1-5-21-1-2-3-1001\Software\Microsoft\Windows\CurrentVersion\Run\Claude</td></tr>
@@ -1339,13 +1517,13 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Remaining risk score 0 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Claude Desktop - company standard&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0075</span><span class="ftitle">Startup folder entry &#39;Ollama.lnk&#39; starts Ollama</span>
-<span class="fmeta">4. Persistence &middot; StartupItem &middot; Ollama &middot; alice &middot; 2026-10-22 10:00 &middot; score 0</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0083</span><span class="ftitle">Startup folder entry &#39;Ollama.lnk&#39; starts Ollama</span>
+<span class="fmeta">4. Persistence &middot; StartupItem &middot; Ollama &middot; alice &middot; 2026-11-22 10:00 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\alice\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\Ollama.lnk</td></tr>
 <tr><th>Startup entry</th><td>C:\Users\alice\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\Ollama.lnk</td></tr>
 <tr><th>Target</th><td>C:\Users\alice\AppData\Local\Programs\Ollama\ollama app.exe</td></tr>
-<tr><th>Created / changed</th><td>2026-10-22 10:00:00</td></tr>
+<tr><th>Created / changed</th><td>2026-11-22 10:00:00</td></tr>
 <tr><th>Matched because</th><td>references the executable of Ollama</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Matches allow-list entry &#39;Ollama - local models (alice only)&#39; (approved by IT Security (J. Admin), on 2026-09-15, expires 2099-12-31).</li>
@@ -1353,8 +1531,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Remaining risk score 0 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Ollama - local models (alice only)&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0076</span><span class="ftitle">Claude Code running (claude.exe, PID 4300)</span>
-<span class="fmeta">1. Processes &middot; AgentProcess &middot; Claude Code &middot; CORP\alice &middot; 2026-10-23 10:00 &middot; score 0</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0084</span><span class="ftitle">Claude Code running (claude.exe, PID 4300)</span>
+<span class="fmeta">1. Processes &middot; AgentProcess &middot; Claude Code &middot; CORP\alice &middot; 2026-11-23 10:00 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\alice\.local\bin\claude.exe</td></tr>
 <tr><th>Process</th><td>claude.exe (PID 4300)</td></tr>
@@ -1362,8 +1540,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <tr><th>Command line</th><td>claude.exe</td></tr>
 <tr><th>Parent</th><td>explorer.exe (PID 801)</td></tr>
 <tr><th>Owner</th><td>CORP\alice</td></tr>
-<tr><th>Started</th><td>2026-10-23 10:00:00</td></tr>
-<tr><th>Uptime (hours)</th><td>81.5</td></tr>
+<tr><th>Started</th><td>2026-11-23 10:00:00</td></tr>
+<tr><th>Uptime (hours)</th><td>14.2</td></tr>
 <tr><th>Matched because</th><td>process name &#39;claude.exe&#39; in a path matching //\.local/bin/|/claude-code/|/claudecode//</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Matches allow-list entry &#39;Claude Code - Engineering&#39; (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1042).</li>
@@ -1371,8 +1549,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Remaining risk score 0 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Claude Code - Engineering&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0077</span><span class="ftitle">Ollama running (ollama.exe, PID 7100)</span>
-<span class="fmeta">1. Processes &middot; AgentProcess &middot; Ollama &middot; CORP\alice &middot; 2026-10-23 08:00 &middot; score 0</span></summary>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0085</span><span class="ftitle">Ollama running (ollama.exe, PID 7100)</span>
+<span class="fmeta">1. Processes &middot; AgentProcess &middot; Ollama &middot; CORP\alice &middot; 2026-11-23 08:00 &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>C:\Users\alice\AppData\Local\Programs\Ollama\ollama.exe</td></tr>
 <tr><th>Process</th><td>ollama.exe (PID 7100)</td></tr>
@@ -1380,8 +1558,8 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <tr><th>Command line</th><td>&quot;ollama.exe&quot; serve</td></tr>
 <tr><th>Parent</th><td>explorer.exe (PID 801)</td></tr>
 <tr><th>Owner</th><td>CORP\alice</td></tr>
-<tr><th>Started</th><td>2026-10-23 08:00:00</td></tr>
-<tr><th>Uptime (hours)</th><td>83.5</td></tr>
+<tr><th>Started</th><td>2026-11-23 08:00:00</td></tr>
+<tr><th>Uptime (hours)</th><td>16.2</td></tr>
 <tr><th>Matched because</th><td>process name &#39;ollama.exe&#39;</td></tr>
 </tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
 <li>Matches allow-list entry &#39;Ollama - local models (alice only)&#39; (approved by IT Security (J. Admin), on 2026-09-15, expires 2099-12-31).</li>
@@ -1389,23 +1567,7 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Remaining risk score 0 is below the threshold of 40.</li>
 </ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Ollama - local models (alice only)&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
 <details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0078</span><span class="ftitle">AI browser extension &#39;Claude&#39; in Chrome</span>
-<span class="fmeta">5. Tokens &amp; OAuth &middot; BrowserExtension &middot; Claude Desktop &middot; alice &middot; 2026-10-23 10:00 &middot; score 0</span></summary>
-<div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
-<tr><th>Location</th><td>C:\Users\alice\AppData\Local\Google\Chrome\User Data/Default/Extensions/fcoeoabgfenejglbffodgkkbkcdhcgfn/1.0.36_0</td></tr>
-<tr><th>Browser</th><td>Chrome (Default)</td></tr>
-<tr><th>Extension</th><td>Claude</td></tr>
-<tr><th>Extension ID</th><td>fcoeoabgfenejglbffodgkkbkcdhcgfn</td></tr>
-<tr><th>Version</th><td>1.0.36_0</td></tr>
-<tr><th>Notable permissions</th><td>debugger, nativeMessaging, tabs, sidePanel</td></tr>
-<tr><th>Folder</th><td>C:\Users\alice\AppData\Local\Google\Chrome\User Data/Default/Extensions/fcoeoabgfenejglbffodgkkbkcdhcgfn/1.0.36_0</td></tr>
-</tbody></table></div><div><h3>Why this label</h3><ul class="reasons">
-<li>Matches allow-list entry &#39;Claude Desktop - company standard&#39; (approved by IT Security (J. Admin), on 2026-09-01, expires 2099-12-31, ticket CHG-1043).</li>
-<li>Accepted by the approval: BrowserControlPermission (Browser extension holds debugger or native-messaging permission (can drive the browser)).</li>
-<li>Remaining risk score 0 is below the threshold of 40.</li>
-</ul><h3>Recommended next step</h3><p class="rec">No action needed. Approved under &#39;Claude Desktop - company standard&#39;. Re-validate before the approval expires on 2099-12-31.</p></div></div></details>
-<details class="finding" data-class="Trusted"><summary>
-<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0079</span><span class="ftitle">Browser bridge &#39;com.anthropic.claude_browser_extension&#39; lets Claude Desktop drive Chrome</span>
+<span class="badge b-Trusted">Trusted</span><span class="fid">RAC-0086</span><span class="ftitle">Browser bridge &#39;com.anthropic.claude_browser_extension&#39; lets Claude Desktop drive Chrome</span>
 <span class="fmeta">5. Tokens &amp; OAuth &middot; NativeMessagingHost &middot; Claude Desktop &middot; CORP\alice &middot; score 0</span></summary>
 <div class="fbody"><div><h3>Evidence</h3><table class="kv"><tbody>
 <tr><th>Location</th><td>Chrome native messaging: com.anthropic.claude_browser_extension</td></tr>
@@ -1424,7 +1586,7 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <section><h2>Coverage</h2><p class="note">What this scan could and could not examine. "Nothing found" only means something for sources marked Checked.</p>
 <div class="wrap"><table><thead><tr><th>Source</th><th>Status</th><th>Items</th><th>Detail</th></tr></thead><tbody>
 <tr><td>User profiles (from -ProfileRoot)</td><td><span class="badge b-Checked">Checked</span></td><td>3</td><td></td></tr>
-<tr><td>Process analysis</td><td><span class="badge b-Info">Info</span></td><td>7</td><td>Agent, MCP server and browser-automation processes identified.</td></tr>
+<tr><td>Process analysis</td><td><span class="badge b-Info">Info</span></td><td>9</td><td>Agent, MCP server and browser-automation processes identified, plus processes running a script or encoded command that uses an AI API (script files are read, never run; network paths are never opened).</td></tr>
 <tr><td>Browser AI sessions</td><td><span class="badge b-Info">Info</span></td><td>1</td><td>Ordinary web-browser connections to AI services were counted but not itemized. Use -IncludeBrowserAiSessions to list them.</td></tr>
 <tr><td>Proxy log: C:\proxy\access.log</td><td><span class="badge b-Checked">Checked</span></td><td>6</td><td></td></tr>
 <tr><td>Agent folders, MCP configs, .env files, packages</td><td><span class="badge b-Info">Info</span></td><td>3</td><td>Profiles examined. Project folders are searched to depth 4 under Desktop, Documents, Downloads, source, src, dev, code, repos, projects, git, GitHub, workspace, work. OneDrive is skipped.</td></tr>
@@ -1439,9 +1601,9 @@ code{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace;font-size:.92em
 <li>Local-only: no network requests or DNS lookups were made. Hostnames come from the local DNS cache.</li>
 <li>Secrets: API keys are detected by name and format. Their values were never recorded; command lines and snippets are redacted.</li>
 <li>Classification: each finding scores the sum of its indicator weights. Approved (allow-listed) findings stay Trusted unless risk the approval does not accept reaches 40. Unapproved findings are Unknown, or Suspicious at 40 or more.</li>
-<li>Files written: RogueAgentReport_FAKE-WS01_20261026-193240_scan.log, RogueAgentReport_FAKE-WS01_20261026-193240.html, RogueAgentReport_FAKE-WS01_20261026-193240_findings.csv, RogueAgentReport_FAKE-WS01_20261026-193240.json</li>
+<li>Files written: RogueAgentReport_FAKE-WS01_20261124-001420_scan.log, RogueAgentReport_FAKE-WS01_20261124-001420.html, RogueAgentReport_FAKE-WS01_20261124-001420_findings.csv, RogueAgentReport_FAKE-WS01_20261124-001420.json</li>
 </ul></section>
-<footer>Generated by Rogue Agent Checker v0.1.0 on FAKE-WS01. Report only: nothing was disabled, blocked or deleted.</footer>
+<footer>Generated by Rogue Agent Checker v0.1.1 on FAKE-WS01. Report only: nothing was disabled, blocked or deleted.</footer>
 </main><script>(function () {
   var buttons = document.querySelectorAll('[data-filter]');
   buttons.forEach(function (button) {

@@ -40,6 +40,7 @@ function Register-RacFakeSystemMock {
     Mock -ModuleName $m Get-RacRawCredentialTarget { $global:RacFake.CredentialTargets }
     Mock -ModuleName $m Get-RacRawNativeMessagingHost { $global:RacFake.NativeMessagingHosts }
     Mock -ModuleName $m Get-RacRawWinEvent { $global:RacFake.Events[$LogName] }
+    Mock -ModuleName $m Get-RacRawEventLogInfo { $null }
     Mock -ModuleName $m Get-RacFileAclSummary {
         # carol's Downloads .env is readable by every user on the box
         if ($Path -match 'carol' -and $Path -match 'Downloads' -and $Path -match '\.env$') {
@@ -55,14 +56,18 @@ function Invoke-RacFixtureScan {
 
     if (-not $AllowListPath) { $AllowListPath = [System.IO.Path]::Combine($PSScriptRoot, 'Fixtures', 'allowlist.fixture.json') }
     $environment = New-RacFakeAgentEnvironment -Root ([System.IO.Path]::Combine($TestRoot, 'machine'))
-    $global:RacFake = Get-RacFakeSystem -Environment $environment
+    $global:RacFake = Get-RacFakeSystem -Environment $environment -RepoRoot (Split-Path -Parent $PSScriptRoot)
     Register-RacFakeSystemMock
 
     $out = [System.IO.Path]::Combine($TestRoot, 'out')
-    $result = Invoke-RogueAgentScan -ProfileRoot $environment.ProfilePaths -AllowListPath $AllowListPath `
-        -OutputPath $out -ProxyLogPath $environment.ProxyLog -PassThru -WarningAction SilentlyContinue 6>$null
+    # 2>&1 captures anything written to the error stream (red text on a console),
+    # so a test can prove a scan prints none.
+    $all = @(Invoke-RogueAgentScan -ProfileRoot $environment.ProfilePaths -AllowListPath $AllowListPath `
+            -OutputPath $out -ProxyLogPath $environment.ProxyLog -PassThru -WarningAction SilentlyContinue 2>&1 6>$null)
+    $errors = @($all | Where-Object { $_ -is [System.Management.Automation.ErrorRecord] })
+    $result = $all | Where-Object { $_ -isnot [System.Management.Automation.ErrorRecord] } | Select-Object -Last 1
 
-    return [pscustomobject]@{ Environment = $environment; Result = $result; OutputPath = $out }
+    return [pscustomobject]@{ Environment = $environment; Result = $result; OutputPath = $out; Errors = $errors; RepoRoot = (Split-Path -Parent $PSScriptRoot) }
 }
 
 function Get-RacTestFinding {
