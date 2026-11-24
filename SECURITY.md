@@ -6,7 +6,9 @@ agent unreported, or it can harm the machine it was trusted to inspect.
 ## Report privately
 
 Use **Report a vulnerability** on this repository's Security tab (GitHub private
-vulnerability reporting). Please do not open a public issue for:
+vulnerability reporting). If you can't use it, email richard@wieldai.dev with
+"RAC security" in the subject, and we'll agree on a private channel before you send
+details. Please do not open a public issue for:
 
 - anything that makes RAC write, change, delete or send data, or run code;
 - a secret value reaching a report, the scan log or the console;

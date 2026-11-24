@@ -535,6 +535,13 @@ Every release is tested by hand on real Windows. The live test, including what R
 missed and the predictions we got wrong, is in `docs/LIVE-TEST.md`. A tool that looks
 for undisclosed AI should disclose its own.
 
+## Contact
+
+Rich Knowles, WieldAI: richard@wieldai.dev, or @WieldAI on X.
+
+- Bugs, false positives and new agents for the catalog: open an issue.
+- Security problems: report them privately, as `SECURITY.md` describes.
+
 ## License
 
 Apache License 2.0. See `LICENSE` and `NOTICE`. You may use, modify and redistribute
