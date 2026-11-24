@@ -411,6 +411,14 @@ the OpenAI SDK.
     findings: the hidden task (95), the PowerShell running `sync.ps1` (65) and the
     `.env` (55). The standard-user scan had an empty DNS cache, so the catch didn't
     depend on DNS at all. No key value appeared in any output.
+  - A second retest put the rogue and a freshly installed real OpenClaw on the
+    machine together, to check that the new script check doesn't mistake a real agent
+    for a rogue. The rogue had been running for 24 minutes, and the DNS cache was
+    empty. Both scans again reported exactly 3 Suspicious findings, all of them the
+    rogue's, at the same scores. All six OpenClaw processes, its Startup entry, its
+    gateway port and its package were filed under OpenClaw as Unknown, and none was
+    reported as an unidentified script. No coverage source errored, and no key value
+    appeared in any output.
   - Full results, including the predictions we got wrong: `docs/LIVE-TEST.md`.
 - **Off Windows**: 124 of 133 pass on PowerShell 7.4 with Pester 6.2; the 9
   integration tests skip.

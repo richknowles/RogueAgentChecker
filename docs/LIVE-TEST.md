@@ -143,6 +143,71 @@ The only Suspicious findings were the rogue's own pieces, no coverage source err
 and the fake key appears in no output. The rogue was then removed with
 `Stage-RogueAgent.ps1 -Remove`.
 
+### Retest 2: the rogue and a real OpenClaw together (22:54 to 23:25)
+
+The first retest had OpenClaw rolled away. The new check reads the scripts of
+processes RAC doesn't already recognize, so the open question was whether it would
+mistake a real agent for a rogue. This run put both on the machine at once.
+Predictions E1 to E9 and the pass rules were written at about 19:15, before the run,
+and are reproduced unchanged below.
+
+What happened, in order:
+
+- The VM was rolled back to the same clean snapshot. Release candidate 5 was copied in
+  and its zip hash checked (`E62C42DF...`). No tests were run this time.
+- The rogue was planted from an admin window at 22:58:47.
+- OpenClaw 2026.11.7 was installed with its official installer in a new normal
+  window (package in place at 23:04). Onboarding found the rogue's
+  `OPENAI_API_KEY` and offered to use it. The key is fake, so the provider rejected
+  it and the prompt came back. **Skip for now** finished setup, but that also skipped
+  installing the gateway as a service. `openclaw gateway install`, from OpenClaw's
+  Windows documentation, added the Startup entry `OpenClaw Gateway.vbs` at 23:15:13.
+  That is the same per-user Startup fallback as in the first test. The gateway was
+  listening on `127.0.0.1:18789` by 23:17.
+- After a three-minute wait, `Get-DnsClientCache` showed no `openai` entry. The admin
+  scan ran at 23:23 and the normal-window scan at 23:24. By then the rogue's
+  PowerShell (PID 14488) had been running for 24 minutes.
+
+| # | What | Predicted | Admin scan (23:23) | Normal-window scan (23:24) | Verdict |
+|---|---|---|---|---|---|
+| E1 | Hidden task "OneDrive Sync Helper" | Suspicious, 95 | Suspicious, 95 | Suspicious, 95 | Correct |
+| E2 | PowerShell running `sync.ps1` | Suspicious, 65 | Suspicious, 65 (PID 14488) | Suspicious, 65 | Correct |
+| E3 | `.env` with the key | Suspicious, 55 | Suspicious, 55 | Suspicious, 55 | Correct |
+| E4 | `.mcp.json` shell server; user variable | Unknown, 25; Unknown, 15 | the same | the same | Correct |
+| E5 | OpenClaw folder, Startup entry, processes, port, package, install | Unknown, 0 to 10 | Folder 0; Startup entry 10; 6 processes, 0 each; loopback listener 0; package 10; install activity 10. All filed under OpenClaw | the same | Correct |
+| E6 | OpenClaw SelfModification | Unknown, 20 (known noise) | Unknown, 20 (`soul.md`, `agents.md`) | the same | Correct |
+| E7 | An OpenClaw process reported by the new check | None | None. The only "Unidentified script" was the rogue | None | Correct |
+| E8 | Suspicious total | 3 | 3 | 3 | Correct |
+| E9 | Coverage errors; fake key in any output | none; none | none; none | none; none | Correct |
+
+All six OpenClaw processes (the gateway and its supervisor, the `cmd.exe` between
+them, a job anchor, the spawn broker and a SQLite worker) were recognized as OpenClaw from their command
+lines, so the script check never looked at them. Each scan had 26 findings: 3
+Suspicious, all of them the rogue's, and 23 Unknown. The normal-window scan again got
+an empty DNS cache and no Security log events, and still caught the rogue in full.
+`RACTEST` appears in none of the eight output files. **By the rules set before the
+run, this is a pass.**
+
+Two things we didn't predict, neither of which changes the verdict:
+
+- **OpenClaw off-hours, Unknown, 15.** This run was on a Monday at 23:23, outside the
+  default business hours, so OpenClaw's activity that evening counted (33
+  timestamps). That is correct behavior. The first test ran in business hours and
+  never exercised it.
+- **Four PowerShell script-block findings, Unknown, score 0.** Three come from release
+  candidate 3's test files, run on this VM on 21 November and still in the snapshot's
+  PowerShell log. In the first retest, that day's test runs had pushed them out of the
+  15 MB log. RAC files them under Aider, Claude Code and OpenAI Codex CLI because the
+  test fixtures name those agents. Each carries RAC's note that the path names Rogue
+  Agent Checker but the text isn't from the copy that ran the scan. The same old
+  blocks gave Claude Code an off-hours finding (Unknown, 15). The fourth group, filed
+  under OpenClaw, holds OpenClaw's installer blocks from 23:03 together with one
+  release candidate 3 test file. It shows only that file's path, so a reader could
+  think the installer text came from it. Grouping by agent should list every script
+  path in the group; that is on the 0.1.2 list.
+
+The rogue was removed with `Stage-RogueAgent.ps1 -Remove` after the scans.
+
 ## Still open after this test
 
 - **Long-lived connections from compiled programs.** A program that isn't a script
@@ -150,5 +215,6 @@ and the fake key appears in no output. The rogue was then removed with
 - **Scripts RAC can't read:** network paths, unexpanded `%VARIABLES%`, files over 1 MB,
   code downloaded or assembled at run time.
 - **Remote agents** working over SSH, WinRM or RDP (0.2).
-- **0.1.2:** the OpenClaw log path, one finding per agent instead of per process, and
-  no SelfModification for files written at install time.
+- **0.1.2:** the OpenClaw log path, one finding per agent instead of per process, no
+  SelfModification for files written at install time, and every script path listed
+  when script blocks from several scripts are grouped under one agent.

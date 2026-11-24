@@ -135,6 +135,11 @@ test against a staged rogue agent. Still read-only.
   hidden task (Suspicious, 95), the PowerShell running the script (Suspicious, 65)
   and the `.env` (Suspicious, 55). No key value appeared in any output, and no
   coverage source errored.
+- Second live retest of release candidate 5, with the rogue and a freshly installed
+  OpenClaw 2026.11.7 on the machine together: the same 3 Suspicious findings at the
+  same scores in both scans, and nothing else Suspicious. OpenClaw's six processes,
+  Startup entry, gateway port and package were all filed under OpenClaw, and the
+  script check reported none of them. No key value in any output, no coverage errors.
 - Off Windows (PowerShell 7.4, Pester 6.2.0), 124 of 133 pass and the 9 Windows
   integration tests skip. Each new test fails against the build before its fix and
   passes against this one.
