@@ -320,6 +320,7 @@ function Get-RacRecommendation {
         'ProxyLogLlm'            = 'Use the proxy''s client IP and user fields to find the machine and person behind this traffic.'
         'BrowserExtension'       = 'Extensions with debugger or native messaging permission can drive the browser with the user''s sessions. Manage them with browser policy (ExtensionInstallAllowlist).'
         'NativeMessagingHost'    = 'This bridge lets a browser extension run a local program. Confirm both the extension and the program are approved.'
+        'LlmScriptProcess'       = 'Open the script (see Script) and find its owner. A script that calls an AI API on its own is an unmanaged agent; check the Persistence findings for what starts it.'
         'PowerShellScriptBlock'  = 'Find the script (see Script path) and its owner. Scripts calling LLM APIs directly are unmanaged agents.'
         'SysmonLlmTraffic'       = 'Identify the program in Process image and confirm it is allowed to call this AI provider.'
     }

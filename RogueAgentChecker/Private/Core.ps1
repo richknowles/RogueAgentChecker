@@ -357,6 +357,41 @@ function Format-RacTime {
     return ''
 }
 
+function Get-RacEventLogReach {
+    <#
+        Decides whether an event log still covers the lookback window. Windows keeps
+        each log at a fixed maximum size. On the Windows 11 test VM the PowerShell
+        log held about an hour of a busy test day, not the 7 days the report
+        claimed: RAC said "Checked" for days the log no longer had. Flooding a log
+        until its oldest events roll off is also a known way to hide.
+
+        $Info comes from Get-RacRawEventLogInfo (LogName, LogMode, MaxBytes,
+        FileBytes, OldestEvent). Returns Partial (bool) and Note (text).
+    #>
+    param($Info, [object]$LookbackStart)
+
+    if (-not $Info) { return [pscustomobject]@{ Partial = $false; Note = '' } }
+    $oldest = $Info.OldestEvent
+    $full = ([long]$Info.MaxBytes -gt 0) -and ([long]$Info.FileBytes -ge ([long]$Info.MaxBytes * 0.9))
+    $short = ($oldest -is [datetime]) -and ($LookbackStart -is [datetime]) -and ($oldest -gt $LookbackStart)
+    $size = '{0:N0} MB' -f ([long]$Info.MaxBytes / 1MB)
+    $advice = 'Raise its maximum size (wevtutil sl "{0}" /ms:<bytes>, or Group Policy).' -f $Info.LogName
+
+    if ($full -and [string]$Info.LogMode -eq 'Retain') {
+        $note = 'The log is full ({0}) and set to keep old events, so Windows has stopped recording new ones. {1}' -f $size, $advice
+        return [pscustomobject]@{ Partial = $true; Note = $note }
+    }
+    if ($full -and $short) {
+        $how = 'Windows overwrites the oldest events'
+        if ([string]$Info.LogMode -eq 'AutoBackup') { $how = 'Windows moves older events to archive files, which RAC does not read' }
+        $note = 'The log only reaches back to {0}: it is full ({1}) and {2}, so the lookback window is not covered. {3}' -f (Format-RacTime $oldest), $size, $how, $advice
+        return [pscustomobject]@{ Partial = $true; Note = $note }
+    }
+    $note = ''
+    if ($oldest -is [datetime]) { $note = 'Log reaches back to ' + (Format-RacTime $oldest) + '.' }
+    return [pscustomobject]@{ Partial = $false; Note = $note }
+}
+
 function Test-RacOffHours {
     <# True if $Time falls outside the configured business days/hours (local time). #>
     param(

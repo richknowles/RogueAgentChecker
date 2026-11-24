@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "2026.10.26",
+  "catalogVersion": "2026.11.23",
   "notes": [
     "Starter detection catalog for Rogue Agent Checker. Vendors move files around between releases: treat this as living content.",
     "Regex patterns are matched case-insensitively against NORMALIZED text: lowercase, backslashes converted to forward slashes.",
@@ -55,6 +55,24 @@
       "ideExtensions": [],
       "packages": [],
       "credentialTargets": [ "claude" ],
+      "endpoints": [ "claude.ai", "api.anthropic.com" ]
+    },
+    {
+      "id": "claude-in-chrome",
+      "name": "Claude in Chrome",
+      "vendor": "Anthropic",
+      "kind": "Browser agent extension",
+      "processes": [],
+      "commandLinePatterns": [],
+      "keywords": [],
+      "configPaths": [],
+      "skillPaths": [],
+      "tokenFiles": [],
+      "logPaths": [],
+      "mcpConfigFiles": [],
+      "ideExtensions": [],
+      "packages": [],
+      "credentialTargets": [],
       "endpoints": [ "claude.ai", "api.anthropic.com" ]
     },
     {
@@ -624,13 +642,18 @@
       "node.exe", "python.exe", "pythonw.exe", "py.exe", "bun.exe", "deno.exe", "uv.exe", "uvx.exe",
       "powershell.exe", "pwsh.exe", "cmd.exe"
     ],
-    "toolCallRecord": "\"type\"\\s*:\\s*\"(tool_use|tool_call|function_call|tool-call|toolcall)\"|\"tool_calls\"\\s*:|\"toolUse\"\\s*:|\"functionCall\"\\s*:"
+    "toolCallRecord": "\"type\"\\s*:\\s*\"(tool_use|tool_call|function_call|tool-call|toolcall)\"|\"tool_calls\"\\s*:|\"toolUse\"\\s*:|\"functionCall\"\\s*:",
+    "llmSdkUse": [
+      "(^|[\\n;])\\s*(from|import)\\s+(openai|anthropic|google\\.genai|google\\.generativeai|mistralai|groq|cohere|litellm|ollama|langchain_openai|langchain_anthropic|langchain_google_genai)\\b",
+      "(require\\(\\s*|from\\s+|import\\(\\s*)['\"](openai|@anthropic-ai/sdk|@google/genai|@google/generative-ai|@mistralai/mistralai|groq-sdk|cohere-ai|ollama|@ai-sdk/[a-z0-9-]+)['\"]",
+      "import-module\\s+(-name\\s+)?['\"]?(psopenai|powershellai|psai)\\b"
+    ]
   },
 
   "aiKeywordPattern": "claude|anthropic|openai|chatgpt|codex|copilot|gemini|cursor|windsurf|codeium|perplexity|ollama|openclaw|clawdbot|moltbot|huggingface|\\bmcp\\b|ai agent|browser agent|agentic|\\bmanus\\b|\\bmonica\\b|\\bsider\\b|\\bharpa\\b|\\bmaxai\\b|\\bmerlin\\b",
 
   "knownBrowserExtensions": [
-    { "id": "fcoeoabgfenejglbffodgkkbkcdhcgfn", "name": "Claude in Chrome", "agentId": "claude-desktop" }
+    { "id": "fcoeoabgfenejglbffodgkkbkcdhcgfn", "name": "Claude in Chrome", "agentId": "claude-in-chrome" }
   ],
 
   "browserProfiles": [
@@ -762,7 +785,7 @@
       "SelfModification":         { "weight": 20, "description": "Agent skills, memory, or instruction files changed within the lookback window" },
       "SelfModificationByAgent":  { "weight": 15, "description": "Event logs show an agent process writing to its own skills or memory" },
       "AgentSpawnedShell":        { "weight": 10, "description": "Agent process launched command shells" },
-      "LlmCallFromScript":        { "weight": 25, "description": "A PowerShell script block called an LLM API directly" }
+      "LlmCallFromScript":        { "weight": 25, "description": "A script calls an LLM API directly (a logged PowerShell script block, or the script or encoded command a process or autostart entry runs)" }
     }
   }
 }

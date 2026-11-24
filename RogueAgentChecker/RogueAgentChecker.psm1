@@ -10,7 +10,7 @@
 #>
 
 $script:RacModuleRoot = $PSScriptRoot
-$script:RacVersion = '0.1.0'
+$script:RacVersion = '0.1.1'
 
 foreach ($folder in @('Private', 'Public')) {
     $folderPath = Join-Path -Path $PSScriptRoot -ChildPath $folder

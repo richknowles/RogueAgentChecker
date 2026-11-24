@@ -6,6 +6,37 @@
     and a COUNT of tool-call records. Event snippets are short and redacted.
 #>
 
+function Test-RacSelfPath {
+    <# True if a script path belongs to Rogue Agent Checker itself (module, or its repository when run from one). #>
+    param([string]$Path)
+    $p = ConvertTo-RacNormalizedText $Path
+    foreach ($root in @(Get-RacSelfPath)) {
+        if (-not $root) { continue }
+        $r = (ConvertTo-RacNormalizedText $root).TrimEnd('/') + '/'
+        if ($p.StartsWith($r)) { return $true }
+    }
+    return $false
+}
+
+function Test-RacOwnCode {
+    <#
+        True if a logged script block is, word for word, part of Rogue Agent
+        Checker's own code. This recognizes RAC's code wherever it was logged from,
+        including another copy of the same version in a different folder. A script
+        that only borrows RAC's file names, folder or function names does not pass.
+    #>
+    param([string]$Text)
+    if ([string]::IsNullOrEmpty($Text)) { return $false }
+    # Windows splits long scripts into chunks, so a chunk can start or end in the
+    # middle of a line break. Trim covers that; the content itself must match.
+    $t = $Text.Replace("`r`n", "`n").Trim()
+    if (-not $t) { return $false }
+    foreach ($own in @(Get-RacSelfScriptText)) {
+        if ($own -and $own.Contains($t)) { return $true }
+    }
+    return $false
+}
+
 function Get-RacSnippet {
     <# Up to $Width characters around the first regex match, redacted. #>
     param([string]$Text, [string]$Pattern, [int]$Width = 160)
@@ -151,9 +182,11 @@ function Find-RacPowerShellEvent {
 
             # Don't report ourselves: with Script Block Logging on, importing this
             # module logs its own code, which mentions agent names and key formats.
+            # Fast path: anything logged from the folders of the copy that is
+            # running. (Windows logs a large script in several chunks, all with the
+            # script's Path.) Everything else is checked by content further down.
             $scriptPath = [string]$e.Data['Path']
-            if ($scriptPath -and $script:RacModuleRoot -and $scriptPath.StartsWith($script:RacModuleRoot, [System.StringComparison]::OrdinalIgnoreCase)) { continue }
-            if ($text -match 'New-RacFinding|Invoke-RogueAgentScan|RacModuleRoot') { continue }
+            if ($scriptPath -and (Test-RacSelfPath -Path $scriptPath)) { continue }
 
             $normalized = ConvertTo-RacNormalizedText $text
 
@@ -162,6 +195,14 @@ function Find-RacPowerShellEvent {
             $agentMatch = Find-RacAgentByText -Signatures $sig -Text $text
             $secretRefs = @([regex]::Matches($text, '\$env:([A-Za-z0-9_]+)') | ForEach-Object { $_.Groups[1].Value } | Where-Object { $_ -match $sig.secretEnvNamePattern } | Select-Object -Unique)
             if (-not $hostName -and -not $agentMatch -and $secretRefs.Count -eq 0) { continue }
+
+            # RAC's own code logged from somewhere else: another copy of RAC, or no
+            # path at all. Recognized by its exact text. Until v0.1.1, RAC skipped any
+            # block that merely contained one of its function names, which let any
+            # script hide by adding that name in a comment, and the first v0.1.1 build
+            # reported the tests of a second RAC copy on the test machine.
+            if (Test-RacOwnCode -Text $text) { continue }
+            $looksLikeRac = [bool]($scriptPath -and (ConvertTo-RacNormalizedText $scriptPath) -match 'rogueagentchecker')
 
             $agentKey = 'unattributed'
             $agentName = 'Unattributed (PowerShell)'
@@ -177,6 +218,7 @@ function Find-RacPowerShellEvent {
             Add-RacEventGroup -Groups $groups -Key $key -Seed $seed -Time $e.TimeCreated -Sample (Get-RacSnippet -Text $text -Pattern $pattern)
             foreach ($r in $secretRefs) { if ($groups[$key].Seed.SecretRefs -notcontains $r) { $groups[$key].Seed.SecretRefs += $r } }
             if ($scriptPath -and -not $groups[$key].Seed.ContainsKey('ScriptPath')) { $groups[$key].Seed.ScriptPath = $scriptPath }
+            if ($looksLikeRac) { $groups[$key].Seed.LooksLikeRac = $true }
         }
     }
 
@@ -193,6 +235,11 @@ function Find-RacPowerShellEvent {
             'Key variables used'  = ($s.SecretRefs -join ', ')
             'Script path'         = $s.ScriptPath
             'Samples (redacted)'  = ($g.Samples -join ' | ')
+        }
+        if ($s.ContainsKey('LooksLikeRac')) {
+            # Most likely an older or newer RAC version in another folder. Reported
+            # anyway: a name is not proof, and a hidden script would choose this name.
+            $evidence['Note'] = 'The path names Rogue Agent Checker, but this text is not part of the RAC copy that ran this scan. If it is another RAC version, confirm by comparing the file with that release; otherwise treat it as any other script.'
         }
         $what = 'references AI keys'
         if ($s.HostName) { $what = 'references ' + $s.HostName }

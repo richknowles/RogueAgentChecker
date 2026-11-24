@@ -4,7 +4,9 @@
     folders, and WMI event subscriptions.
 
     Each autostart command is matched with the same signature logic used for
-    processes. Every WMI command/script consumer is reported, attributed or not,
+    processes. When the command itself looks ordinary, RAC also looks inside the
+    script or encoded command it runs (Get-RacScriptLlmUse; read, never run).
+    Every WMI command/script consumer is reported, attributed or not,
     because that mechanism is rarely legitimate and is a favourite hiding place.
 #>
 
@@ -30,7 +32,28 @@ function Get-RacAutostartMatch {
     if ($normalized -and $sig._EndpointRegex -and $normalized -match $sig._EndpointRegex) {
         return [pscustomobject]@{ AgentName = 'Unidentified agent'; AgentId = ''; Reason = 'command calls an LLM API (' + $Matches[1] + ')' }
     }
+
+    # The command itself looks ordinary: look at the script or encoded command it
+    # runs (see Get-RacScriptLlmUse; files are read, never run).
+    $use = Get-RacScriptLlmUse -Context $Context -CommandLine $CommandText
+    if ($use) {
+        $extra = @()
+        if ($use.Calls) { $extra += 'LlmCallFromScript' }
+        return [pscustomobject]@{ AgentName = 'Unidentified agent'; AgentId = ''; Reason = (Format-RacScriptLlmReason -Use $use); Indicators = $extra; ScriptUse = $use }
+    }
     return $null
+}
+
+function Add-RacScriptEvidence {
+    <# Adds the script details of an autostart match to its evidence (names only, redacted sample). #>
+    param($Evidence, $Match)
+    $use = $Match.ScriptUse
+    if (-not $use) { return }
+    if ($use.ScriptPath) { $Evidence['Script'] = $use.ScriptPath }
+    if ($use.HostName) { $Evidence['LLM host referenced'] = $use.HostName }
+    if ($use.Sdk) { $Evidence['AI SDK'] = $use.Sdk }
+    if ($use.KeyNames.Count -gt 0) { $Evidence['Key variables used'] = ($use.KeyNames -join ', ') }
+    $Evidence['Sample (redacted)'] = $use.Sample
 }
 
 function Get-RacCommonAutostartIndicator {
@@ -55,8 +78,9 @@ function Find-RacPersistenceFinding {
             $match = Get-RacAutostartMatch -Context $Context -CommandText $commandText -NameText $taskName
             if (-not $match) { continue }
 
-            $indicators = Get-RacCommonAutostartIndicator -Context $Context -CommandText $commandText -RunAs $t.UserId
+            $indicators = @(Get-RacCommonAutostartIndicator -Context $Context -CommandText $commandText -RunAs $t.UserId)
             if ($t.Hidden) { $indicators += 'HiddenTask' }
+            if ($match.Indicators) { $indicators += @($match.Indicators) }
 
             $run = Get-RacScheduledTaskRunInfo -TaskPath $t.TaskPath -TaskName $t.TaskName
             $evidence = [ordered]@{
@@ -72,6 +96,7 @@ function Find-RacPersistenceFinding {
                 'Registered'      = $t.RegistrationDate
                 'Matched because' = $match.Reason
             }
+            Add-RacScriptEvidence -Evidence $evidence -Match $match
             $times = @()
             if ($run) {
                 $evidence['Last run'] = $run.LastRunTime
@@ -94,6 +119,7 @@ function Find-RacPersistenceFinding {
         if (-not $match) { continue }
         $indicators = @(Get-RacCommonAutostartIndicator -Context $Context -CommandText $s.PathName -RunAs $s.StartName)
         if ($s.StartMode -notmatch '^Auto') { $indicators = @($indicators | Where-Object { $_ -ne 'PersistenceAutostart' }) }
+        if ($match.Indicators) { $indicators += @($match.Indicators) }
         $evidence = [ordered]@{
             'Service'         = '{0} ({1})' -f $s.Name, $s.DisplayName
             'Binary path'     = $s.PathName
@@ -103,6 +129,7 @@ function Find-RacPersistenceFinding {
             'Process ID'      = $(if ($s.ProcessId -gt 0) { $s.ProcessId } else { $null })
             'Matched because' = $match.Reason
         }
+        Add-RacScriptEvidence -Evidence $evidence -Match $match
         New-RacFinding -Category 'Persistence' -Breadcrumb 'Service' `
             -Title ("Service '{0}' runs {1}" -f $s.Name, $match.AgentName) `
             -Agent $match.AgentName -AgentId $match.AgentId -Location ('Service: ' + $s.Name) -User $s.StartName `
@@ -114,7 +141,8 @@ function Find-RacPersistenceFinding {
         if (-not $r) { continue }
         $match = Get-RacAutostartMatch -Context $Context -CommandText $r.Command -NameText $r.ValueName
         if (-not $match) { continue }
-        $indicators = Get-RacCommonAutostartIndicator -Context $Context -CommandText $r.Command -RunAs ''
+        $indicators = @(Get-RacCommonAutostartIndicator -Context $Context -CommandText $r.Command -RunAs '')
+        if ($match.Indicators) { $indicators += @($match.Indicators) }
         $evidence = [ordered]@{
             'Registry key'    = $r.KeyPath
             'Value name'      = $r.ValueName
@@ -122,6 +150,7 @@ function Find-RacPersistenceFinding {
             'Applies to'      = $(if ($r.User) { $r.User } else { 'all users (HKLM)' })
             'Matched because' = $match.Reason
         }
+        Add-RacScriptEvidence -Evidence $evidence -Match $match
         New-RacFinding -Category 'Persistence' -Breadcrumb 'RunKey' `
             -Title ("Run key '{0}' starts {1} at logon" -f $r.ValueName, $match.AgentName) `
             -Agent $match.AgentName -AgentId $match.AgentId -Location ('{0}\{1}' -f $r.KeyPath, $r.ValueName) -User $r.User `
@@ -134,7 +163,8 @@ function Find-RacPersistenceFinding {
         $commandText = ('"{0}" {1}' -f $s.TargetPath, $s.Arguments).Trim()
         $match = Get-RacAutostartMatch -Context $Context -CommandText $commandText -NameText (((Get-RacLeafName $s.Path) -replace '\.[^.]+$', ''))
         if (-not $match) { continue }
-        $indicators = Get-RacCommonAutostartIndicator -Context $Context -CommandText $commandText -RunAs ''
+        $indicators = @(Get-RacCommonAutostartIndicator -Context $Context -CommandText $commandText -RunAs '')
+        if ($match.Indicators) { $indicators += @($match.Indicators) }
         $evidence = [ordered]@{
             'Startup entry'   = $s.Path
             'Target'          = $s.TargetPath
@@ -142,6 +172,7 @@ function Find-RacPersistenceFinding {
             'Created / changed' = $s.LastWriteTime
             'Matched because' = $match.Reason
         }
+        Add-RacScriptEvidence -Evidence $evidence -Match $match
         New-RacFinding -Category 'Persistence' -Breadcrumb 'StartupItem' `
             -Title ("Startup folder entry '{0}' starts {1}" -f (Split-Path -Leaf $s.Path), $match.AgentName) `
             -Agent $match.AgentName -AgentId $match.AgentId -Location $s.Path -User $s.User `
@@ -161,6 +192,7 @@ function Find-RacPersistenceFinding {
 
         $indicators = @('PersistenceWmi')
         if (Get-RacGenericMatch -Signatures $Context.Signatures -Group 'stealthLaunch' -Text $text) { $indicators += 'StealthLaunch' }
+        if ($match -and $match.Indicators) { $indicators += @($match.Indicators) }
         $evidence = [ordered]@{
             'Consumer'        = $w.Name
             'Consumer type'   = $w.ClassName
@@ -170,6 +202,7 @@ function Find-RacPersistenceFinding {
             'Trigger query'   = $w.FilterQuery
             'Matched because' = $reason
         }
+        if ($match) { Add-RacScriptEvidence -Evidence $evidence -Match $match }
         New-RacFinding -Category 'Persistence' -Breadcrumb 'WmiSubscription' `
             -Title ("WMI event subscription '{0}' runs {1}" -f $w.Name, $agentName) `
             -Agent $agentName -AgentId $agentId -Location ('root\subscription: ' + $w.Name) -User (Get-RacUserFromPath -Path $text) `
