@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.2 (unreleased)
+
+### Fixed
+
+- Intel's Local Management Service was reported as a Suspicious LM Studio (issue #2,
+  reported by a user in Italy). LM Studio's CLI and Intel's Management Engine service
+  are both named `lms.exe`; the service runs as SYSTEM and starts automatically, so the
+  mismatch crossed the Suspicious threshold. RAC now treats `lms.exe` as LM Studio only
+  when it runs from an LM Studio folder (`~/.lmstudio`, the older `.cache/lm-studio`, or
+  a portable `LM Studio` folder). Catalog 2026.11.25. Two new tests, using the path from
+  the reporter's scan (the Windows driver store) and Intel's older install folder:
+  Intel's service and process are not reported, and the real LM Studio CLI still is.
+
 ## 0.1.1 (2026-11-24)
 
 Fixes from the first runs on real Windows (Windows 11 25H2, build 26200, Windows

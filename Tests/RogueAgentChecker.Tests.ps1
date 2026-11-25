@@ -135,6 +135,24 @@ Describe 'Scripts that processes and autostarts run (added after the 0.1.1 live 
     }
 }
 
+Describe 'False positives reported by users' {
+    It 'does not file Intel''s Local Management Service (LMS.exe) under LM Studio (issue #2)' {
+        # LM Studio's CLI is also called lms.exe, but it lives in ~/.lmstudio/bin. Intel's
+        # Management Engine service of the same name runs as SYSTEM from Program Files,
+        # which made it look like a Suspicious LM Studio.
+        $intel = @($findings | Where-Object {
+                ((@($_.Title, $_.Location) + @($_.Evidence.Values)) -join ' ') -match 'Management Engine|DriverStore|PID 690[01]|Local Management Service'
+            })
+        $intel.Count | Should -Be 0
+    }
+
+    It 'still identifies the real LM Studio CLI in ~/.lmstudio/bin' {
+        $f = @(Get-RacTestFinding $scan -Breadcrumb 'AgentProcess' -AgentId 'lm-studio')
+        $f.Count | Should -Be 1
+        $f[0].Evidence['Process'] | Should -Be 'lms.exe (PID 6910)'
+    }
+}
+
 Describe 'Category 2 - network' {
     It 'flags a hidden SYSTEM PowerShell talking to the OpenAI API' {
         $f = @(Get-RacTestFinding $scan -Breadcrumb 'LlmConnection' -TitleLike 'powershell.exe*')

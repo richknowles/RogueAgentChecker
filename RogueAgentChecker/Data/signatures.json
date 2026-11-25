@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "catalogVersion": "2026.11.23",
+  "catalogVersion": "2026.11.25",
   "notes": [
     "Starter detection catalog for Rogue Agent Checker. Vendors move files around between releases: treat this as living content.",
     "Regex patterns are matched case-insensitively against NORMALIZED text: lowercase, backslashes converted to forward slashes.",
@@ -430,7 +430,7 @@
       "name": "LM Studio",
       "vendor": "Element Labs",
       "kind": "Local LLM runtime",
-      "processes": [ { "name": "lm studio.exe" }, { "name": "lms.exe" } ],
+      "processes": [ { "name": "lm studio.exe" }, { "name": "lms.exe", "path": "(\\.lmstudio|lm-studio|lm studio)/" } ],
       "commandLinePatterns": [],
       "keywords": [ "lm ?studio" ],
       "configPaths": [ "~/.lmstudio", "~/.cache/lm-studio" ],
