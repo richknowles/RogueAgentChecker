@@ -70,6 +70,9 @@ function Get-RacFakeSystem {
             New-FakeProcess 802 600 'powershell.exe' 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe' 'powershell.exe -NoProfile -WindowStyle Hidden -EncodedCommand SQBuAHYAbwBrAGUALQBSAGUAcwB0AE0AZQB0AGgAbwBkAA==' $now.AddMinutes(-40) 'NT AUTHORITY\SYSTEM'   # hidden SYSTEM PowerShell (see network)
             New-FakeProcess 6600 800 'powershell.exe' 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe' ('"powershell.exe" -NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -File "' + $e.RogueScript + '"') $now.AddMinutes(-70) 'CORP\bob'   # the live test's rogue: no open connection RAC can name, but its script calls OpenAI
             New-FakeProcess 6700 700 'python.exe' 'C:\Python312\python.exe' ('python.exe "' + $e.SdkScript + '" --once') $biz 'CORP\carol'   # visible script using the OpenAI SDK
+            New-FakeProcess 6900 600 'LMS.exe' 'C:\WINDOWS\System32\DriverStore\FileRepository\lms.inf_amd64_84c8651a9ebb25c9\LMS.exe' 'C:\WINDOWS\System32\DriverStore\FileRepository\lms.inf_amd64_84c8651a9ebb25c9\LMS.exe' $now.AddDays(-5) 'NT AUTHORITY\SYSTEM'   # Intel ME service from the driver store, as in issue #2
+            New-FakeProcess 6901 600 'LMS.exe' 'C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\LMS\LMS.exe' 'C:\Program Files (x86)\Intel\Intel(R) Management Engine Components\LMS\LMS.exe' $now.AddDays(-5) 'NT AUTHORITY\SYSTEM'   # the same service from its older install folder
+            New-FakeProcess 6910 801 'lms.exe' 'C:\Users\alice\.lmstudio\bin\lms.exe' '"C:\Users\alice\.lmstudio\bin\lms.exe" server start' $biz 'CORP\alice'   # the real LM Studio CLI
             New-FakeProcess 6800 801 'powershell.exe' 'C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe' ('powershell.exe -NoProfile -File "' + $e.PlainScript + '"') $biz 'CORP\alice'   # ordinary script: ignored
         )
 
@@ -140,6 +143,7 @@ function Get-RacFakeSystem {
         )
         ScheduledTaskRunInfo = [pscustomobject]@{ LastRunTime = $off1; NextRunTime = $now.AddDays(1); LastTaskResult = 0 }
         Services = @(
+            [pscustomobject]@{ Name = 'LMS'; DisplayName = 'Intel(R) Management and Security Application Local Management Service'; PathName = 'C:\WINDOWS\System32\DriverStore\FileRepository\lms.inf_amd64_84c8651a9ebb25c9\LMS.exe'; StartMode = 'Auto'; State = 'Running'; StartName = 'LocalSystem'; ProcessId = 6900 }   # issue #2: path from the reporter's scan
             [pscustomobject]@{ Name = 'Spooler'; DisplayName = 'Print Spooler'; PathName = 'C:\Windows\System32\spoolsv.exe'; StartMode = 'Auto'; State = 'Running'; StartName = 'LocalSystem'; ProcessId = 1500 }
             [pscustomobject]@{ Name = 'n8n'; DisplayName = 'n8n Automation'; PathName = '"C:\Program Files\nodejs\node.exe" "C:\agents\n8n\node_modules\n8n\bin\n8n" start'; StartMode = 'Auto'; State = 'Running'; StartName = 'LocalSystem'; ProcessId = 3100 }
         )
