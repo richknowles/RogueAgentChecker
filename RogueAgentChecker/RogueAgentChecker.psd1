@@ -1,6 +1,6 @@
 @{
     RootModule           = 'RogueAgentChecker.psm1'
-    ModuleVersion        = '0.1.1'
+    ModuleVersion        = '0.1.2'
     GUID                 = '25cbcaf5-706a-4e00-859f-61401161992e'
     Author               = 'Rich Knowles'
     CompanyName          = 'WieldAI'
@@ -23,7 +23,7 @@
             Tags         = @('Security', 'AI', 'Agents', 'MCP', 'Audit', 'Inventory', 'ShadowAI', 'ReadOnly', 'Windows')
             LicenseUri   = 'https://github.com/richknowles/RogueAgentChecker/blob/main/LICENSE'
             ProjectUri   = 'https://github.com/richknowles/RogueAgentChecker'
-            ReleaseNotes = '0.1.1: fixes from the first real-Windows run (standard-user scans now read your own registry hive; honest coverage for the DNS cache and Security log; RAC ignores its own tests; extension labels, including Claude in Chrome as its own entry; hidden-task scoring; RAC recognizes its own code by content; event logs that overwrote themselves are no longer reported as fully covered; RAC now looks inside the script or encoded command a process or autostart runs, so a hidden script calling an AI API is caught even after the DNS cache has forgotten the hostname). See CHANGELOG.md.'
+            ReleaseNotes = '0.1.2: Intel''s Local Management Service (LMS.exe) is no longer reported as LM Studio (issue #2). See CHANGELOG.md.'
         }
     }
 }

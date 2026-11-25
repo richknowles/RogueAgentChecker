@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.2 (unreleased)
+## 0.1.2 (2026-11-25)
 
 ### Fixed
 
@@ -12,6 +12,12 @@
   a portable `LM Studio` folder). Catalog 2026.11.25. Two new tests, using the path from
   the reporter's scan (the Windows driver store) and Intel's older install folder:
   Intel's service and process are not reported, and the real LM Studio CLI still is.
+
+### Tests
+
+- 135 tests. Off Windows, 126 of 135 pass (the 9 Windows-only tests skip).
+- Windows 11 25H2 VM, Windows PowerShell 5.1, release candidate 1 (zip hash checked):
+  135 of 135 passed in a normal window, 134 passed and 1 skipped in an admin window.
 
 ## 0.1.1 (2026-11-24)
 
